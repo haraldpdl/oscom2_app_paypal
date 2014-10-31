@@ -9,10 +9,11 @@ For earlier osCommerce Online Merchant installation versions, please review the 
 ## Legacy Changes
 
 1. Administration Tool Navigation Menu Box
-2. Administration Tool and Catalog Hooks
-3. Administration Tool Order Administration Page
+2. Default Shipping Rate Selection
+3. Administration Tool and Catalog Hooks
+4. Administration Tool Order Administration Page
 
-Only the changes in (1) are required to add the PayPal App links to the Administration Tool. Changes (2) and (3) are optional and are needed if transaction management is to be added to the Administration Tool Orders management page (this requires a new order management page which may overwrite installed Add-Ons).
+Only the changes in (1) and (2) are required to add the PayPal App links to the Administration Tool and to update the default shipping rate selection. Changes (3) and (4) are optional and are needed if transaction management is to be added to the Administration Tool Orders management page (this requires a new order management page which may overwrite installed Add-Ons).
 
 _The versions described below are inclusive of the version stated (eg, v2.3.3.2 affects all versions up to and including v2.3.3.2)._
 
@@ -34,7 +35,31 @@ to:
 
     catalog/admin/includes/boxes/paypal.php
 
-### 2. Administration Tool and Catalog Hooks
+### 2. Default Shipping Rate Selection
+
+**osCommerce Online Merchant up to v2.3.4 (5-June-2014)**
+
+Copy (and overwrite) the following file from:
+
+    docs/legacy/v234/includes/classes/shipping.php
+
+to:
+
+    catalog/includes/classes/shipping.php
+
+In the following file:
+
+    catalog/checkout_shipping.php
+
+replace the following (around line 156):
+
+    if ( !tep_session_is_registered('shipping') || ( tep_session_is_registered('shipping') && ($shipping == false) && (tep_count_shipping_modules() > 1) ) ) $shipping = $shipping_modules->cheapest();
+
+with:
+
+    if ( !tep_session_is_registered('shipping') || ( tep_session_is_registered('shipping') && ($shipping == false) && (tep_count_shipping_modules() > 1) ) ) $shipping = $shipping_modules->get_first();
+
+### 3. Administration Tool and Catalog Hooks
 
 **osCommerce Online Merchant up to v2.3.4 (5-June-2014)**
 
@@ -64,7 +89,7 @@ add to the bottom (before ?>):
     require(DIR_FS_CATALOG . 'includes/classes/hooks.php');
     $OSCOM_Hooks = new hooks('admin');
 
-### 3. Administration Tool Order Administration Page
+### 4. Administration Tool Order Administration Page
 
 **osCommerce Online Merchant up to v2.3.4 (5-June-2014)**
 
