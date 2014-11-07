@@ -8,15 +8,15 @@ For earlier osCommerce Online Merchant installation versions, please review the 
 
 ## Legacy Changes
 
-1. Administration Tool Navigation Menu Box
-2. Administration Tool and Catalog Hooks
+1. Administration Tool App Setup
+2. Hooks for the Administration Tool and Catalog
 3. Administration Tool Order Administration Page
 
 Only the changes in (1) are required to add the PayPal App links to the Administration Tool. Changes (2) and (3) are optional and are needed if transaction management is to be added to the Administration Tool Orders management page (this requires a new order management page which may overwrite installed Add-Ons).
 
 _The versions described below are inclusive of the version stated (eg, v2.3.3.2 affects all versions up to and including v2.3.3.2)._
 
-### 1. Administration Tool Navigation Menu Box
+### 1. Administration Tool App Setup
 
 **osCommerce Online Merchant up to v2.3.3.2 (5-Sept-2013)**
 
@@ -26,15 +26,19 @@ In catalog/admin/includes/column_left.php, add the following to the collection o
 
 **osCommerce Online Merchant up to v2.2 RC2a (30-Jan-2008)**
 
-Copy (and overwrite) the following file from:
+Copy (and overwrite) the following files from:
 
     docs/legacy/v22rc2a/admin/includes/boxes/paypal.php
+    docs/legacy/v22rc2a/admin/includes/template_top.php
+    docs/legacy/v22rc2a/admin/includes/template_bottom.php
 
 to:
 
     catalog/admin/includes/boxes/paypal.php
+    catalog/admin/includes/template_top.php
+    catalog/admin/includes/template_bottom.php
 
-### 2. Administration Tool and Catalog Hooks
+### 2. Hooks for the Administration Tool and Catalog
 
 **osCommerce Online Merchant up to v2.3.4 (5-June-2014)**
 
