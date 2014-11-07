@@ -21,7 +21,7 @@
   $contents = array();
 
   $heading[] = array('text'  => MODULES_ADMIN_MENU_PAYPAL_HEADING,
-                     'link'  => tep_href_link('paypal.php'));
+                     'link'  => tep_href_link('paypal.php', 'selected_box=paypal'));
 
   if ($selected_box == 'paypal') {
     $pp_menu = array();
