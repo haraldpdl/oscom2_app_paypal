@@ -93,10 +93,6 @@ In all catalog/admin/includes/languages/LANGUAGE/orders.php language files, add 
 
     define('ENTRY_ADD_COMMENT', 'Add Comment:');
 
-**osCommerce Online Merchant up to v2.2 RC2a (30-Jan-2008)**
-
-**-- PENDING --**
-
 ### 4. Public CA Certificate Bundle
 
 **osCommerce Online Merchant up to v2.3.3 (15-August-2012)**
