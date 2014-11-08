@@ -11,8 +11,9 @@ For earlier osCommerce Online Merchant installation versions, please review the 
 1. Administration Tool App Setup
 2. Hooks for the Administration Tool and Catalog
 3. Administration Tool Order Administration Page
+4. Public CA Certificate Bundle
 
-Only the changes in (1) are required to add the PayPal App links to the Administration Tool. Changes (2) and (3) are optional and are needed if transaction management is to be added to the Administration Tool Orders management page (this requires a new order management page which may overwrite installed Add-Ons).
+Only the changes in (1) are required to add the PayPal App links to the Administration Tool. Changes (2), (3), and (4) are optional and are needed if transaction management is to be added to the Administration Tool Orders management page (this requires a new order management page which may overwrite installed Add-Ons).
 
 _The versions described below are inclusive of the version stated (eg, v2.3.3.2 affects all versions up to and including v2.3.3.2)._
 
@@ -95,3 +96,15 @@ In all catalog/admin/includes/languages/LANGUAGE/orders.php language files, add 
 **osCommerce Online Merchant up to v2.2 RC2a (30-Jan-2008)**
 
 **-- PENDING --**
+
+### 4. Public CA Certificate Bundle
+
+**osCommerce Online Merchant up to v2.3.3 (15-August-2012)**
+
+Copy the following file from:
+
+    docs/legacy/v233/includes/cacert.pem
+
+to:
+
+    catalog/includes/cacert.pem
