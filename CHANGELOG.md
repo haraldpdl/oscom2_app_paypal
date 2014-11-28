@@ -2,13 +2,13 @@
 
 ## Changelog
 
-**v4.xxx xx-Nov-2014**
+**v4.027 28-Nov-2014**
 
-* Add support for Payments Standard Payment Data Transfer (PDT). If the Identity token has not been configured, use the API Credentials to retrieve the transaction information.
+* Add support for Payments Standard Payment Data Transfer (PDT). If the Identity Token has not been configured, use the API Credentials to retrieve the transaction information.
 
 * Add support for admin order transactions to Payments Standard and Hosted Solution.
 
-* Redirect to the order status history tab after an order transaction has been performed.
+* Redirect to the order status history tab after an admin order transaction has been performed.
 
 * Bug: Fix order total and transaction total comparison mismatch notification stored in the order status comment.
 
