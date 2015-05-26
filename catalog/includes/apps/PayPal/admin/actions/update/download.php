@@ -13,12 +13,12 @@
   $ppUpdateDownloadResult = array('rpcStatus' => -1);
 
   if ( isset($HTTP_GET_VARS['v']) && is_numeric($HTTP_GET_VARS['v']) && ($HTTP_GET_VARS['v'] > $OSCOM_PayPal->getVersion()) ) {
-    if ( $OSCOM_PayPal->isWritable(DIR_FS_CATALOG . 'includes/apps/paypal/work') ) {
-      if ( !file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/work') ) {
-        mkdir(DIR_FS_CATALOG . 'includes/apps/paypal/work', 0777, true);
+    if ( $OSCOM_PayPal->isWritable(DIR_FS_CATALOG . 'includes/apps/PayPal/work') ) {
+      if ( !file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/work') ) {
+        mkdir(DIR_FS_CATALOG . 'includes/apps/PayPal/work', 0777, true);
       }
 
-      $filepath = DIR_FS_CATALOG . 'includes/apps/paypal/work/update.zip';
+      $filepath = DIR_FS_CATALOG . 'includes/apps/PayPal/work/update.zip';
 
       if ( file_exists($filepath) && is_writable($filepath) ) {
         unlink($filepath);
@@ -34,7 +34,7 @@
         $ppUpdateDownloadResult['error'] = $OSCOM_PayPal->getDef('error_saving_download', array('filepath' => $OSCOM_PayPal->displayPath($filepath)));
       }
     } else {
-      $ppUpdateDownloadResult['error'] = $OSCOM_PayPal->getDef('error_download_directory_permissions', array('filepath' => $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/paypal/work')));
+      $ppUpdateDownloadResult['error'] = $OSCOM_PayPal->getDef('error_download_directory_permissions', array('filepath' => $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/PayPal/work')));
     }
   }
 

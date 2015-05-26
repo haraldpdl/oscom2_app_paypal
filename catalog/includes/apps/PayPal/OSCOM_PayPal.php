@@ -30,7 +30,7 @@
       if ( !isset($countries) ) {
         $countries = array();
 
-        foreach ( file(DIR_FS_CATALOG . 'includes/apps/paypal/req_api_countries.txt') as $c ) {
+        foreach ( file(DIR_FS_CATALOG . 'includes/apps/PayPal/req_api_countries.txt') as $c ) {
           $c = trim($c);
 
           if ( !empty($c) ) {
@@ -118,7 +118,7 @@
           if ( !class_exists($class) ) {
             $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
 
-            include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/' . $module . '.php');
+            include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
           }
 
           $m = new $class();
@@ -142,9 +142,9 @@
       if ( !isset($result) ) {
         $result = array();
 
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/paypal/modules/') ) {
+        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/') ) {
           while ( $file = $dir->read() ) {
-            if ( !in_array($file, array('.', '..')) && is_dir(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $file) && file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $file . '/' . $file . '.php') ) {
+            if ( !in_array($file, array('.', '..')) && is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $file) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $file . '/' . $file . '.php') ) {
               $sort_order = $this->getModuleInfo($file, 'sort_order');
 
               if ( is_numeric($sort_order) ) {
@@ -175,7 +175,7 @@
     }
 
     function isInstalled($module) {
-      if ( file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . basename($module) . '/' . basename($module) . '.php') ) {
+      if ( file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . basename($module) . '/' . basename($module) . '.php') ) {
         return defined('OSCOM_APP_PAYPAL_' . basename($module) . '_STATUS') && tep_not_null(constant('OSCOM_APP_PAYPAL_' . basename($module) . '_STATUS'));
       }
 
@@ -188,7 +188,7 @@
       if ( !class_exists($class) ) {
         $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
 
-        include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/' . $module . '.php');
+        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
       }
 
       $m = new $class();
@@ -288,17 +288,17 @@
       $result = array();
 
       if ( $module == 'G' ) {
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/paypal/cfg_params/') ) {
+        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/') ) {
           while ( $file = $dir->read() ) {
-            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/paypal/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
+            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
               $result[] = 'OSCOM_APP_PAYPAL_' . strtoupper(substr($file, 0, strrpos($file, '.')));
             }
           }
         }
       } else {
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/cfg_params/') ) {
+        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/') ) {
           while ( $file = $dir->read() ) {
-            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
+            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
               $result[] = 'OSCOM_APP_PAYPAL_' . $module . '_' . strtoupper(substr($file, 0, strrpos($file, '.')));
             }
           }
@@ -328,7 +328,7 @@
           if ( !class_exists($cfg_class) ) {
             $this->loadLanguageFile('cfg_params/' . $p . '.php');
 
-            include(DIR_FS_CATALOG . 'includes/apps/paypal/cfg_params/' . $p . '.php');
+            include(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/' . $p . '.php');
           }
         } else {
           $cfg_class = 'OSCOM_PayPal_' . $module . '_Cfg_' . $p;
@@ -336,7 +336,7 @@
           if ( !class_exists($cfg_class) ) {
             $this->loadLanguageFile('modules/' . $module . '/cfg_params/' . $p . '.php');
 
-            include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/cfg_params/' . $p . '.php');
+            include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $p . '.php');
           }
         }
 
@@ -382,7 +382,7 @@
         $function = 'OSCOM_PayPal_Api_' . $call;
 
         if ( !function_exists($function) ) {
-          include(DIR_FS_CATALOG . 'includes/apps/paypal/api/' . $call . '.php');
+          include(DIR_FS_CATALOG . 'includes/apps/PayPal/api/' . $call . '.php');
         }
       } else {
         if ( !isset($server) ) {
@@ -392,7 +392,7 @@
         $function = 'OSCOM_PayPal_' . $module . '_Api_' . $call;
 
         if ( !function_exists($function) ) {
-          include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/api/' . $call . '.php');
+          include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/api/' . $call . '.php');
         }
       }
 
@@ -629,7 +629,7 @@
 
     function getVersion() {
       if ( !isset($this->_version) ) {
-        $version = trim(file_get_contents(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt'));
+        $version = trim(file_get_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt'));
 
         if ( is_numeric($version) ) {
           $this->_version = $version;
@@ -705,7 +705,7 @@
         if ( !class_exists($cfg_class) ) {
           $this->loadLanguageFile('modules/' . $module . '/cfg_params/' . $p . '.php');
 
-          include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/cfg_params/' . $p . '.php');
+          include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $p . '.php');
         }
 
         $cfg = new $cfg_class();
@@ -718,7 +718,7 @@
       if ( !class_exists($m_class) ) {
         $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
 
-        include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/' . $module . '.php');
+        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
       }
 
       $m = new $m_class();
@@ -736,7 +736,7 @@
       if ( !class_exists($m_class) ) {
         $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
 
-        include(DIR_FS_CATALOG . 'includes/apps/paypal/modules/' . $module . '/' . $module . '.php');
+        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
       }
 
       $m = new $m_class();
@@ -747,8 +747,8 @@
     }
 
     function logUpdate($message, $version) {
-      if ( is_writable(DIR_FS_CATALOG . 'includes/apps/paypal/work') ) {
-        file_put_contents(DIR_FS_CATALOG . 'includes/apps/paypal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
+      if ( is_writable(DIR_FS_CATALOG . 'includes/apps/PayPal/work') ) {
+        file_put_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
       }
     }
 
@@ -761,7 +761,7 @@
         $this->loadLanguageFile($filename, 'english');
       }
 
-      $pathname = DIR_FS_CATALOG . 'includes/apps/paypal/languages/' . $lang . '/' . $filename;
+      $pathname = DIR_FS_CATALOG . 'includes/apps/PayPal/languages/' . $lang . '/' . $filename;
 
       if ( file_exists($pathname) ) {
         $contents = file($pathname);

@@ -34,7 +34,7 @@ EOD;
     tep_db_query($sql);
   }
 
-  require(DIR_FS_CATALOG . 'includes/apps/paypal/OSCOM_PayPal.php');
+  require(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
   $OSCOM_PayPal = new OSCOM_PayPal();
 
   $content = 'start.php';
@@ -43,7 +43,7 @@ EOD;
 
   $OSCOM_PayPal->loadLanguageFile('admin.php');
 
-  if ( isset($HTTP_GET_VARS['action']) && file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/admin/actions/' . basename($HTTP_GET_VARS['action']) . '.php') ) {
+  if ( isset($HTTP_GET_VARS['action']) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . basename($HTTP_GET_VARS['action']) . '.php') ) {
     $action = basename($HTTP_GET_VARS['action']);
   }
 
@@ -66,14 +66,14 @@ EOD;
     }
   }
 
-  include(DIR_FS_CATALOG . 'includes/apps/paypal/admin/actions/' . $action . '.php');
+  include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '.php');
 
-  if ( isset($HTTP_GET_VARS['subaction']) && file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/admin/actions/' . $action . '/' . basename($HTTP_GET_VARS['subaction']) . '.php') ) {
+  if ( isset($HTTP_GET_VARS['subaction']) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '/' . basename($HTTP_GET_VARS['subaction']) . '.php') ) {
     $subaction = basename($HTTP_GET_VARS['subaction']);
   }
 
   if ( !empty($subaction) ) {
-    include(DIR_FS_CATALOG . 'includes/apps/paypal/admin/actions/' . $action . '/' . $subaction . '.php');
+    include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '/' . $subaction . '.php');
   }
 
   include(DIR_WS_INCLUDES . 'template_top.php');
@@ -429,7 +429,7 @@ if ( !$.isFunction($.Deferred) ) {
 }
 </script>
 
-    <?php include(DIR_FS_CATALOG . 'includes/apps/paypal/admin/content/' . basename($content)); ?>
+    <?php include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/content/' . basename($content)); ?>
   </div>
 </div>
 

@@ -15,15 +15,15 @@
   if ( isset($HTTP_GET_VARS['v']) && is_numeric($HTTP_GET_VARS['v']) && ($HTTP_GET_VARS['v'] > $OSCOM_PayPal->getVersion()) ) {
     $update_version = basename($HTTP_GET_VARS['v']);
 
-    $update_zip = DIR_FS_CATALOG . 'includes/apps/paypal/work/update.zip';
+    $update_zip = DIR_FS_CATALOG . 'includes/apps/PayPal/work/update.zip';
 
 // reset the log
-    if ( file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/work/update_log-' . $update_version . '.php') && is_writable(DIR_FS_CATALOG . 'includes/apps/paypal/work/update_log-' . $update_version . '.php') ) {
-      unlink(DIR_FS_CATALOG . 'includes/apps/paypal/work/update_log-' . $update_version . '.php');
+    if ( file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $update_version . '.php') && is_writable(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $update_version . '.php') ) {
+      unlink(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $update_version . '.php');
     }
 
     if ( file_exists($update_zip) ) {
-      $work_dir = DIR_FS_CATALOG . 'includes/apps/paypal/work/update_contents';
+      $work_dir = DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_contents';
 
       if ( file_exists($work_dir) ) {
         $OSCOM_PayPal->rmdir($work_dir);
@@ -44,7 +44,7 @@
       $update_pkg = $work_dir . '/' . $update_version . '.zip';
 
       if ( file_exists($update_pkg) && file_exists($update_pkg . '.sig') ) {
-        $public = openssl_get_publickey(file_get_contents(DIR_FS_CATALOG . 'includes/apps/paypal/work/paypal.pubkey'));
+        $public = openssl_get_publickey(file_get_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/work/paypal.pubkey'));
 
         if ( openssl_verify(sha1_file($update_pkg), file_get_contents($update_pkg . '.sig'), $public) === 1 ) {
           mkdir($work_dir . '/' . $update_version);
@@ -81,8 +81,8 @@
           if ( $meta_pass === true ) {
             $errors = array();
 
-            if ( !$OSCOM_PayPal->isWritable(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt') ) {
-              $errors[] = $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt');
+            if ( !$OSCOM_PayPal->isWritable(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt') ) {
+              $errors[] = $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt');
             }
 
             $update_pkg_contents = $OSCOM_PayPal->getDirectoryContents($work_dir . '/' . $update_version);
@@ -155,10 +155,10 @@
               }
 
               if ( empty($errors) ) {
-                if ( file_put_contents(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt', $update_version) ) {
-                  $OSCOM_PayPal->logUpdate($OSCOM_PayPal->getDef('log_updated_file', array('filepath' => $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt'))), $update_version);
+                if ( file_put_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt', $update_version) ) {
+                  $OSCOM_PayPal->logUpdate($OSCOM_PayPal->getDef('log_updated_file', array('filepath' => $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt'))), $update_version);
                 } else {
-                  $errors[] = $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/paypal/version.txt');
+                  $errors[] = $OSCOM_PayPal->displayPath(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt');
                 }
               }
 

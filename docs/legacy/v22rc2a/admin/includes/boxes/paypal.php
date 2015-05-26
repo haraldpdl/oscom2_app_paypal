@@ -11,7 +11,7 @@
 */
 
   include(DIR_FS_ADMIN . 'includes/languages/' . $language . '/modules/boxes/paypal.php');
-  include(DIR_FS_CATALOG . 'includes/apps/paypal/admin/functions/boxes.php');
+  include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/functions/boxes.php');
 ?>
 <!-- paypal //-->
           <tr>

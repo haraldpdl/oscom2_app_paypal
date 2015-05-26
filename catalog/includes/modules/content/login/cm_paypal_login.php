@@ -11,7 +11,7 @@
 */
 
   if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/paypal/OSCOM_PayPal.php');
+    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
   }
 
   class cm_paypal_login {

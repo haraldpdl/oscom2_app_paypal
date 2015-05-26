@@ -13,7 +13,7 @@
   class hook_admin_orders_paypal {
     function listen_orderAction() {
       if ( !class_exists('paypal_hook_admin_orders_action') ) {
-        include(DIR_FS_CATALOG . 'includes/apps/paypal/hooks/admin/orders/action.php');
+        include(DIR_FS_CATALOG . 'includes/apps/PayPal/hooks/admin/orders/action.php');
       }
 
       $hook = new paypal_hook_admin_orders_action();
@@ -23,7 +23,7 @@
 
     function listen_orderTab() {
       if ( !class_exists('paypal_hook_admin_orders_tab') ) {
-        include(DIR_FS_CATALOG . 'includes/apps/paypal/hooks/admin/orders/tab.php');
+        include(DIR_FS_CATALOG . 'includes/apps/PayPal/hooks/admin/orders/tab.php');
       }
 
       $hook = new paypal_hook_admin_orders_tab();

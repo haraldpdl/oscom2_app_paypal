@@ -26,7 +26,7 @@
     function getSetField() {
       global $OSCOM_PayPal;
 
-      if ( !file_exists(DIR_FS_CATALOG . 'includes/apps/paypal/with_beta.txt') ) {
+      if ( !file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/with_beta.txt') ) {
         return false;
       }
 
