@@ -1,17 +1,76 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Menu;
 
-  Copyright (c) 2014 osCommerce
+if ( !class_exists('OSCOM_PayPal', false) ) {
+    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
+}
 
-  Released under the GNU General Public License
-*/
+class PayPal implements \OSC\OM\ModuleAdminMenuInterface
+{
+    public static function execute()
+    {
+        global $cl_box_groups, $OSCOM_PayPal;
 
-  include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/functions/boxes.php');
+        if ( !isset($OSCOM_PayPal) || !is_object($OSCOM_PayPal) || (isset($OSCOM_PayPal) && (get_class($OSCOM_PayPal) != 'OSCOM_PayPal')) ) {
+            $OSCOM_PayPal = new \OSCOM_PayPal();
+        }
 
-  $cl_box_groups[] = array('heading' => MODULES_ADMIN_MENU_PAYPAL_HEADING,
-                           'apps' => app_paypal_get_admin_box_links());
-?>
+        $OSCOM_PayPal->loadLanguageFile('admin/modules/boxes/paypal.php');
+
+        $paypal_menu = [
+            [
+                'code' => 'paypal.php',
+                'title' => $OSCOM_PayPal->getDef('module_admin_menu_start'),
+                'link' => tep_href_link('paypal.php')
+            ]
+        ];
+
+        $paypal_menu_check = [
+            'OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL',
+            'OSCOM_APP_PAYPAL_LIVE_API_USERNAME',
+            'OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL',
+            'OSCOM_APP_PAYPAL_SANDBOX_API_USERNAME',
+            'OSCOM_APP_PAYPAL_PF_LIVE_VENDOR',
+            'OSCOM_APP_PAYPAL_PF_SANDBOX_VENDOR'
+        ];
+
+        foreach ($paypal_menu_check as $value) {
+            if (defined($value) && !empty(constant($value))) {
+                $paypal_menu = [
+                    [
+                        'code' => 'paypal.php',
+                        'title' => MODULES_ADMIN_MENU_PAYPAL_BALANCE,
+                        'link' => tep_href_link('paypal.php', 'action=balance')
+                    ],
+                    [
+                        'code' => 'paypal.php',
+                        'title' => MODULES_ADMIN_MENU_PAYPAL_CONFIGURE,
+                        'link' => tep_href_link('paypal.php', 'action=configure')
+                    ],
+                    [
+                        'code' => 'paypal.php',
+                        'title' => MODULES_ADMIN_MENU_PAYPAL_MANAGE_CREDENTIALS,
+                        'link' => tep_href_link('paypal.php', 'action=credentials')
+                    ],
+                    [
+                        'code' => 'paypal.php',
+                        'title' => MODULES_ADMIN_MENU_PAYPAL_LOG,
+                        'link' => tep_href_link('paypal.php', 'action=log')
+                    ]
+                ];
+
+                break;
+            }
+        }
+
+        $cl_box_groups[] = array('heading' => $OSCOM_PayPal->getDef('module_admin_menu_title'),
+                                 'apps' => $paypal_menu);
+    }
+}
