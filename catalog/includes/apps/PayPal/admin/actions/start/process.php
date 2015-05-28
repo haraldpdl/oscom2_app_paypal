@@ -11,7 +11,7 @@
 */
 
   if ( isset($HTTP_GET_VARS['type']) && in_array($HTTP_GET_VARS['type'], array('live', 'sandbox')) ) {
-    $params = array('return_url' => tep_href_link('paypal.php', 'action=start&subaction=retrieve', 'SSL'),
+    $params = array('return_url' => tep_href_link('apps.php', 'PayPal&action=start&subaction=retrieve', 'SSL'),
                     'type' => $HTTP_GET_VARS['type']);
 
     $result_string = $OSCOM_PayPal->makeApiCall('https://ssl.oscommerce.com/index.php?RPC&Website&Index&PayPalStart', $params);

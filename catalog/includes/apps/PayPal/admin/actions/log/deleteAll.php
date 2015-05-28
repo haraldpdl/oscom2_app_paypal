@@ -14,5 +14,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
 
-  tep_redirect(tep_href_link('paypal.php', 'action=log'));
+  tep_redirect(tep_href_link('apps.php', 'PayPal&action=log'));
 ?>

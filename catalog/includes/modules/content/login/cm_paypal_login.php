@@ -35,7 +35,7 @@
       $this->group = basename(dirname(__FILE__));
 
       $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), tep_href_link('paypal.php', 'action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), tep_href_link('apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
         $this->sort_order = OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER;
@@ -301,11 +301,11 @@
     }
 
     function install() {
-      tep_redirect(tep_href_link('paypal.php', 'action=configure&subaction=install&module=LOGIN'));
+      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN'));
     }
 
     function remove() {
-      tep_redirect(tep_href_link('paypal.php', 'action=configure&subaction=uninstall&module=LOGIN'));
+      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN'));
     }
 
     function keys() {

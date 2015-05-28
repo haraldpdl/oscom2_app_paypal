@@ -53,7 +53,7 @@
       <td><?php echo long2ip($log['ip_address']); ?></td>
       <td><?php echo (!empty($customers_name)) ? tep_output_string_protected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
       <td><?php echo date(PHP_DATE_TIME_FORMAT, $log['date_added']); ?></td>
-      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), tep_href_link('paypal.php', 'action=log&page=' . $HTTP_GET_VARS['page'] . '&lID=' . $log['id'] . '&subaction=view'), 'info'); ?></small></td>
+      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), tep_href_link('apps.php', 'PayPal&action=log&page=' . $HTTP_GET_VARS['page'] . '&lID=' . $log['id'] . '&subaction=view'), 'info'); ?></small></td>
     </tr>
 
 <?php
@@ -92,7 +92,7 @@ $(function() {
     modal: true,
     buttons: {
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_delete')); ?>": function() {
-        window.location = '<?php echo tep_href_link('paypal.php', 'action=log&subaction=deleteAll'); ?>';
+        window.location = '<?php echo tep_href_link('apps.php', 'PayPal&action=log&subaction=deleteAll'); ?>';
       },
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_cancel')); ?>": function() {
         $( this ).dialog('close');

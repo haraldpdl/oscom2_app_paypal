@@ -14,5 +14,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_uninstall_success'), 'success');
 
-  tep_redirect(tep_href_link('paypal.php', 'action=configure&module=' . $current_module));
+  tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&module=' . $current_module));
 ?>

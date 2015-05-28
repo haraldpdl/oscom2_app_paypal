@@ -26,9 +26,9 @@ class PayPal implements \OSC\OM\ModuleAdminMenuInterface
 
         $paypal_menu = [
             [
-                'code' => 'paypal.php',
+                'code' => 'apps.php',
                 'title' => $OSCOM_PayPal->getDef('module_admin_menu_start'),
-                'link' => tep_href_link('paypal.php')
+                'link' => tep_href_link('apps.php', 'PayPal')
             ]
         ];
 
@@ -45,24 +45,24 @@ class PayPal implements \OSC\OM\ModuleAdminMenuInterface
             if (defined($value) && !empty(constant($value))) {
                 $paypal_menu = [
                     [
-                        'code' => 'paypal.php',
+                        'code' => 'apps.php',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_BALANCE,
-                        'link' => tep_href_link('paypal.php', 'action=balance')
+                        'link' => tep_href_link('apps.php', 'PayPal&action=balance')
                     ],
                     [
-                        'code' => 'paypal.php',
+                        'code' => 'apps.php',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_CONFIGURE,
-                        'link' => tep_href_link('paypal.php', 'action=configure')
+                        'link' => tep_href_link('apps.php', 'PayPal&action=configure')
                     ],
                     [
-                        'code' => 'paypal.php',
+                        'code' => 'apps.php',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_MANAGE_CREDENTIALS,
-                        'link' => tep_href_link('paypal.php', 'action=credentials')
+                        'link' => tep_href_link('apps.php', 'PayPal&action=credentials')
                     ],
                     [
-                        'code' => 'paypal.php',
+                        'code' => 'apps.php',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_LOG,
-                        'link' => tep_href_link('paypal.php', 'action=log')
+                        'link' => tep_href_link('apps.php', 'PayPal&action=log')
                     ]
                 ];
 

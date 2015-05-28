@@ -45,7 +45,7 @@
 
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_success'), 'success');
 
-      tep_redirect(tep_href_link('paypal.php', 'action=credentials'));
+      tep_redirect(tep_href_link('apps.php', 'PayPal&action=credentials'));
     } else {
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_retrieve_error'), 'error');
     }

@@ -40,5 +40,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_credentials_saved_success'), 'success');
 
-  tep_redirect(tep_href_link('paypal.php', 'action=credentials&module=' . $current_module));
+  tep_redirect(tep_href_link('apps.php', 'PayPal&action=credentials&module=' . $current_module));
 ?>

@@ -16,12 +16,12 @@
 <?php
   foreach ( $OSCOM_PayPal->getModules() as $m ) {
     if ( $OSCOM_PayPal->isInstalled($m) ) {
-      echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getModuleInfo($m, 'short_title'), tep_href_link('paypal.php', 'action=configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
+      echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getModuleInfo($m, 'short_title'), tep_href_link('apps.php', 'PayPal&action=configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
     }
   }
 ?>
 
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_general'), tep_href_link('paypal.php', 'action=configure&module=G'), 'info', 'data-module="G"'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_general'), tep_href_link('apps.php', 'PayPal&action=configure&module=G'), 'info', 'data-module="G"'); ?>
   <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_more'), '#', 'info', 'data-module="appPayPalToolbarMoreButton"'); ?>
 </div>
 
@@ -30,7 +30,7 @@
 <?php
   foreach ( $OSCOM_PayPal->getModules() as $m ) {
     if ( !$OSCOM_PayPal->isInstalled($m) ) {
-      echo '<li><a href="' . tep_href_link('paypal.php', 'action=configure&module=' . $m) . '">' . $OSCOM_PayPal->getModuleInfo($m, 'title') . '</a></li>';
+      echo '<li><a href="' . tep_href_link('apps.php', 'PayPal&action=configure&module=' . $m) . '">' . $OSCOM_PayPal->getModuleInfo($m, 'title') . '</a></li>';
     }
   }
 ?>
@@ -77,7 +77,7 @@ $(function() {
     }
 ?>
 
-<form name="paypalConfigure" action="<?php echo tep_href_link('paypal.php', 'action=configure&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
+<form name="paypalConfigure" action="<?php echo tep_href_link('apps.php', 'PayPal&action=configure&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
 
 <h3 class="pp-panel-header-info"><?php echo $current_module_title; ?></h3>
 <div class="pp-panel pp-panel-info" style="padding-bottom: 15px;">
@@ -120,7 +120,7 @@ $(function() {
     modal: true,
     buttons: {
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_uninstall')); ?>": function() {
-        window.location = '<?php echo tep_href_link('paypal.php', 'action=configure&subaction=uninstall&module=' . $current_module); ?>';
+        window.location = '<?php echo tep_href_link('apps.php', 'PayPal&action=configure&subaction=uninstall&module=' . $current_module); ?>';
       },
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_cancel')); ?>": function() {
         $(this).dialog('close');
@@ -147,7 +147,7 @@ $(function() {
 </div>
 
 <p>
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_install_title', array('title' => $OSCOM_PayPal->getModuleInfo($current_module, 'title'))), tep_href_link('paypal.php', 'action=configure&subaction=install&module=' . $current_module), 'success'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_install_title', array('title' => $OSCOM_PayPal->getModuleInfo($current_module, 'title'))), tep_href_link('apps.php', 'PayPal&action=configure&subaction=install&module=' . $current_module), 'success'); ?>
 </p>
 
 <?php
