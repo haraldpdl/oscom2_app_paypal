@@ -10,8 +10,6 @@
   Released under the GNU General Public License
 */
 
-  require('includes/application_top.php');
-
   if ( tep_db_num_rows(tep_db_query("show tables like 'oscom_app_paypal_log'")) != 1 ) {
     $sql = <<<EOD
 CREATE TABLE oscom_app_paypal_log (
@@ -457,5 +455,4 @@ $(function() {
 
 <?php
   include(DIR_WS_INCLUDES . 'template_bottom.php');
-  require(DIR_WS_INCLUDES . 'application_bottom.php');
 ?>
