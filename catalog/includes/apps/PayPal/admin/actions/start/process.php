@@ -10,9 +10,9 @@
   Released under the GNU General Public License
 */
 
-  if ( isset($HTTP_GET_VARS['type']) && in_array($HTTP_GET_VARS['type'], array('live', 'sandbox')) ) {
+  if ( isset($_GET['type']) && in_array($_GET['type'], array('live', 'sandbox')) ) {
     $params = array('return_url' => tep_href_link('apps.php', 'PayPal&action=start&subaction=retrieve', 'SSL'),
-                    'type' => $HTTP_GET_VARS['type']);
+                    'type' => $_GET['type']);
 
     $result_string = $OSCOM_PayPal->makeApiCall('https://ssl.oscommerce.com/index.php?RPC&Website&Index&PayPalStart', $params);
     $result = array();

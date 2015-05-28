@@ -228,7 +228,7 @@ EOD;
     }
 
     function before_process_paypal() {
-      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $HTTP_POST_VARS, $comments;
+      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $comments;
 
       if ( !tep_session_is_registered('appPayPalEcResult') ) {
         tep_redirect(tep_href_link('ext/modules/payment/paypal/express.php', '', 'SSL'));
@@ -243,8 +243,8 @@ EOD;
       }
 
       if (empty($comments)) {
-        if (isset($HTTP_POST_VARS['ppecomments']) && tep_not_null($HTTP_POST_VARS['ppecomments'])) {
-          $comments = tep_db_prepare_input($HTTP_POST_VARS['ppecomments']);
+        if (isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments'])) {
+          $comments = tep_db_prepare_input($_POST['ppecomments']);
 
           $order->info['comments'] = $comments;
         }
@@ -284,7 +284,7 @@ EOD;
     }
 
     function before_process_payflow() {
-      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $HTTP_POST_VARS, $comments;
+      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $comments;
 
       if ( !tep_session_is_registered('appPayPalEcResult') ) {
         tep_redirect(tep_href_link('ext/modules/payment/paypal/express.php', '', 'SSL'));
@@ -299,8 +299,8 @@ EOD;
       }
 
       if ( empty($comments) ) {
-        if ( isset($HTTP_POST_VARS['ppecomments']) && tep_not_null($HTTP_POST_VARS['ppecomments']) ) {
-          $comments = tep_db_prepare_input($HTTP_POST_VARS['ppecomments']);
+        if ( isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments']) ) {
+          $comments = tep_db_prepare_input($_POST['ppecomments']);
 
           $order->info['comments'] = $comments;
         }

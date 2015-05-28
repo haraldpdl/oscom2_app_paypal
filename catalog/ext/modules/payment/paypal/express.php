@@ -60,7 +60,7 @@
   if (!tep_session_is_registered('cartID')) tep_session_register('cartID');
   $cartID = $cart->cartID;
 
-  switch ($HTTP_GET_VARS['osC_Action']) {
+  switch ($_GET['osC_Action']) {
     case 'cancel':
       tep_session_unregister('appPayPalEcResult');
       tep_session_unregister('appPayPalEcSecret');
@@ -82,18 +82,18 @@
 
         $counter = 0;
 
-        if (isset($HTTP_POST_VARS['CURRENCYCODE']) && $currencies->is_set($HTTP_POST_VARS['CURRENCYCODE']) && ($currency != $HTTP_POST_VARS['CURRENCYCODE'])) {
-          $currency = $HTTP_POST_VARS['CURRENCYCODE'];
+        if (isset($_POST['CURRENCYCODE']) && $currencies->is_set($_POST['CURRENCYCODE']) && ($currency != $_POST['CURRENCYCODE'])) {
+          $currency = $_POST['CURRENCYCODE'];
 
-          $log_sane['CURRENCYCODE'] = $HTTP_POST_VARS['CURRENCYCODE'];
+          $log_sane['CURRENCYCODE'] = $_POST['CURRENCYCODE'];
         }
 
         while (true) {
-          if ( isset($HTTP_POST_VARS['L_NUMBER' . $counter]) && isset($HTTP_POST_VARS['L_QTY' . $counter]) ) {
-            $cart->add_cart($HTTP_POST_VARS['L_NUMBER' . $counter], $HTTP_POST_VARS['L_QTY' . $counter]);
+          if ( isset($_POST['L_NUMBER' . $counter]) && isset($_POST['L_QTY' . $counter]) ) {
+            $cart->add_cart($_POST['L_NUMBER' . $counter], $_POST['L_QTY' . $counter]);
 
-            $log_sane['L_NUMBER' . $counter] = $HTTP_POST_VARS['L_NUMBER' . $counter];
-            $log_sane['L_QTY' . $counter] = $HTTP_POST_VARS['L_QTY' . $counter];
+            $log_sane['L_NUMBER' . $counter] = $_POST['L_NUMBER' . $counter];
+            $log_sane['L_QTY' . $counter] = $_POST['L_QTY' . $counter];
           } else {
             break;
           }
@@ -109,23 +109,23 @@
         $sendto = array('firstname' => '',
                         'lastname' => '',
                         'company' => '',
-                        'street_address' => $HTTP_POST_VARS['SHIPTOSTREET'],
+                        'street_address' => $_POST['SHIPTOSTREET'],
                         'suburb' => '',
-                        'postcode' => $HTTP_POST_VARS['SHIPTOZIP'],
-                        'city' => $HTTP_POST_VARS['SHIPTOCITY'],
+                        'postcode' => $_POST['SHIPTOZIP'],
+                        'city' => $_POST['SHIPTOCITY'],
                         'zone_id' => '',
-                        'zone_name' => $HTTP_POST_VARS['SHIPTOSTATE'],
+                        'zone_name' => $_POST['SHIPTOSTATE'],
                         'country_id' => '',
-                        'country_name' => $HTTP_POST_VARS['SHIPTOCOUNTRY'],
+                        'country_name' => $_POST['SHIPTOCOUNTRY'],
                         'country_iso_code_2' => '',
                         'country_iso_code_3' => '',
                         'address_format_id' => '');
 
-        $log_sane['SHIPTOSTREET'] = $HTTP_POST_VARS['SHIPTOSTREET'];
-        $log_sane['SHIPTOZIP'] = $HTTP_POST_VARS['SHIPTOZIP'];
-        $log_sane['SHIPTOCITY'] = $HTTP_POST_VARS['SHIPTOCITY'];
-        $log_sane['SHIPTOSTATE'] = $HTTP_POST_VARS['SHIPTOSTATE'];
-        $log_sane['SHIPTOCOUNTRY'] = $HTTP_POST_VARS['SHIPTOCOUNTRY'];
+        $log_sane['SHIPTOSTREET'] = $_POST['SHIPTOSTREET'];
+        $log_sane['SHIPTOZIP'] = $_POST['SHIPTOZIP'];
+        $log_sane['SHIPTOCITY'] = $_POST['SHIPTOCITY'];
+        $log_sane['SHIPTOSTATE'] = $_POST['SHIPTOSTATE'];
+        $log_sane['SHIPTOCOUNTRY'] = $_POST['SHIPTOCOUNTRY'];
 
         $country_query = tep_db_query("select * from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" . tep_db_input($sendto['country_name']) . "' limit 1");
         if (tep_db_num_rows($country_query)) {
@@ -288,17 +288,17 @@
 
       break;
     case 'retrieve':
-      if ( ($cart->count_contents() < 1) || !isset($HTTP_GET_VARS['token']) || empty($HTTP_GET_VARS['token']) || !tep_session_is_registered('appPayPalEcSecret') ) {
+      if ( ($cart->count_contents() < 1) || !isset($_GET['token']) || empty($_GET['token']) || !tep_session_is_registered('appPayPalEcSecret') ) {
         tep_redirect(tep_href_link(FILENAME_SHOPPING_CART, '', 'SSL'));
       }
 
-      if ( !tep_session_is_registered('appPayPalEcResult') || ($appPayPalEcResult['TOKEN'] != $HTTP_GET_VARS['token']) ) {
+      if ( !tep_session_is_registered('appPayPalEcResult') || ($appPayPalEcResult['TOKEN'] != $_GET['token']) ) {
         tep_session_register('appPayPalEcResult');
 
         if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
-          $appPayPalEcResult = $paypal_express->_app->getApiResult('EC', 'GetExpressCheckoutDetails', array('TOKEN' => $HTTP_GET_VARS['token']));
+          $appPayPalEcResult = $paypal_express->_app->getApiResult('EC', 'GetExpressCheckoutDetails', array('TOKEN' => $_GET['token']));
         } else { // Payflow
-          $appPayPalEcResult = $paypal_express->_app->getApiResult('EC', 'PayflowGetExpressCheckoutDetails', array('TOKEN' => $HTTP_GET_VARS['token']));
+          $appPayPalEcResult = $paypal_express->_app->getApiResult('EC', 'PayflowGetExpressCheckoutDetails', array('TOKEN' => $_GET['token']));
         }
       }
 
