@@ -17,9 +17,9 @@
     exit;
   }
 
-  require(DIR_WS_LANGUAGES . $language . '/' . FILENAME_CHECKOUT_PROCESS);
+  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/' . FILENAME_CHECKOUT_PROCESS);
 
-  require(DIR_WS_LANGUAGES . $language . '/modules/payment/paypal_standard.php');
+  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_standard.php');
   require('includes/modules/payment/paypal_standard.php');
 
   $paypal_standard = new paypal_standard();

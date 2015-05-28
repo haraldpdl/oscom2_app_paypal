@@ -753,9 +753,7 @@
     }
 
     public function loadLanguageFile($filename, $lang = null) {
-      global $language;
-
-      $lang = isset($lang) ? basename($lang) : basename($language);
+      $lang = isset($lang) ? basename($lang) : basename($_SESSION['language']);
 
       if ( $lang != 'english' ) {
         $this->loadLanguageFile($filename, 'english');
