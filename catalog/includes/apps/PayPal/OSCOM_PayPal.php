@@ -277,11 +277,11 @@
     }
 
     function getApiCredentials($server, $type) {
-      if ( $server == 'live' ) {
+      if ( ($server == 'live') && defined('OSCOM_APP_PAYPAL_LIVE_API_' . strtoupper($type)) ) {
         return constant('OSCOM_APP_PAYPAL_LIVE_API_' . strtoupper($type));
+      } elseif ( defined('OSCOM_APP_PAYPAL_SANDBOX_API_' . strtoupper($type)) ) {
+        return constant('OSCOM_APP_PAYPAL_SANDBOX_API_' . strtoupper($type));
       }
-
-      return constant('OSCOM_APP_PAYPAL_SANDBOX_API_' . strtoupper($type));
     }
 
     function getParameters($module) {
