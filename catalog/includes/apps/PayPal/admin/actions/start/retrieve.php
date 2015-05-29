@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   $params = array('merchant_id' => OSCOM_APP_PAYPAL_START_MERCHANT_ID,
                   'secret' => OSCOM_APP_PAYPAL_START_SECRET);
 
@@ -45,7 +47,7 @@
 
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_success'), 'success');
 
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=credentials'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=credentials');
     } else {
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_retrieve_error'), 'error');
     }

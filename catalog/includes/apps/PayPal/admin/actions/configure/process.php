@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   if ( $current_module == 'G' ) {
     $cut = 'OSCOM_APP_PAYPAL_';
   } else {
@@ -28,5 +30,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_cfg_saved_success'), 'success');
 
-  tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&module=' . $current_module));
+  OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&module=' . $current_module);
 ?>

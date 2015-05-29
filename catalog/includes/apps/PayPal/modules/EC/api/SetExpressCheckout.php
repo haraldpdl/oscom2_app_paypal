@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   function OSCOM_PayPal_EC_Api_SetExpressCheckout($OSCOM_PayPal, $server, $extra_params) {
     if ( $server == 'live' ) {
       $api_url = 'https://api-3t.paypal.com/nvp';
@@ -20,8 +22,8 @@
     $params = array('VERSION' => $OSCOM_PayPal->getApiVersion(),
                     'METHOD' => 'SetExpressCheckout',
                     'PAYMENTREQUEST_0_PAYMENTACTION' => ((OSCOM_APP_PAYPAL_EC_TRANSACTION_METHOD == '1') || !$OSCOM_PayPal->hasCredentials('EC') ? 'Sale' : 'Authorization'),
-                    'RETURNURL' => tep_href_link('ext/modules/payment/paypal/express.php', 'osC_Action=retrieve', 'SSL'),
-                    'CANCELURL' => tep_href_link('ext/modules/payment/paypal/express.php', 'osC_Action=cancel', 'SSL'),
+                    'RETURNURL' => OSCOM::link('ext/modules/payment/paypal/express.php', 'osC_Action=retrieve', 'SSL'),
+                    'CANCELURL' => OSCOM::link('ext/modules/payment/paypal/express.php', 'osC_Action=cancel', 'SSL'),
                     'BRANDNAME' => STORE_NAME,
                     'SOLUTIONTYPE' => (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1') ? 'Sole' : 'Mark');
 

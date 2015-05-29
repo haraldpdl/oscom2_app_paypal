@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   if ( !class_exists('OSCOM_PayPal') ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
   }
@@ -29,7 +31,7 @@
       $this->code = 'paypal_pro_dp';
       $this->title = $this->_app->getDef('module_dp_title');
       $this->public_title = $this->_app->getDef('module_dp_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_dp_legacy_admin_app_button'), tep_href_link('apps.php', 'PayPal&action=configure&module=DP'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_dp_legacy_admin_app_button'), OSCOM::link('admin/apps.php', 'PayPal&action=configure&module=DP'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_DP_SORT_ORDER') ? OSCOM_APP_PAYPAL_DP_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_DP_STATUS') && in_array(OSCOM_APP_PAYPAL_DP_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID : 0;
@@ -274,10 +276,10 @@
         $response_array = $this->_app->getApiResult('DP', 'DoDirectPayment', $params);
 
         if ( !in_array($response_array['ACK'], array('Success', 'SuccessWithWarning')) ) {
-          tep_redirect(tep_href_link(FILENAME_SHOPPING_CART, 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL'));
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');
         }
       } else {
-        tep_redirect(tep_href_link(FILENAME_CHECKOUT_CONFIRMATION, 'error_message=' . $this->_app->getDef('module_dp_error_all_fields_required'), 'SSL'));
+        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->_app->getDef('module_dp_error_all_fields_required'), 'SSL');
       }
     }
 
@@ -375,10 +377,10 @@
               break;
           }
 
-          tep_redirect(tep_href_link(FILENAME_CHECKOUT_CONFIRMATION, 'error_message=' . $error_message, 'SSL'));
+          OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $error_message, 'SSL');
         }
       } else {
-        tep_redirect(tep_href_link(FILENAME_CHECKOUT_CONFIRMATION, 'error_message=' . $this->_app->getDef('module_dp_error_all_fields_required'), 'SSL'));
+        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->_app->getDef('module_dp_error_all_fields_required'), 'SSL');
       }
     }
 
@@ -526,11 +528,11 @@
     }
 
     function install() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=install&module=DP'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=install&module=DP');
     }
 
     function remove() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=uninstall&module=DP'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=uninstall&module=DP');
     }
 
     function keys() {

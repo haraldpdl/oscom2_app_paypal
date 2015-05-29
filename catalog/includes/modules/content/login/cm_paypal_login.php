@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   if ( !class_exists('OSCOM_PayPal') ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
   }
@@ -35,7 +37,7 @@
       $this->group = basename(dirname(__FILE__));
 
       $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), tep_href_link('apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('admin/apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
         $this->sort_order = OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER;
@@ -99,13 +101,13 @@
     function preLogin() {
       global $paypal_login_access_token, $paypal_login_customer_id, $sendto, $billto;
 
-      $return_url = tep_href_link(FILENAME_LOGIN, '', 'SSL');
+      $return_url = OSCOM::link('login.php', '', 'SSL');
 
       if ( isset($_GET['code']) ) {
         $paypal_login_customer_id = false;
 
         $params = array('code' => $_GET['code'],
-                        'redirect_uri' => str_replace('&amp;', '&', tep_href_link(FILENAME_LOGIN, 'action=paypal_login', 'SSL')));
+                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('login.php', 'action=paypal_login', 'SSL')));
 
         $response_token = $this->_app->getApiResult('LOGIN', 'GrantToken', $params);
 
@@ -251,7 +253,7 @@
               tep_session_register('billto');
             }
 
-            $return_url = tep_href_link(FILENAME_LOGIN, 'action=paypal_login_process', 'SSL');
+            $return_url = OSCOM::link('login.php', 'action=paypal_login_process', 'SSL');
           }
         }
       }
@@ -301,11 +303,11 @@
     }
 
     function install() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN');
     }
 
     function remove() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN');
     }
 
     function keys() {

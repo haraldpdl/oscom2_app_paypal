@@ -10,9 +10,11 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   $OSCOM_PayPal->install($current_module);
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
 
-  tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&module=' . $current_module));
+  OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&module=' . $current_module);
 ?>

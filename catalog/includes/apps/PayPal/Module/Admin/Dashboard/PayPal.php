@@ -8,6 +8,8 @@
 
 namespace OSC\OM\Apps\PayPal\Module\Admin\Dashboard;
 
+use OSC\OM\OSCOM;
+
 if ( !class_exists('OSCOM_PayPal', false) ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
 }
@@ -34,14 +36,14 @@ class PayPal extends \OSC\OM\ModuleAdminDashboardAbstract
       $can_apply_online_updates = class_exists('ZipArchive') && function_exists('json_encode') && function_exists('openssl_verify') ? 'true' : 'false';
       $has_live_account = ($this->_app->hasApiCredentials('live') === true) ? 'true' : 'false';
       $has_sandbox_account = ($this->_app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
-      $version_check_url = tep_href_link('apps.php', 'PayPal&action=checkVersion');
-      $new_update_notice = $this->_app->getDef('update_available_body', array('button_view_update' => $this->_app->drawButton($this->_app->getDef('button_view_update'), tep_href_link('apps.php', 'PayPal&action=update'), 'success', null, true)));
+      $version_check_url = OSCOM::link('admin/apps.php', 'PayPal&action=checkVersion');
+      $new_update_notice = $this->_app->getDef('update_available_body', array('button_view_update' => $this->_app->drawButton($this->_app->getDef('button_view_update'), OSCOM::link('admin/apps.php', 'PayPal&action=update'), 'success', null, true)));
       $heading_live_account = $this->_app->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $this->_app->getApiCredentials('live', 'username'))));
       $heading_sandbox_account = $this->_app->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $this->_app->getApiCredentials('sandbox', 'username'))));
       $receiving_balance_progress = $this->_app->getDef('retrieving_balance_progress');
-      $app_get_started = $this->_app->drawButton($this->_app->getDef('button_app_get_started'), tep_href_link('apps.php', 'PayPal'), 'warning', null, true);
+      $app_get_started = $this->_app->drawButton($this->_app->getDef('button_app_get_started'), OSCOM::link('admin/apps.php', 'PayPal'), 'warning', null, true);
       $error_balance_retrieval = addslashes($this->_app->getDef('error_balance_retrieval'));
-      $get_balance_url = tep_href_link('apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE');
+      $get_balance_url = OSCOM::link('admin/apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE');
 
       $output = <<<EOD
 <style>

@@ -9,6 +9,8 @@
 
   Released under the GNU General Public License
 */
+
+  use OSC\OM\OSCOM;
 ?>
 
 <div id="ppAccountBalanceLive">
@@ -39,7 +41,7 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
 
   var divId = 'ppBalance' + type.charAt(0).toUpperCase() + type.slice(1) + 'Info';
 
-  $.get('<?php echo tep_href_link('apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE'); ?>'.replace('PPTYPE', type), function (data) {
+  $.get('<?php echo OSCOM::link('admin/apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE'); ?>'.replace('PPTYPE', type), function (data) {
     var balance = {};
 
     $('#' + divId).empty();

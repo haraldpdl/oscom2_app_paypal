@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   $data = array();
 
   if ( $current_module == 'PP' ) {
@@ -40,5 +42,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_credentials_saved_success'), 'success');
 
-  tep_redirect(tep_href_link('apps.php', 'PayPal&action=credentials&module=' . $current_module));
+  OSCOM::redirect('admin/apps.php', 'PayPal&action=credentials&module=' . $current_module);
 ?>

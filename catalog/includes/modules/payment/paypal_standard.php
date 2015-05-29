@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   if ( !class_exists('OSCOM_PayPal') ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
   }
@@ -29,7 +31,7 @@
       $this->code = 'paypal_standard';
       $this->title = $this->_app->getDef('module_ps_title');
       $this->public_title = $this->_app->getDef('module_ps_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), tep_href_link('apps.php', 'PayPal&action=configure&module=PS'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), OSCOM::link('admin/apps.php', 'PayPal&action=configure&module=PS'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_PS_SORT_ORDER') ? OSCOM_APP_PAYPAL_PS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_PS_STATUS') && in_array(OSCOM_APP_PAYPAL_PS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID : 0;
@@ -70,7 +72,7 @@
 // Before the stock quantity check is performed in checkout_process.php, detect if the quantity
 // has already beed deducated in the IPN to avoid a quantity == 0 redirect
       if ( $this->enabled === true ) {
-        if ( defined('FILENAME_CHECKOUT_PROCESS') && (basename($PHP_SELF) == FILENAME_CHECKOUT_PROCESS) ) {
+        if ( basename($PHP_SELF) == 'checkout_process.php' ) {
           if ( tep_session_is_registered('payment') && ($payment == $this->code) ) {
             $this->pre_before_check();
           }
@@ -356,10 +358,10 @@
                           'invoice' => substr($cart_PayPal_Standard_ID, strpos($cart_PayPal_Standard_ID, '-')+1),
                           'custom' => $customer_id,
                           'no_note' => '1',
-                          'notify_url' => tep_href_link('ext/modules/payment/paypal/standard_ipn.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
+                          'notify_url' => OSCOM::link('ext/modules/payment/paypal/standard_ipn.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
                           'rm' => '2',
-                          'return' => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
-                          'cancel_return' => tep_href_link(FILENAME_CHECKOUT_PAYMENT, '', 'SSL'),
+                          'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
+                          'cancel_return' => OSCOM::link('checkout_payment.php', '', 'SSL'),
                           'bn' => 'OSCOM23_PS',
                           'paymentaction' => (OSCOM_APP_PAYPAL_PS_TRANSACTION_METHOD == '1') ? 'sale' : 'authorization');
 
@@ -628,7 +630,7 @@
       if ( $result != 'VERIFIED' ) {
         $messageStack->add_session('header', $this->_app->getDef('module_ps_error_invalid_transaction'));
 
-        tep_redirect(tep_href_link(FILENAME_SHOPPING_CART));
+        OSCOM::redirect('shopping_cart.php');
       }
 
       $this->verifyTransaction($pptx_params);
@@ -638,7 +640,7 @@
       $check_query = tep_db_query("select orders_status from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "' and customers_id = '" . (int)$customer_id . "'");
 
       if (!tep_db_num_rows($check_query) || ($order_id != $pptx_params['invoice']) || ($customer_id != $pptx_params['custom'])) {
-        tep_redirect(tep_href_link(FILENAME_SHOPPING_CART));
+        OSCOM::redirect('shopping_cart.php');
       }
 
       $check = tep_db_fetch_array($check_query);
@@ -756,7 +758,7 @@
       $email_order = STORE_NAME . "\n" .
                      EMAIL_SEPARATOR . "\n" .
                      EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                     EMAIL_TEXT_INVOICE_URL . ' ' . tep_href_link(FILENAME_ACCOUNT_HISTORY_INFO, 'order_id=' . $order_id, 'SSL', false) . "\n" .
+                     EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
                      EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
       if ($order->info['comments']) {
         $email_order .= tep_db_output($order->info['comments']) . "\n\n";
@@ -815,7 +817,7 @@
 
       tep_session_unregister('cart_PayPal_Standard_ID');
 
-      tep_redirect(tep_href_link(FILENAME_CHECKOUT_SUCCESS, '', 'SSL'));
+      OSCOM::redirect('checkout_success.php', '', 'SSL');
     }
 
     function get_error() {
@@ -834,11 +836,11 @@
     }
 
     function install() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=install&module=PS'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=install&module=PS');
     }
 
     function remove() {
-      tep_redirect(tep_href_link('apps.php', 'PayPal&action=configure&subaction=uninstall&module=PS'));
+      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=uninstall&module=PS');
     }
 
     function keys() {

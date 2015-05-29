@@ -10,9 +10,11 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\OSCOM;
+
   tep_db_query('delete from oscom_app_paypal_log');
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
 
-  tep_redirect(tep_href_link('apps.php', 'PayPal&action=log'));
+  OSCOM::redirect('admin/apps.php', 'PayPal&action=log');
 ?>
