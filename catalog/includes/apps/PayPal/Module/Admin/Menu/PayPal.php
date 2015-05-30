@@ -28,7 +28,7 @@ class PayPal implements \OSC\OM\ModuleAdminMenuInterface
 
         $paypal_menu = [
             [
-                'code' => 'apps.php',
+                'code' => 'App/PayPal',
                 'title' => $OSCOM_PayPal->getDef('module_admin_menu_start'),
                 'link' => OSCOM::link('admin/apps.php', 'PayPal')
             ]
@@ -47,22 +47,22 @@ class PayPal implements \OSC\OM\ModuleAdminMenuInterface
             if (defined($value) && !empty(constant($value))) {
                 $paypal_menu = [
                     [
-                        'code' => 'apps.php',
+                        'code' => 'App/PayPal',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_BALANCE,
                         'link' => OSCOM::link('admin/apps.php', 'PayPal&action=balance')
                     ],
                     [
-                        'code' => 'apps.php',
+                        'code' => 'App/PayPal',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_CONFIGURE,
                         'link' => OSCOM::link('admin/apps.php', 'PayPal&action=configure')
                     ],
                     [
-                        'code' => 'apps.php',
+                        'code' => 'App/PayPal',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_MANAGE_CREDENTIALS,
                         'link' => OSCOM::link('admin/apps.php', 'PayPal&action=credentials')
                     ],
                     [
-                        'code' => 'apps.php',
+                        'code' => 'App/PayPal',
                         'title' => MODULES_ADMIN_MENU_PAYPAL_LOG,
                         'link' => OSCOM::link('admin/apps.php', 'PayPal&action=log')
                     ]
