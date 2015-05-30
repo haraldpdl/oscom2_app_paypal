@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_PS_Cfg_ewp_openssl {
     var $default = '/usr/bin/openssl';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('ewp_openssl', OSCOM_APP_PAYPAL_PS_EWP_OPENSSL, 'id="inputPsEwpOpenSsl"');
+      $input = HTML::inputField('ewp_openssl', OSCOM_APP_PAYPAL_PS_EWP_OPENSSL, 'id="inputPsEwpOpenSsl"');
 
       $result = <<<EOT
 <div>

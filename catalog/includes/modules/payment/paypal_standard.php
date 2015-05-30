@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 
   if ( !class_exists('OSCOM_PayPal') ) {
@@ -513,13 +514,13 @@
           unlink(OSCOM_APP_PAYPAL_PS_EWP_WORKING_DIRECTORY . '/' . $random_string . 'encrypted.txt');
         }
 
-        $process_button_string = tep_draw_hidden_field('cmd', '_s-xclick') .
-                                 tep_draw_hidden_field('encrypted', $data);
+        $process_button_string = HTML::hiddenField('cmd', '_s-xclick') .
+                                 HTML::hiddenField('encrypted', $data);
 
         unset($data);
       } else {
         foreach ($parameters as $key => $value) {
-          $process_button_string .= tep_draw_hidden_field($key, $value);
+          $process_button_string .= HTML::hiddenField($key, $value);
         }
       }
 

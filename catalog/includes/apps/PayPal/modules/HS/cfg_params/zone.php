@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_HS_Cfg_zone {
     var $default = '0';
     var $title;
@@ -34,7 +36,7 @@
                                     'text' => $zone_class['geo_zone_name']);
       }
 
-      $input = tep_draw_pull_down_menu('zone', $zone_class_array, OSCOM_APP_PAYPAL_HS_ZONE, 'id="inputHsZone"');
+      $input = HTML::selectField('zone', $zone_class_array, OSCOM_APP_PAYPAL_HS_ZONE, 'id="inputHsZone"');
 
       $result = <<<EOT
 <div>

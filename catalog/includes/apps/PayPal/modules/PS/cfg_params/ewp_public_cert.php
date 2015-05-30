@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_PS_Cfg_ewp_public_cert {
     var $default = '';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('ewp_public_cert', OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT, 'id="inputPsEwpPublicCert"');
+      $input = HTML::inputField('ewp_public_cert', OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT, 'id="inputPsEwpPublicCert"');
 
       $result = <<<EOT
 <div>

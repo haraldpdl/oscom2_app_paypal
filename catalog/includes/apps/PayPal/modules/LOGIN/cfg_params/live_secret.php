@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_LOGIN_Cfg_live_secret {
     var $default = '';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('live_secret', OSCOM_APP_PAYPAL_LOGIN_LIVE_SECRET, 'id="inputLogInLiveSecret"');
+      $input = HTML::inputField('live_secret', OSCOM_APP_PAYPAL_LOGIN_LIVE_SECRET, 'id="inputLogInLiveSecret"');
 
       $result = <<<EOT
 <div>

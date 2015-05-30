@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_PS_Cfg_page_style {
     var $default = '';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('page_style', OSCOM_APP_PAYPAL_PS_PAGE_STYLE, 'id="inputPsPageStyle"');
+      $input = HTML::inputField('page_style', OSCOM_APP_PAYPAL_PS_PAGE_STYLE, 'id="inputPsPageStyle"');
 
       $result = <<<EOT
 <div>

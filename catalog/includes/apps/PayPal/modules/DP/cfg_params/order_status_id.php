@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_DP_Cfg_order_status_id {
     var $default = '0';
     var $title;
@@ -34,7 +36,7 @@
                                   'text' => $statuses['orders_status_name']);
       }
 
-      $input = tep_draw_pull_down_menu('order_status_id', $statuses_array, OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID, 'id="inputDpOrderStatusId"');
+      $input = HTML::selectField('order_status_id', $statuses_array, OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID, 'id="inputDpOrderStatusId"');
 
       $result = <<<EOT
 <div>

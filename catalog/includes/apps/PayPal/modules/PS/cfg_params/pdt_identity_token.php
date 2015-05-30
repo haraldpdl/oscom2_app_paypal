@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_PS_Cfg_pdt_identity_token {
     var $default = '';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('pdt_identity_token', OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN, 'id="inputPsPdtIdentityToken"');
+      $input = HTML::inputField('pdt_identity_token', OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN, 'id="inputPsPdtIdentityToken"');
 
       $result = <<<EOT
 <div>

@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 ?>
 
@@ -46,21 +47,21 @@
         <div>
           <p>
             <label for="live_username"><?php echo $OSCOM_PayPal->getDef('paypal_live_api_username'); ?></label>
-            <?php echo tep_draw_input_field('live_username', OSCOM_APP_PAYPAL_LIVE_API_USERNAME); ?>
+            <?php echo HTML::inputField('live_username', OSCOM_APP_PAYPAL_LIVE_API_USERNAME); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="live_password"><?php echo $OSCOM_PayPal->getDef('paypal_live_api_password'); ?></label>
-            <?php echo tep_draw_input_field('live_password', OSCOM_APP_PAYPAL_LIVE_API_PASSWORD); ?>
+            <?php echo HTML::inputField('live_password', OSCOM_APP_PAYPAL_LIVE_API_PASSWORD); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="live_signature"><?php echo $OSCOM_PayPal->getDef('paypal_live_api_signature'); ?></label>
-            <?php echo tep_draw_input_field('live_signature', OSCOM_APP_PAYPAL_LIVE_API_SIGNATURE); ?>
+            <?php echo HTML::inputField('live_signature', OSCOM_APP_PAYPAL_LIVE_API_SIGNATURE); ?>
           </p>
         </div>
       </td>
@@ -68,14 +69,14 @@
         <div>
           <p>
             <label for="live_email"><?php echo $OSCOM_PayPal->getDef('paypal_live_email_address'); ?></label>
-            <?php echo tep_draw_input_field('live_email', OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL); ?>
+            <?php echo HTML::inputField('live_email', OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="live_email_primary"><?php echo $OSCOM_PayPal->getDef('paypal_live_primary_email_address'); ?></label>
-            <?php echo tep_draw_input_field('live_email_primary', OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL_PRIMARY); ?>
+            <?php echo HTML::inputField('live_email_primary', OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL_PRIMARY); ?>
           </p>
 
           <p><em><?php echo $OSCOM_PayPal->getDef('paypal_live_primary_email_address_desc'); ?></em></p>
@@ -93,21 +94,21 @@
         <div>
           <p>
             <label for="sandbox_username"><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_api_username'); ?></label>
-            <?php echo tep_draw_input_field('sandbox_username', OSCOM_APP_PAYPAL_SANDBOX_API_USERNAME); ?>
+            <?php echo HTML::inputField('sandbox_username', OSCOM_APP_PAYPAL_SANDBOX_API_USERNAME); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="sandbox_password"><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_api_password'); ?></label>
-            <?php echo tep_draw_input_field('sandbox_password', OSCOM_APP_PAYPAL_SANDBOX_API_PASSWORD); ?>
+            <?php echo HTML::inputField('sandbox_password', OSCOM_APP_PAYPAL_SANDBOX_API_PASSWORD); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="sandbox_signature"><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_api_signature'); ?></label>
-            <?php echo tep_draw_input_field('sandbox_signature', OSCOM_APP_PAYPAL_SANDBOX_API_SIGNATURE); ?>
+            <?php echo HTML::inputField('sandbox_signature', OSCOM_APP_PAYPAL_SANDBOX_API_SIGNATURE); ?>
           </p>
         </div>
       </td>
@@ -115,14 +116,14 @@
         <div>
           <p>
             <label for="sandbox_email"><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_email_address'); ?></label>
-            <?php echo tep_draw_input_field('sandbox_email', OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL); ?>
+            <?php echo HTML::inputField('sandbox_email', OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL); ?>
           </p>
         </div>
 
         <div>
           <p>
             <label for="sandbox_email_primary"><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_primary_email_address'); ?></label>
-            <?php echo tep_draw_input_field('sandbox_email_primary', OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL_PRIMARY); ?>
+            <?php echo HTML::inputField('sandbox_email_primary', OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL_PRIMARY); ?>
           </p>
 
           <p><em><?php echo $OSCOM_PayPal->getDef('paypal_sandbox_primary_email_address_desc'); ?></em></p>
@@ -141,28 +142,28 @@
   <div>
     <p>
       <label for="live_partner"><?php echo $OSCOM_PayPal->getDef('payflow_live_partner'); ?></label>
-      <?php echo tep_draw_input_field('live_partner', OSCOM_APP_PAYPAL_PF_LIVE_PARTNER); ?>
+      <?php echo HTML::inputField('live_partner', OSCOM_APP_PAYPAL_PF_LIVE_PARTNER); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="live_vendor"><?php echo $OSCOM_PayPal->getDef('payflow_live_merchant_login'); ?></label>
-      <?php echo tep_draw_input_field('live_vendor', OSCOM_APP_PAYPAL_PF_LIVE_VENDOR); ?>
+      <?php echo HTML::inputField('live_vendor', OSCOM_APP_PAYPAL_PF_LIVE_VENDOR); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="live_user"><?php echo $OSCOM_PayPal->getDef('payflow_live_user'); ?></label>
-      <?php echo tep_draw_input_field('live_user', OSCOM_APP_PAYPAL_PF_LIVE_USER); ?>
+      <?php echo HTML::inputField('live_user', OSCOM_APP_PAYPAL_PF_LIVE_USER); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="live_password"><?php echo $OSCOM_PayPal->getDef('payflow_live_password'); ?></label>
-      <?php echo tep_draw_input_field('live_password', OSCOM_APP_PAYPAL_PF_LIVE_PASSWORD); ?>
+      <?php echo HTML::inputField('live_password', OSCOM_APP_PAYPAL_PF_LIVE_PASSWORD); ?>
     </p>
   </div>
 </div>
@@ -172,28 +173,28 @@
   <div>
     <p>
       <label for="sandbox_partner"><?php echo $OSCOM_PayPal->getDef('payflow_sandbox_partner'); ?></label>
-      <?php echo tep_draw_input_field('sandbox_partner', OSCOM_APP_PAYPAL_PF_SANDBOX_PARTNER); ?>
+      <?php echo HTML::inputField('sandbox_partner', OSCOM_APP_PAYPAL_PF_SANDBOX_PARTNER); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="sandbox_vendor"><?php echo $OSCOM_PayPal->getDef('payflow_sandbox_merchant_login'); ?></label>
-      <?php echo tep_draw_input_field('sandbox_vendor', OSCOM_APP_PAYPAL_PF_SANDBOX_VENDOR); ?>
+      <?php echo HTML::inputField('sandbox_vendor', OSCOM_APP_PAYPAL_PF_SANDBOX_VENDOR); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="sandbox_user"><?php echo $OSCOM_PayPal->getDef('payflow_sandbox_user'); ?></label>
-      <?php echo tep_draw_input_field('sandbox_user', OSCOM_APP_PAYPAL_PF_SANDBOX_USER); ?>
+      <?php echo HTML::inputField('sandbox_user', OSCOM_APP_PAYPAL_PF_SANDBOX_USER); ?>
     </p>
   </div>
 
   <div>
     <p>
       <label for="sandbox_password"><?php echo $OSCOM_PayPal->getDef('payflow_sandbox_password'); ?></label>
-      <?php echo tep_draw_input_field('sandbox_password', OSCOM_APP_PAYPAL_PF_SANDBOX_PASSWORD); ?>
+      <?php echo HTML::inputField('sandbox_password', OSCOM_APP_PAYPAL_PF_SANDBOX_PASSWORD); ?>
     </p>
   </div>
 </div>

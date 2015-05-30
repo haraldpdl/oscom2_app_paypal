@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 
   if ( !class_exists('OSCOM_PayPal') ) {
@@ -152,33 +153,33 @@
       $content = '<table id="paypal_table_new_card" border="0" width="100%" cellspacing="0" cellpadding="2">' .
                  '  <tr>' .
                  '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_type') . '</td>' .
-                 '    <td>' . tep_draw_pull_down_menu('cc_type', $types_array, '', 'id="paypal_card_type"') . '</td>' .
+                 '    <td>' . HTML::selectField('cc_type', $types_array, null, 'id="paypal_card_type"') . '</td>' .
                  '  </tr>' .
                  '  <tr>' .
                  '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_owner') . '</td>' .
-                 '    <td>' . tep_draw_input_field('cc_owner', $order->billing['firstname'] . ' ' . $order->billing['lastname']) . '</td>' .
+                 '    <td>' . HTML::inputField('cc_owner', $order->billing['firstname'] . ' ' . $order->billing['lastname']) . '</td>' .
                  '  </tr>' .
                  '  <tr>' .
                  '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_number') . '</td>' .
-                 '    <td>' . tep_draw_input_field('cc_number_nh-dns', '', 'id="paypal_card_num"') . '</td>' .
+                 '    <td>' . HTML::inputField('cc_number_nh-dns', '', 'id="paypal_card_num"') . '</td>' .
                  '  </tr>' .
                  '  <tr>' .
                  '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_expires') . '</td>' .
-                 '    <td>' . tep_draw_pull_down_menu('cc_expires_month', $months_array) . '&nbsp;' . tep_draw_pull_down_menu('cc_expires_year', $year_expires_array) . '</td>' .
+                 '    <td>' . HTML::selectField('cc_expires_month', $months_array) . '&nbsp;' . HTML::selectField('cc_expires_year', $year_expires_array) . '</td>' .
                  '  </tr>' .
                  '  <tr>' .
                  '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_cvc') . '</td>' .
-                 '    <td>' . tep_draw_input_field('cc_cvc_nh-dns', '', 'size="5" maxlength="4"') . ' <span id="cardSecurityCodeInfo" title="' . tep_output_string($this->_app->getDef('module_dp_field_card_cvc_info')) . '" style="color: #084482; text-decoration: none; border-bottom: 1px dashed #084482; cursor: pointer;">' . $this->_app->getDef('module_dp_field_card_cvc_info_link') . '</span></td>' .
+                 '    <td>' . HTML::inputField('cc_cvc_nh-dns', '', 'size="5" maxlength="4"') . ' <span id="cardSecurityCodeInfo" title="' . tep_output_string($this->_app->getDef('module_dp_field_card_cvc_info')) . '" style="color: #084482; text-decoration: none; border-bottom: 1px dashed #084482; cursor: pointer;">' . $this->_app->getDef('module_dp_field_card_cvc_info_link') . '</span></td>' .
                  '  </tr>';
 
       if ( $this->isCardAccepted('MAESTRO') ) {
         $content .= '  <tr>' .
                     '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_valid_from') . '</td>' .
-                    '    <td>' . tep_draw_pull_down_menu('cc_starts_month', $months_array, '', 'id="paypal_card_date_start"') . '&nbsp;' . tep_draw_pull_down_menu('cc_starts_year', $year_valid_from_array) . '&nbsp;' . $this->_app->getDef('module_dp_field_card_valid_from_info') . '</td>' .
+                    '    <td>' . HTML::selectField('cc_starts_month', $months_array, null, 'id="paypal_card_date_start"') . '&nbsp;' . HTML::selectField('cc_starts_year', $year_valid_from_array) . '&nbsp;' . $this->_app->getDef('module_dp_field_card_valid_from_info') . '</td>' .
                     '  </tr>' .
                     '  <tr>' .
                     '    <td width="30%">' . $this->_app->getDef('module_dp_field_card_issue_number') . '</td>' .
-                    '    <td>' . tep_draw_input_field('cc_issue_nh-dns', '', 'id="paypal_card_issue" size="3" maxlength="2"') . '&nbsp;' . $this->_app->getDef('module_dp_field_card_issue_number_info') . '</td>' .
+                    '    <td>' . HTML::inputField('cc_issue_nh-dns', '', 'id="paypal_card_issue" size="3" maxlength="2"') . '&nbsp;' . $this->_app->getDef('module_dp_field_card_issue_number_info') . '</td>' .
                     '  </tr>';
       }
 

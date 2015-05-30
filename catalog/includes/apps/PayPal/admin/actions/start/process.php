@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
 
   if ( isset($_GET['type']) && in_array($_GET['type'], array('live', 'sandbox')) ) {
@@ -34,7 +35,7 @@
         $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_MERCHANT_ID', $result['merchant_id']);
         $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_SECRET', $result['secret']);
 
-        tep_redirect($result['redirect_url']);
+        HTTP:redirect($result['redirect_url']);
       } else {
         $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_initialization_error'), 'error');
       }

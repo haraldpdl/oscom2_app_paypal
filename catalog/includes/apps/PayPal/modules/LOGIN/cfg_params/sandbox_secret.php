@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_LOGIN_Cfg_sandbox_secret {
     var $default = '';
     var $sort_order = 500;
@@ -22,7 +24,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('sandbox_secret', OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET, 'id="inputLogInSandboxSecret"');
+      $input = HTML::inputField('sandbox_secret', OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET, 'id="inputLogInSandboxSecret"');
 
       $result = <<<EOT
 <div>

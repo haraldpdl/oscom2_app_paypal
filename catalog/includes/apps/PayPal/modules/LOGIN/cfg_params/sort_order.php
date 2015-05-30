@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+
   class OSCOM_PayPal_LOGIN_Cfg_sort_order {
     var $default = '0';
     var $title;
@@ -24,7 +26,7 @@
     }
 
     function getSetField() {
-      $input = tep_draw_input_field('sort_order', OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER, 'id="inputLogInSortOrder"');
+      $input = HTML::inputField('sort_order', OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER, 'id="inputLogInSortOrder"');
 
       $result = <<<EOT
 <div>

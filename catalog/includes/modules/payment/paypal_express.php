@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
+  use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
 
   if ( !class_exists('OSCOM_PayPal') ) {
@@ -211,7 +213,7 @@ EOD;
 
       if (empty($comments)) {
         $confirmation = array('fields' => array(array('title' => $this->_app->getDef('module_ec_field_comments'),
-                                                      'field' => tep_draw_textarea_field('ppecomments', 'soft', '60', '5', $comments))));
+                                                      'field' => HTML::textareaField('ppecomments', '60', '5', $comments))));
       }
 
       return $confirmation;
@@ -278,7 +280,7 @@ EOD;
 
           $paypal_url .= '&token=' . $appPayPalEcResult['TOKEN'];
 
-          tep_redirect($paypal_url);
+          HTTP::redirect($paypal_url);
         }
 
         OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');

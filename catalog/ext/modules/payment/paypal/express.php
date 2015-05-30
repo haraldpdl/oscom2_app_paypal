@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
 
   chdir('../../../../');
@@ -983,7 +984,7 @@ EOD;
         $response_array = $paypal_express->_app->getApiResult('EC', 'SetExpressCheckout', $params);
 
         if ( in_array($response_array['ACK'], array('Success', 'SuccessWithWarning')) ) {
-          tep_redirect($paypal_url . 'token=' . $response_array['TOKEN']);
+          HTTP::redirect($paypal_url . 'token=' . $response_array['TOKEN']);
         } else {
           OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');
         }
@@ -998,7 +999,7 @@ EOD;
         $response_array = $paypal_express->_app->getApiResult('EC', 'PayflowSetExpressCheckout', $params);
 
         if ( $response_array['RESULT'] == '0' ) {
-          tep_redirect($paypal_url . 'token=' . $response_array['TOKEN']);
+          HTTP::redirect($paypal_url . 'token=' . $response_array['TOKEN']);
         } else {
           OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($response_array['OSCOM_ERROR_MESSAGE']), 'SSL');
         }
