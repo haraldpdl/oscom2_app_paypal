@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
 
@@ -130,24 +131,26 @@
         $log_sane['SHIPTOSTATE'] = $_POST['SHIPTOSTATE'];
         $log_sane['SHIPTOCOUNTRY'] = $_POST['SHIPTOCOUNTRY'];
 
-        $country_query = tep_db_query("select * from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" . tep_db_input($sendto['country_name']) . "' limit 1");
-        if (tep_db_num_rows($country_query)) {
-          $country = tep_db_fetch_array($country_query);
+        $Qcountry = $OSCOM_Db->get('countries', '*', ['countries_iso_code_2' => $sendto['country_name']], null, 1);
 
-          $sendto['country_id'] = $country['countries_id'];
-          $sendto['country_name'] = $country['countries_name'];
-          $sendto['country_iso_code_2'] = $country['countries_iso_code_2'];
-          $sendto['country_iso_code_3'] = $country['countries_iso_code_3'];
-          $sendto['address_format_id'] = $country['address_format_id'];
+        if ($Qcountry->fetch() !== false) {
+          $sendto['country_id'] = $Qcountry->valueInt('countries_id');
+          $sendto['country_name'] = $Qcountry->value('countries_name');
+          $sendto['country_iso_code_2'] = $Qcountry->value('countries_iso_code_2');
+          $sendto['country_iso_code_3'] = $Qcountry->value('countries_iso_code_3');
+          $sendto['address_format_id'] = $Qcountry->value('address_format_id');
         }
 
         if ($sendto['country_id'] > 0) {
-          $zone_query = tep_db_query("select * from " . TABLE_ZONES . " where zone_country_id = '" . (int)$sendto['country_id'] . "' and (zone_name = '" . tep_db_input($sendto['zone_name']) . "' or zone_code = '" . tep_db_input($sendto['zone_name']) . "') limit 1");
-          if (tep_db_num_rows($zone_query)) {
-            $zone = tep_db_fetch_array($zone_query);
+          $Qzone = $OSCOM_Db->prepare('select * from :zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+          $Qzone->bindInt(':zone_country_id', $sendto['country_id']);
+          $Qzone->bindValue(':zone_name', $sendto['zone_name']);
+          $Qzone->bindValue(':zone_code', $sendto['zone_name']);
+          $Qzone->execute();
 
-            $sendto['zone_id'] = $zone['zone_id'];
-            $sendto['zone_name'] = $zone['zone_name'];
+          if ($Qzone->fetch() !== false) {
+            $sendto['zone_id'] = $Qzone->valueInt('zone_id');
+            $sendto['zone_name'] = $Qzone->value('zone_name');
           }
         }
 
@@ -336,74 +339,85 @@
 // check if e-mail address exists in database and login or create customer account
         if ( !tep_session_is_registered('customer_id') ) {
           $force_login = true;
+          $force_redirect = false;
 
-          $email_address = tep_db_prepare_input($appPayPalEcResult['EMAIL']);
+          $email_address = HTML::sanitize($appPayPalEcResult['EMAIL']);
 
-          $check_query = tep_db_query("select * from " . TABLE_CUSTOMERS . " where customers_email_address = '" . tep_db_input($email_address) . "' limit 1");
-          if ( tep_db_num_rows($check_query) ) {
-            $check = tep_db_fetch_array($check_query);
+          if (!tep_validate_email($email_address)) {
+            $force_redirect = true;
+          } else {
+            $Qcheck = $OSCOM_Db->get('customers', '*', ['customers_email_address' => $email_address], null, 1);
 
+            if ($Qcheck->fetch() !== false) {
 // Force the customer to log into their local account if payerstatus is unverified and a local password is set
-            if ( ($appPayPalEcResult['PAYERSTATUS'] == 'unverified') && !empty($check['customers_password']) ) {
-              $messageStack->add_session('login', $paypal_express->_app->getDef('module_ec_error_local_login_required'), 'warning');
+              if ( ($appPayPalEcResult['PAYERSTATUS'] == 'unverified') && !empty($Qcheck->value('customers_password')) ) {
+                $force_redirect = true;
+              } else {
+                $customer_id = $Qcheck->valueInt('customers_id');
+                $customers_firstname = $Qcheck->value('customers_firstname');
+                $customer_default_address_id = $Qcheck->valueInt('customers_default_address_id');
+              }
+            } else {
+              $customers_firstname = HTML::sanitize($appPayPalEcResult['FIRSTNAME']);
+              $customers_lastname = HTML::sanitize($appPayPalEcResult['LASTNAME']);
 
-              $navigation->set_snapshot();
+              $sql_data_array = array('customers_firstname' => $customers_firstname,
+                                      'customers_lastname' => $customers_lastname,
+                                      'customers_email_address' => $email_address,
+                                      'customers_telephone' => '',
+                                      'customers_fax' => '',
+                                      'customers_newsletter' => '0',
+                                      'customers_password' => '',
+                                      'customers_gender' => '');
 
-              $login_url = OSCOM::link('login.php', '', 'SSL');
-              $login_email_address = tep_output_string($appPayPalEcResult['EMAIL']);
+              if ( isset($appPayPalEcResult['PHONENUM']) && tep_not_null($appPayPalEcResult['PHONENUM']) ) {
+                $customers_telephone = HTML::sanitize($appPayPalEcResult['PHONENUM']);
 
-      $output = <<<EOD
+                $sql_data_array['customers_telephone'] = $customers_telephone;
+              }
+
+              $OSCOM_Db->save('customers', $sql_data_array);
+
+              $customer_id = $OSCOM_Db->lastInsertId();
+
+              $OSCOM_Db->save('customers_info', [
+                'customers_info_id' => $customer_id,
+                'customers_info_number_of_logons' => '0',
+                'customers_info_date_account_created' => 'now()'
+              ]);
+
+// Only generate a password and send an email if the Set Password Content Module is not enabled
+              if ( !defined('MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS') || (MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS != 'True') ) {
+                $customer_password = tep_create_random_value(max(ENTRY_PASSWORD_MIN_LENGTH, 8));
+
+                $OSCOM_Db->save('customers', ['customers_password' => tep_encrypt_password($customer_password)], ['customers_id' => $customer_id]);
+
+// build the message content
+                $name = $customers_firstname . ' ' . $customers_lastname;
+                $email_text = sprintf(EMAIL_GREET_NONE, $customers_firstname) . EMAIL_WELCOME . $paypal_express->_app->getDef('module_ec_email_account_password', array('email_address' => $email_address, 'password' => $customer_password)) . "\n\n" . EMAIL_TEXT . EMAIL_CONTACT . EMAIL_WARNING;
+                tep_mail($name, $email_address, EMAIL_SUBJECT, $email_text, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
+              }
+            }
+          }
+
+          if ($force_redirect === true) {
+            $messageStack->add_session('login', $paypal_express->_app->getDef('module_ec_error_local_login_required'), 'warning');
+
+            $navigation->set_snapshot();
+
+            $login_url = OSCOM::link('login.php', '', 'SSL');
+
+            $output = <<<EOD
 <form name="pe" action="{$login_url}" method="post" target="_top">
-  <input type="hidden" name="email_address" value="{$login_email_address}" />
+  <input type="hidden" name="email_address" value="{$email_address}" />
 </form>
 <script type="text/javascript">
 document.pe.submit();
 </script>
 EOD;
 
-              echo $output;
-              exit;
-            } else {
-              $customer_id = $check['customers_id'];
-              $customers_firstname = $check['customers_firstname'];
-              $customer_default_address_id = $check['customers_default_address_id'];
-            }
-          } else {
-            $customers_firstname = tep_db_prepare_input($appPayPalEcResult['FIRSTNAME']);
-            $customers_lastname = tep_db_prepare_input($appPayPalEcResult['LASTNAME']);
-
-            $sql_data_array = array('customers_firstname' => $customers_firstname,
-                                    'customers_lastname' => $customers_lastname,
-                                    'customers_email_address' => $email_address,
-                                    'customers_telephone' => '',
-                                    'customers_fax' => '',
-                                    'customers_newsletter' => '0',
-                                    'customers_password' => '',
-                                    'customers_gender' => ''); // v22rc2a compatibility
-
-            if ( isset($appPayPalEcResult['PHONENUM']) && tep_not_null($appPayPalEcResult['PHONENUM']) ) {
-              $customers_telephone = tep_db_prepare_input($appPayPalEcResult['PHONENUM']);
-
-              $sql_data_array['customers_telephone'] = $customers_telephone;
-            }
-
-            tep_db_perform(TABLE_CUSTOMERS, $sql_data_array);
-
-            $customer_id = tep_db_insert_id();
-
-            tep_db_query("insert into " . TABLE_CUSTOMERS_INFO . " (customers_info_id, customers_info_number_of_logons, customers_info_date_account_created) values ('" . (int)$customer_id . "', '0', now())");
-
-// Only generate a password and send an email if the Set Password Content Module is not enabled
-            if ( !defined('MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS') || (MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS != 'True') ) {
-              $customer_password = tep_create_random_value(max(ENTRY_PASSWORD_MIN_LENGTH, 8));
-
-              tep_db_perform(TABLE_CUSTOMERS, array('customers_password' => tep_encrypt_password($customer_password)), 'update', 'customers_id = "' . (int)$customer_id . '"');
-
-// build the message content
-              $name = $customers_firstname . ' ' . $customers_lastname;
-              $email_text = sprintf(EMAIL_GREET_NONE, $customers_firstname) . EMAIL_WELCOME . $paypal_express->_app->getDef('module_ec_email_account_password', array('email_address' => $email_address, 'password' => $customer_password)) . "\n\n" . EMAIL_TEXT . EMAIL_CONTACT . EMAIL_WARNING;
-              tep_mail($name, $email_address, EMAIL_SUBJECT, $email_text, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
-            }
+            echo $output;
+            exit;
           }
 
           if ( SESSION_RECREATE == 'True' ) {
@@ -420,49 +434,58 @@ EOD;
 
 // check if paypal shipping address exists in the address book
         if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
-          $ship_firstname = tep_db_prepare_input(substr($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], 0, strpos($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], ' ')));
-          $ship_lastname = tep_db_prepare_input(substr($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], strpos($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], ' ')+1));
-          $ship_address = tep_db_prepare_input($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOSTREET']);
-          $ship_city = tep_db_prepare_input($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOCITY']);
-          $ship_zone = tep_db_prepare_input($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOSTATE']);
-          $ship_postcode = tep_db_prepare_input($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOZIP']);
-          $ship_country = tep_db_prepare_input($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']);
+          $ship_firstname = HTML::sanitize(substr($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], 0, strpos($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], ' ')));
+          $ship_lastname = HTML::sanitize(substr($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], strpos($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTONAME'], ' ')+1));
+          $ship_address = HTML::sanitize($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOSTREET']);
+          $ship_city = HTML::sanitize($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOCITY']);
+          $ship_zone = HTML::sanitize($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOSTATE']);
+          $ship_postcode = HTML::sanitize($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOZIP']);
+          $ship_country = HTML::sanitize($appPayPalEcResult['PAYMENTREQUEST_0_SHIPTOCOUNTRYCODE']);
         } else { // Payflow
-          $ship_firstname = tep_db_prepare_input(substr($appPayPalEcResult['SHIPTONAME'], 0, strpos($appPayPalEcResult['SHIPTONAME'], ' ')));
-          $ship_lastname = tep_db_prepare_input(substr($appPayPalEcResult['SHIPTONAME'], strpos($appPayPalEcResult['SHIPTONAME'], ' ')+1));
-          $ship_address = tep_db_prepare_input($appPayPalEcResult['SHIPTOSTREET']);
-          $ship_city = tep_db_prepare_input($appPayPalEcResult['SHIPTOCITY']);
-          $ship_zone = tep_db_prepare_input($appPayPalEcResult['SHIPTOSTATE']);
-          $ship_postcode = tep_db_prepare_input($appPayPalEcResult['SHIPTOZIP']);
-          $ship_country = tep_db_prepare_input($appPayPalEcResult['SHIPTOCOUNTRY']);
+          $ship_firstname = HTML::sanitize(substr($appPayPalEcResult['SHIPTONAME'], 0, strpos($appPayPalEcResult['SHIPTONAME'], ' ')));
+          $ship_lastname = HTML::sanitize(substr($appPayPalEcResult['SHIPTONAME'], strpos($appPayPalEcResult['SHIPTONAME'], ' ')+1));
+          $ship_address = HTML::sanitize($appPayPalEcResult['SHIPTOSTREET']);
+          $ship_city = HTML::sanitize($appPayPalEcResult['SHIPTOCITY']);
+          $ship_zone = HTML::sanitize($appPayPalEcResult['SHIPTOSTATE']);
+          $ship_postcode = HTML::sanitize($appPayPalEcResult['SHIPTOZIP']);
+          $ship_country = HTML::sanitize($appPayPalEcResult['SHIPTOCOUNTRY']);
         }
 
         $ship_zone_id = 0;
         $ship_country_id = 0;
         $ship_address_format_id = 1;
 
-        $country_query = tep_db_query("select countries_id, address_format_id from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" . tep_db_input($ship_country) . "' limit 1");
-        if ( tep_db_num_rows($country_query) ) {
-          $country = tep_db_fetch_array($country_query);
+        $Qcountry = $OSCOM_Db->get('countries', ['countries_id', 'address_format_id'], ['countries_iso_code_2' => $ship_country], null, 1);
 
-          $ship_country_id = $country['countries_id'];
-          $ship_address_format_id = $country['address_format_id'];
-        }
+        if ($Qcountry->fetch() !== false) {
+          $ship_country_id = $Qcountry->valueInt('countries_id');
+          $ship_address_format_id = $Qcountry->valueInt('address_format_id');
 
-        if ( $ship_country_id > 0 ) {
-          $zone_query = tep_db_query("select zone_id from " . TABLE_ZONES . " where zone_country_id = '" . (int)$ship_country_id . "' and (zone_name = '" . tep_db_input($ship_zone) . "' or zone_code = '" . tep_db_input($ship_zone) . "') limit 1");
-          if (tep_db_num_rows($zone_query)) {
-            $zone = tep_db_fetch_array($zone_query);
+          $Qzone = $OSCOM_Db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+          $Qzone->bindInt(':zone_country_id', $ship_country_id);
+          $Qzone->bindValue(':zone_name', $ship_zone);
+          $Qzone->bindValue(':zone_code', $ship_zone);
+          $Qzone->execute();
 
-            $ship_zone_id = $zone['zone_id'];
+          if ($Qzone->fetch() !== false) {
+            $ship_zone_id = $Qzone->valueInt('zone_id');
           }
         }
 
-        $check_query = tep_db_query("select address_book_id from " . TABLE_ADDRESS_BOOK . " where customers_id = '" . (int)$customer_id . "' and entry_firstname = '" . tep_db_input($ship_firstname) . "' and entry_lastname = '" . tep_db_input($ship_lastname) . "' and entry_street_address = '" . tep_db_input($ship_address) . "' and entry_postcode = '" . tep_db_input($ship_postcode) . "' and entry_city = '" . tep_db_input($ship_city) . "' and (entry_state = '" . tep_db_input($ship_zone) . "' or entry_zone_id = '" . (int)$ship_zone_id . "') and entry_country_id = '" . (int)$ship_country_id . "' limit 1");
-        if ( tep_db_num_rows($check_query) ) {
-          $check = tep_db_fetch_array($check_query);
+        $Qcheck = $OSCOM_Db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
+        $Qcheck->bindInt(':customers_id', $customer_id);
+        $Qcheck->bindValue(':entry_firstname', $ship_firstname);
+        $Qcheck->bindValue(':entry_lastname', $ship_lastname);
+        $Qcheck->bindValue(':entry_street_address', $ship_address);
+        $Qcheck->bindValue(':entry_postcode', $ship_postcode);
+        $Qcheck->bindValue(':entry_city', $ship_city);
+        $Qcheck->bindValue(':entry_state', $ship_zone);
+        $Qcheck->bindInt(':entry_zone_id', $ship_zone_id);
+        $Qcheck->bindInt(':entry_country_id', $ship_country_id);
+        $Qcheck->execute();
 
-          $sendto = $check['address_book_id'];
+        if ($Qcheck->fetch() !== false) {
+          $sendto = $Qcheck->valueInt('address_book_id');
         } else {
           $sql_data_array = array('customers_id' => $customer_id,
                                   'entry_firstname' => $ship_firstname,
@@ -471,7 +494,7 @@ EOD;
                                   'entry_postcode' => $ship_postcode,
                                   'entry_city' => $ship_city,
                                   'entry_country_id' => $ship_country_id,
-                                  'entry_gender' => ''); // v22rc2a compatibility
+                                  'entry_gender' => '');
 
           if (ACCOUNT_STATE == 'true') {
             if ($ship_zone_id > 0) {
@@ -483,14 +506,14 @@ EOD;
             }
           }
 
-          tep_db_perform(TABLE_ADDRESS_BOOK, $sql_data_array);
+          $OSCOM_Db->save('address_book', $sql_data_array);
 
-          $address_id = tep_db_insert_id();
+          $address_id = $OSCOM_Db->lastInsertId();
 
           $sendto = $address_id;
 
           if ($customer_default_address_id < 1) {
-            tep_db_query("update " . TABLE_CUSTOMERS . " set customers_default_address_id = '" . (int)$address_id . "' where customers_id = '" . (int)$customer_id . "'");
+            $OSCOM_Db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $customer_id]);
             $customer_default_address_id = $address_id;
           }
         }

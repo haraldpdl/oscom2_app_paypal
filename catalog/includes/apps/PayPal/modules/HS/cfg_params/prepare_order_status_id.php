@@ -11,6 +11,7 @@
 */
 
   use OSC\OM\HTML;
+  use OSC\OM\Registry;
 
   class OSCOM_PayPal_HS_Cfg_prepare_order_status_id {
     var $default = '0';
@@ -21,32 +22,32 @@
     function OSCOM_PayPal_HS_Cfg_prepare_order_status_id() {
       global $OSCOM_PayPal;
 
+      $OSCOM_Db = Registry::get('Db');
+
       $this->title = $OSCOM_PayPal->getDef('cfg_hs_prepare_order_status_id_title');
       $this->description = $OSCOM_PayPal->getDef('cfg_hs_prepare_order_status_id_desc');
 
       if ( !defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') ) {
-        $check_query = tep_db_query("select orders_status_id from " . TABLE_ORDERS_STATUS . " where orders_status_name = 'Preparing [PayPal Pro HS]' limit 1");
+        $Qcheck = $OSCOM_Db->get('orders_status', 'orders_status_id', ['orders_status_name' => 'Preparing [PayPal Pro HS]'], null, 1);
 
-        if (tep_db_num_rows($check_query) < 1) {
-          $status_query = tep_db_query("select max(orders_status_id) as status_id from " . TABLE_ORDERS_STATUS);
-          $status = tep_db_fetch_array($status_query);
+        if ($Qcheck->fetch() === false) {
+          $Qstatus = $OSCOM_Db->get('orders_status', 'max(orders_status_id) as status_id');
 
-          $status_id = $status['status_id']+1;
+          $status_id = $Qstatus->valueInt('status_id') + 1;
 
           $languages = tep_get_languages();
 
           foreach ($languages as $lang) {
-            tep_db_query("insert into " . TABLE_ORDERS_STATUS . " (orders_status_id, language_id, orders_status_name) values ('" . $status_id . "', '" . $lang['id'] . "', 'Preparing [PayPal Pro HS]')");
-          }
-
-          $flags_query = tep_db_query("describe " . TABLE_ORDERS_STATUS . " public_flag");
-          if (tep_db_num_rows($flags_query) == 1) {
-            tep_db_query("update " . TABLE_ORDERS_STATUS . " set public_flag = 0 and downloads_flag = 0 where orders_status_id = '" . $status_id . "'");
+            $OSCOM_Db->save('orders_status', [
+              'orders_status_id' => $status_id,
+              'language_id' => $lang['id'],
+              'orders_status_name' => 'Preparing [PayPal Pro HS]',
+              'public_flag' => '0',
+              'downloads_flag' => '0'
+            ]);
           }
         } else {
-          $check = tep_db_fetch_array($check_query);
-
-          $status_id = $check['orders_status_id'];
+          $status_id = $Qcheck->valueInt('orders_status_id');
         }
       } else {
         $status_id = OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID;
@@ -58,12 +59,15 @@
     function getSetField() {
       global $OSCOM_PayPal;
 
+      $OSCOM_Db = Registry::get('Db');
+
       $statuses_array = array(array('id' => '0', 'text' => $OSCOM_PayPal->getDef('cfg_hs_prepare_order_status_id_default')));
 
-      $statuses_query = tep_db_query("select orders_status_id, orders_status_name from " . TABLE_ORDERS_STATUS . " where language_id = '" . (int)$_SESSION['languages_id'] . "' order by orders_status_name");
-      while ($statuses = tep_db_fetch_array($statuses_query)) {
-        $statuses_array[] = array('id' => $statuses['orders_status_id'],
-                                  'text' => $statuses['orders_status_name']);
+      $Qstatuses = $OSCOM_Db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id']], 'orders_status_name');
+
+      while ($Qstatuses->next()) {
+        $statuses_array[] = array('id' => $Qstatuses->valueInt('orders_status_id'),
+                                  'text' => $Qstatuses->value('orders_status_name'));
       }
 
       $input = HTML::selectField('prepare_order_status_id', $statuses_array, OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID, 'id="inputHsPrepareOrderStatusId"');

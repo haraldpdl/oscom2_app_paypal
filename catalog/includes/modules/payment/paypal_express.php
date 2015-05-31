@@ -13,6 +13,7 @@
   use OSC\OM\HTML;
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
+  use OSC\OM\Registry;
 
   if ( !class_exists('OSCOM_PayPal') ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
@@ -96,14 +97,15 @@
     function update_status() {
       global $order;
 
+      $OSCOM_Db = Registry::get('Db');
+
       if ( ($this->enabled == true) && ((int)OSCOM_APP_PAYPAL_EC_ZONE > 0) ) {
         $check_flag = false;
-        $check_query = tep_db_query("select zone_id from " . TABLE_ZONES_TO_GEO_ZONES . " where geo_zone_id = '" . OSCOM_APP_PAYPAL_EC_ZONE . "' and zone_country_id = '" . $order->delivery['country']['id'] . "' order by zone_id");
-        while ($check = tep_db_fetch_array($check_query)) {
-          if ($check['zone_id'] < 1) {
-            $check_flag = true;
-            break;
-          } elseif ($check['zone_id'] == $order->delivery['zone_id']) {
+
+        $Qcheck = $OSCOM_Db->get('zones_to_geo_zones', 'zone_id', ['geo_zone_id' => OSCOM_APP_PAYPAL_EC_ZONE, 'zone_country_id' => $order->delivery['country']['id']], 'zone_id');
+
+        while ($Qcheck->fetch()) {
+          if (($Qcheck->valueInt('zone_id') < 1) || ($Qcheck->valueInt('zone_id') == $order->delivery['zone_id'])) {
             $check_flag = true;
             break;
           }
@@ -143,7 +145,7 @@
         $image_button = $this->_app->getDef('module_ec_button_url');
       }
 
-      $button_title = tep_output_string_protected($this->_app->getDef('module_ec_button_title'));
+      $button_title = HTML::outputProtected($this->_app->getDef('module_ec_button_title'));
 
       if ( OSCOM_APP_PAYPAL_EC_STATUS == '0' ) {
         $button_title .= ' (' . $this->code . '; Sandbox)';
@@ -248,7 +250,7 @@ EOD;
 
       if (empty($comments)) {
         if (isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments'])) {
-          $comments = tep_db_prepare_input($_POST['ppecomments']);
+          $comments = HTML::sanitize($_POST['ppecomments']);
 
           $order->info['comments'] = $comments;
         }
@@ -304,7 +306,7 @@ EOD;
 
       if ( empty($comments) ) {
         if ( isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments']) ) {
-          $comments = tep_db_prepare_input($_POST['ppecomments']);
+          $comments = HTML::sanitize($_POST['ppecomments']);
 
           $order->info['comments'] = $comments;
         }
@@ -343,12 +345,14 @@ EOD;
     function after_process_paypal() {
       global $response_array, $insert_id, $appPayPalEcResult;
 
-      $pp_result = 'Transaction ID: ' . tep_output_string_protected($response_array['PAYMENTINFO_0_TRANSACTIONID']) . "\n" .
-                   'Payer Status: ' . tep_output_string_protected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
-                   'Address Status: ' . tep_output_string_protected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
-                   'Payment Status: ' . tep_output_string_protected($response_array['PAYMENTINFO_0_PAYMENTSTATUS']) . "\n" .
-                   'Payment Type: ' . tep_output_string_protected($response_array['PAYMENTINFO_0_PAYMENTTYPE']) . "\n" .
-                   'Pending Reason: ' . tep_output_string_protected($response_array['PAYMENTINFO_0_PENDINGREASON']);
+      $OSCOM_Db = Registry::get('Db');
+
+      $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_TRANSACTIONID']) . "\n" .
+                   'Payer Status: ' . HTML::outputProtected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
+                   'Address Status: ' . HTML::outputProtected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
+                   'Payment Status: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PAYMENTSTATUS']) . "\n" .
+                   'Payment Type: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PAYMENTTYPE']) . "\n" .
+                   'Pending Reason: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PENDINGREASON']);
 
       $sql_data_array = array('orders_id' => $insert_id,
                               'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
@@ -356,7 +360,7 @@ EOD;
                               'customer_notified' => '0',
                               'comments' => $pp_result);
 
-      tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+      $OSCOM_Db->save('orders_status_history', $sql_data_array);
 
       tep_session_unregister('appPayPalEcResult');
       tep_session_unregister('appPayPalEcSecret');
@@ -365,14 +369,16 @@ EOD;
     function after_process_payflow() {
       global $response_array, $insert_id, $appPayPalEcResult;
 
-      $pp_result = 'Transaction ID: ' . tep_output_string_protected($response_array['PNREF']) . "\n" .
+      $OSCOM_Db = Registry::get('Db');
+
+      $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PNREF']) . "\n" .
                    'Gateway: Payflow' . "\n" .
-                   'PayPal ID: ' . tep_output_string_protected($response_array['PPREF']) . "\n" .
-                   'Payer Status: ' . tep_output_string_protected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
-                   'Address Status: ' . tep_output_string_protected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
-                   'Payment Status: ' . tep_output_string_protected($response_array['PENDINGREASON']) . "\n" .
-                   'Payment Type: ' . tep_output_string_protected($response_array['PAYMENTTYPE']) . "\n" .
-                   'Response: ' . tep_output_string_protected($response_array['RESPMSG']) . "\n";
+                   'PayPal ID: ' . HTML::outputProtected($response_array['PPREF']) . "\n" .
+                   'Payer Status: ' . HTML::outputProtected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
+                   'Address Status: ' . HTML::outputProtected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
+                   'Payment Status: ' . HTML::outputProtected($response_array['PENDINGREASON']) . "\n" .
+                   'Payment Type: ' . HTML::outputProtected($response_array['PAYMENTTYPE']) . "\n" .
+                   'Response: ' . HTML::outputProtected($response_array['RESPMSG']) . "\n";
 
       $sql_data_array = array('orders_id' => $insert_id,
                               'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
@@ -380,7 +386,7 @@ EOD;
                               'customer_notified' => '0',
                               'comments' => $pp_result);
 
-      tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+      $OSCOM_Db->save('orders_status_history', $sql_data_array);
 
       tep_session_unregister('appPayPalEcResult');
       tep_session_unregister('appPayPalEcSecret');
@@ -389,7 +395,7 @@ EOD;
       $response = $this->_app->getApiResult('APP', 'PayflowInquiry', array('ORIGID' => $response_array['PNREF']));
 
       if ( isset($response['RESULT']) && ($response['RESULT'] == '0') ) {
-        $result = 'Transaction ID: ' . tep_output_string_protected($response['ORIGPNREF']) . "\n" .
+        $result = 'Transaction ID: ' . HTML::outputProtected($response['ORIGPNREF']) . "\n" .
                   'Gateway: Payflow' . "\n";
 
         $pending_reason = $response['TRANSSTATE'];
@@ -419,10 +425,10 @@ EOD;
         }
 
         if ( isset($payment_status) ) {
-          $result .= 'Payment Status: ' . tep_output_string_protected($payment_status) . "\n";
+          $result .= 'Payment Status: ' . HTML::outputProtected($payment_status) . "\n";
         }
 
-        $result .= 'Pending Reason: ' . tep_output_string_protected($pending_reason) . "\n";
+        $result .= 'Pending Reason: ' . HTML::outputProtected($pending_reason) . "\n";
 
         switch ( $response['AVSADDR'] ) {
           case 'Y':
@@ -470,7 +476,7 @@ EOD;
                                 'customer_notified' => '0',
                                 'comments' => $result);
 
-        tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+        $OSCOM_Db->save('orders_status_history', $sql_data_array);
       }
     }
 
@@ -479,14 +485,7 @@ EOD;
     }
 
     function check() {
-      $check_query = tep_db_query("select configuration_value from " . TABLE_CONFIGURATION . " where configuration_key = 'OSCOM_APP_PAYPAL_EC_STATUS'");
-      if ( tep_db_num_rows($check_query) ) {
-        $check = tep_db_fetch_array($check_query);
-
-        return tep_not_null($check['configuration_value']);
-      }
-
-      return false;
+      return defined('OSCOM_APP_PAYPAL_EC_STATUS') && !empty(OSCOM_APP_PAYPAL_EC_STATUS);
     }
 
     function install() {
@@ -502,10 +501,15 @@ EOD;
     }
 
     function getProductType($id, $attributes) {
-      foreach ( $attributes as $a ) {
-        $virtual_check_query = tep_db_query("select pad.products_attributes_id from " . TABLE_PRODUCTS_ATTRIBUTES . " pa, " . TABLE_PRODUCTS_ATTRIBUTES_DOWNLOAD . " pad where pa.products_id = '" . (int)$id . "' and pa.options_values_id = '" . (int)$a['value_id'] . "' and pa.products_attributes_id = pad.products_attributes_id limit 1");
+      $OSCOM_Db = Registry::get('Db');
 
-        if ( tep_db_num_rows($virtual_check_query) == 1 ) {
+      foreach ( $attributes as $a ) {
+        $Qcheck = $OSCOM_Db->prepare('select pad.products_attributes_id from :table_products_attributes pa, :table_products_attributes_download pad where pa.products_id = :products_id and pa.options_values_id = :options_values_id and pa.products_attributes_id = pad.products_attributes_id limit 1');
+        $Qcheck->bindInt(':products_id', $id);
+        $Qcheck->bindInt(':options_values_id', $a['value_id']);
+        $Qcheck->execute();
+
+        if ($Qcheck->fetch() !== false) {
           return 'Digital';
         }
       }

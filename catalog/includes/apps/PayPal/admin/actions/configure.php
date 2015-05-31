@@ -27,28 +27,26 @@
   $current_module = (isset($_GET['module']) && in_array($_GET['module'], $modules)) ? $_GET['module'] : $default_module;
 
   if ( !defined('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID') ) {
-    $check_query = tep_db_query("select orders_status_id from " . TABLE_ORDERS_STATUS . " where orders_status_name = 'PayPal [Transactions]' limit 1");
+    $Qcheck = $OSCOM_Db->get('orders_status', 'orders_status_id', ['orders_status_name' => 'PayPal [Transactions]'], null, 1);
 
-    if (tep_db_num_rows($check_query) < 1) {
-      $status_query = tep_db_query("select max(orders_status_id) as status_id from " . TABLE_ORDERS_STATUS);
-      $status = tep_db_fetch_array($status_query);
+    if ($Qcheck->fetch() === false) {
+      $Qstatus = $OSCOM_Db->get('orders_status', 'max(orders_status_id) as status_id');
 
-      $status_id = $status['status_id']+1;
+      $status_id = $Qstatus->valueInt('status_id') + 1;
 
       $languages = tep_get_languages();
 
       foreach ($languages as $lang) {
-        tep_db_query("insert into " . TABLE_ORDERS_STATUS . " (orders_status_id, language_id, orders_status_name) values ('" . $status_id . "', '" . $lang['id'] . "', 'PayPal [Transactions]')");
-      }
-
-      $flags_query = tep_db_query("describe " . TABLE_ORDERS_STATUS . " public_flag");
-      if (tep_db_num_rows($flags_query) == 1) {
-        tep_db_query("update " . TABLE_ORDERS_STATUS . " set public_flag = 0 and downloads_flag = 0 where orders_status_id = '" . $status_id . "'");
+        $OSCOM_Db->save('orders_status', [
+          'orders_status_id' => $status_id,
+          'language_id' => $lang['id'],
+          'orders_status_name' => 'PayPal [Transactions]',
+          'public_flag' => 0,
+          'downloads_flag' => 0
+        ]);
       }
     } else {
-      $check = tep_db_fetch_array($check_query);
-
-      $status_id = $check['orders_status_id'];
+      $status_id = $Qcheck->valueInt('orders_status_id');
     }
 
     $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID', $status_id);

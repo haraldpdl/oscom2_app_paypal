@@ -12,7 +12,7 @@
 
   use OSC\OM\OSCOM;
 
-  tep_db_query('delete from oscom_app_paypal_log');
+  $OSCOM_Db->delete('oscom_app_paypal_log');
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
 

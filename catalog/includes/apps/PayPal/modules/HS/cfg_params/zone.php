@@ -11,6 +11,7 @@
 */
 
   use OSC\OM\HTML;
+  use OSC\OM\Registry;
 
   class OSCOM_PayPal_HS_Cfg_zone {
     var $default = '0';
@@ -28,12 +29,15 @@
     function getSetField() {
       global $OSCOM_PayPal;
 
+      $OSCOM_Db = Registry::get('Db');
+
       $zone_class_array = array(array('id' => '0', 'text' => $OSCOM_PayPal->getDef('cfg_hs_zone_global')));
 
-      $zone_class_query = tep_db_query("select geo_zone_id, geo_zone_name from " . TABLE_GEO_ZONES . " order by geo_zone_name");
-      while ($zone_class = tep_db_fetch_array($zone_class_query)) {
-        $zone_class_array[] = array('id' => $zone_class['geo_zone_id'],
-                                    'text' => $zone_class['geo_zone_name']);
+      $Qclasses = $OSCOM_Db->get('geo_zones', ['geo_zone_id', 'geo_zone_name'], null, 'geo_zone_name');
+
+      while ($Qclasses->fetch()) {
+        $zone_class_array[] = array('id' => $Qclasses->valueInt('geo_zone_id'),
+                                    'text' => $Qclasses->value('geo_zone_name'));
       }
 
       $input = HTML::selectField('zone', $zone_class_array, OSCOM_APP_PAYPAL_HS_ZONE, 'id="inputHsZone"');

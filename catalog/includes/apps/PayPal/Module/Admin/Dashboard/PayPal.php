@@ -9,6 +9,7 @@
 namespace OSC\OM\Apps\PayPal\Module\Admin\Dashboard;
 
 use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
 if ( !class_exists('OSCOM_PayPal', false) ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
@@ -310,7 +311,17 @@ EOD;
     }
 
     public function install() {
-      tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER', '0', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
+      $OSCOM_Db = Registry::get('Db');
+
+      $OSCOM_Db->save('configuration', [
+          'configuration_title' => 'Sort Order',
+          'configuration_key' => 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER',
+          'configuration_value' => '0',
+          'configuration_description' => 'Sort order of display. Lowest is displayed first.',
+          'configuration_group_id' => '6',
+          'sort_order' => '0',
+          'date_added' => 'now()'
+      ]);
     }
 
     public function keys() {

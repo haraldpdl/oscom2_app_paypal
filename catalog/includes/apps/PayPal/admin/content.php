@@ -12,7 +12,9 @@
 
   use OSC\OM\OSCOM;
 
-  if ( tep_db_num_rows(tep_db_query("show tables like 'oscom_app_paypal_log'")) != 1 ) {
+  $Qcheck = $OSCOM_Db->query('show tables like "oscom_app_paypal_log"');
+
+  if ($Qcheck->fetch() === false) {
     $sql = <<<EOD
 CREATE TABLE oscom_app_paypal_log (
   id int unsigned NOT NULL auto_increment,
@@ -28,10 +30,9 @@ CREATE TABLE oscom_app_paypal_log (
   PRIMARY KEY (id),
   KEY idx_oapl_module (module)
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-
 EOD;
 
-    tep_db_query($sql);
+    $OSCOM_Db->exec($sql);
   }
 
   require(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
@@ -49,21 +50,24 @@ EOD;
 
   $OSCOM_PayPal->loadLanguageFile('admin/' . $action . '.php');
 
-  if ( $action == 'start' ) {
-    if ( $OSCOM_PayPal->migrate() ) {
-      if ( defined('MODULE_ADMIN_DASHBOARD_INSTALLED') ) {
-        $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
+  if ( ($action == 'start') && $OSCOM_PayPal->migrate() ) {
+    $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
+    $adm_class = 'OSC\OM\Apps\PayPal\Module\Admin\Dashboard\PayPal';
 
-        if ( !in_array('d_paypal_app.php', $admin_dashboard_modules) ) {
-          $admin_dashboard_modules[] = 'd_paypal_app.php';
+    if ( !in_array($adm_class, $admin_dashboard_modules) ) {
+      $admin_dashboard_modules[] = $adm_class;
 
-          tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . tep_db_input(implode(';', $admin_dashboard_modules)) . "' where configuration_key = 'MODULE_ADMIN_DASHBOARD_INSTALLED'");
-          tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('Sort Order', 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER', '5000', 'Sort order of display. Lowest is displayed first.', '6', '0', now())");
-        }
-      }
+      $adm = new $adm_class();
+      $adm->install();
 
-      OSCOM::redirect('admin/apps.php', tep_get_all_get_params());
+      $OSCOM_Db->save('configuration', ['configuration_value' => implode(';', $admin_dashboard_modules)], ['configuration_key' => 'MODULE_ADMIN_DASHBOARD_INSTALLED']);
+
+      unset($adm);
+      unset($adm_class);
+      unset($admin_dashboard_modules);
     }
+
+    OSCOM::redirect('admin/apps.php', tep_get_all_get_params());
   }
 
   include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '.php');

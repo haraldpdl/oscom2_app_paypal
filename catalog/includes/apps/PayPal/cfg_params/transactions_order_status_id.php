@@ -11,6 +11,7 @@
 */
 
   use OSC\OM\HTML;
+  use OSC\OM\Registry;
 
   class OSCOM_PayPal_Cfg_transactions_order_status_id {
     var $default = '0';
@@ -26,19 +27,15 @@
     }
 
     function getSetField() {
+      $OSCOM_Db = Registry::get('Db');
+
       $statuses_array = array();
 
-      $flags_query = tep_db_query("describe " . TABLE_ORDERS_STATUS . " public_flag");
+      $Qstatuses = $OSCOM_Db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id'], 'public_flag' => '0'], 'orders_status_name');
 
-      if (tep_db_num_rows($flags_query) == 1) {
-        $statuses_query = tep_db_query("select orders_status_id, orders_status_name from " . TABLE_ORDERS_STATUS . " where language_id = '" . (int)$_SESSION['languages_id'] . "' and public_flag = '0' order by orders_status_name");
-      } else {
-        $statuses_query = tep_db_query("select orders_status_id, orders_status_name from " . TABLE_ORDERS_STATUS . " where language_id = '" . (int)$_SESSION['languages_id'] . "' order by orders_status_name");
-      }
-
-      while ($statuses = tep_db_fetch_array($statuses_query)) {
-        $statuses_array[] = array('id' => $statuses['orders_status_id'],
-                                  'text' => $statuses['orders_status_name']);
+      while ($Qstatuses->next()) {
+        $statuses_array[] = array('id' => $Qstatuses->valueInt('orders_status_id'),
+                                  'text' => $Qstatuses->value('orders_status_name'));
       }
 
       $input = HTML::selectField('transactions_order_status_id', $statuses_array, OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID, 'id="inputTransactionsOrderStatusId"');

@@ -10,7 +10,9 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
+  use OSC\OM\Registry;
 
   if ( !class_exists('OSCOM_PayPal') ) {
     include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
@@ -101,6 +103,8 @@
     function preLogin() {
       global $paypal_login_access_token, $paypal_login_customer_id, $sendto, $billto;
 
+      $OSCOM_Db = Registry::get('Db');
+
       $return_url = OSCOM::link('login.php', '', 'SSL');
 
       if ( isset($_GET['code']) ) {
@@ -135,16 +139,15 @@
 
               $force_login = true;
 
-              $email_address = tep_db_prepare_input($response['email']);
+              $email_address = HTML::sanitize($response['email']);
 
-              $check_query = tep_db_query("select customers_id from " . TABLE_CUSTOMERS . " where customers_email_address = '" . tep_db_input($email_address) . "' limit 1");
-              if (tep_db_num_rows($check_query)) {
-                $check = tep_db_fetch_array($check_query);
+              $Qcheck = $OSCOM_Db->get('customers', 'customers_id', ['customers_email_address' => $email_address], null, 1);
 
-                $customer_id = (int)$check['customers_id'];
+              if ($Qcheck->fetch() !== false) {
+                $customer_id = $Qcheck->valueInt('customers_id');
               } else {
-                $customers_firstname = tep_db_prepare_input($response['given_name']);
-                $customers_lastname = tep_db_prepare_input($response['family_name']);
+                $customers_firstname = HTML::sanitize($response['given_name']);
+                $customers_lastname = HTML::sanitize($response['family_name']);
 
                 $sql_data_array = array('customers_firstname' => $customers_firstname,
                                         'customers_lastname' => $customers_lastname,
@@ -155,53 +158,68 @@
                                         'customers_password' => '');
 
                 if ($this->hasAttribute('phone') && isset($response['phone_number']) && tep_not_null($response['phone_number'])) {
-                  $customers_telephone = tep_db_prepare_input($response['phone_number']);
+                  $customers_telephone = HTML::sanitize($response['phone_number']);
 
                   $sql_data_array['customers_telephone'] = $customers_telephone;
                 }
 
-                tep_db_perform(TABLE_CUSTOMERS, $sql_data_array);
+                $OSCOM_Db->save('customers', $sql_data_array);
 
-                $customer_id = (int)tep_db_insert_id();
+                $customer_id = $OSCOM_Db->lastInsertId();
 
-                tep_db_query("insert into " . TABLE_CUSTOMERS_INFO . " (customers_info_id, customers_info_number_of_logons, customers_info_date_account_created) values ('" . (int)$customer_id . "', '0', now())");
+                $OSCOM_Db->save('customers_info', [
+                  'customers_info_id' => $customer_id,
+                  'customers_info_number_of_logons' => '0',
+                  'customers_info_date_account_created' => 'now()'
+                ]);
               }
             }
 
 // check if paypal shipping address exists in the address book
-            $ship_firstname = tep_db_prepare_input($response['given_name']);
-            $ship_lastname = tep_db_prepare_input($response['family_name']);
-            $ship_address = tep_db_prepare_input($response['address']['street_address']);
-            $ship_city = tep_db_prepare_input($response['address']['locality']);
-            $ship_zone = tep_db_prepare_input($response['address']['region']);
+            $ship_firstname = HTML::sanitize($response['given_name']);
+            $ship_lastname = HTML::sanitize($response['family_name']);
+            $ship_address = HTML::sanitize($response['address']['street_address']);
+            $ship_city = HTML::sanitize($response['address']['locality']);
+            $ship_zone = HTML::sanitize($response['address']['region']);
             $ship_zone_id = 0;
-            $ship_postcode = tep_db_prepare_input($response['address']['postal_code']);
-            $ship_country = tep_db_prepare_input($response['address']['country']);
+            $ship_postcode = HTML::sanitize($response['address']['postal_code']);
+            $ship_country = HTML::sanitize($response['address']['country']);
             $ship_country_id = 0;
             $ship_address_format_id = 1;
 
-            $country_query = tep_db_query("select countries_id, address_format_id from " . TABLE_COUNTRIES . " where countries_iso_code_2 = '" . tep_db_input($ship_country) . "' limit 1");
-            if (tep_db_num_rows($country_query)) {
-              $country = tep_db_fetch_array($country_query);
+            $Qcountry = $OSCOM_Db->get('countries', ['countries_id', 'address_format_id'], ['countries_iso_code_2' => $ship_country], null, 1);
 
-              $ship_country_id = $country['countries_id'];
-              $ship_address_format_id = $country['address_format_id'];
+            if ($Qcountry->fetch() !== false) {
+              $ship_country_id = $Qcountry->valueInt('countries_id');
+              $ship_address_format_id = $Qcountry->valueInt('address_format_id');
             }
 
             if ($ship_country_id > 0) {
-              $zone_query = tep_db_query("select zone_id from " . TABLE_ZONES . " where zone_country_id = '" . (int)$ship_country_id . "' and (zone_name = '" . tep_db_input($ship_zone) . "' or zone_code = '" . tep_db_input($ship_zone) . "') limit 1");
-              if (tep_db_num_rows($zone_query)) {
-                $zone = tep_db_fetch_array($zone_query);
+              $Qzone = $OSCOM_Db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+              $Qzone->bindInt(':zone_country_id', $ship_country_id);
+              $Qzone->bindValue(':zone_name', $ship_zone);
+              $Qzone->bindValue(':zone_code', $ship_zone);
+              $Qzone->execute();
 
-                $ship_zone_id = $zone['zone_id'];
+              if ($Qzone->fetch() !== false) {
+                $ship_zone_id = $Qzone->valueInt('zone_id');
               }
             }
 
-            $check_query = tep_db_query("select address_book_id from " . TABLE_ADDRESS_BOOK . " where customers_id = '" . (int)$customer_id . "' and entry_firstname = '" . tep_db_input($ship_firstname) . "' and entry_lastname = '" . tep_db_input($ship_lastname) . "' and entry_street_address = '" . tep_db_input($ship_address) . "' and entry_postcode = '" . tep_db_input($ship_postcode) . "' and entry_city = '" . tep_db_input($ship_city) . "' and (entry_state = '" . tep_db_input($ship_zone) . "' or entry_zone_id = '" . (int)$ship_zone_id . "') and entry_country_id = '" . (int)$ship_country_id . "' limit 1");
-            if (tep_db_num_rows($check_query)) {
-              $check = tep_db_fetch_array($check_query);
+            $Qcheck = $OSCOM_Db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
+            $Qcheck->bindInt(':customers_id', $customer_id);
+            $Qcheck->bindValue(':entry_firstname', $ship_firstname);
+            $Qcheck->bindValue(':entry_lastname', $ship_lastname);
+            $Qcheck->bindValue(':entry_street_address', $ship_address);
+            $Qcheck->bindValue(':entry_postcode', $ship_postcode);
+            $Qcheck->bindValue(':entry_city', $ship_city);
+            $Qcheck->bindValue(':entry_state', $ship_zone);
+            $Qcheck->bindInt(':entry_zone_id', $ship_zone_id);
+            $Qcheck->bindInt(':entry_country_id', $ship_country_id);
+            $Qcheck->execute();
 
-              $sendto = $check['address_book_id'];
+            if ($Qcheck->fetch() !== false) {
+              $sendto = $Qcheck->valueInt('address_book_id');
             } else {
               $sql_data_array = array('customers_id' => $customer_id,
                                       'entry_firstname' => $ship_firstname,
@@ -221,14 +239,14 @@
                 }
               }
 
-              tep_db_perform(TABLE_ADDRESS_BOOK, $sql_data_array);
+              $OSCOM_Db->save('address_book', $sql_data_array);
 
-              $address_id = tep_db_insert_id();
+              $address_id = $OSCOM_Db->lastInsertId();
 
               $sendto = $address_id;
 
               if ($customer_default_address_id < 1) {
-                tep_db_query("update " . TABLE_CUSTOMERS . " set customers_default_address_id = '" . (int)$address_id . "' where customers_id = '" . (int)$customer_id . "'");
+                $OSCOM_Db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $customer_id]);
                 $customer_default_address_id = $address_id;
               }
             }

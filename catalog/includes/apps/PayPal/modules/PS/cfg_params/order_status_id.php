@@ -11,6 +11,7 @@
 */
 
   use OSC\OM\HTML;
+  use OSC\OM\Registry;
 
   class OSCOM_PayPal_PS_Cfg_order_status_id {
     var $default = '0';
@@ -28,12 +29,15 @@
     function getSetField() {
       global $OSCOM_PayPal;
 
+      $OSCOM_Db = Registry::get('Db');
+
       $statuses_array = array(array('id' => '0', 'text' => $OSCOM_PayPal->getDef('cfg_ps_order_status_id_default')));
 
-      $statuses_query = tep_db_query("select orders_status_id, orders_status_name from " . TABLE_ORDERS_STATUS . " where language_id = '" . (int)$_SESSION['languages_id'] . "' order by orders_status_name");
-      while ($statuses = tep_db_fetch_array($statuses_query)) {
-        $statuses_array[] = array('id' => $statuses['orders_status_id'],
-                                  'text' => $statuses['orders_status_name']);
+      $Qstatuses = $OSCOM_Db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id']], 'orders_status_name');
+
+      while ($Qstatuses->next()) {
+        $statuses_array[] = array('id' => $Qstatuses->valueInt('orders_status_id'),
+                                  'text' => $Qstatuses->value('orders_status_name'));
       }
 
       $input = HTML::selectField('order_status_id', $statuses_array, OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID, 'id="inputPsOrderStatusId"');

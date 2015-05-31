@@ -10,17 +10,18 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 
-  $log_query_raw = "select l.id, l.customers_id, l.module, l.action, l.result, l.ip_address, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from oscom_app_paypal_log l left join " . TABLE_CUSTOMERS . " c on (l.customers_id = c.customers_id) order by l.date_added desc";
-  $log_split = new splitPageResults($_GET['page'], MAX_DISPLAY_SEARCH_RESULTS, $log_query_raw, $log_query_numrows);
-  $log_query = tep_db_query($log_query_raw);
+  $Qlog = $OSCOM_Db->prepare('select SQL_CALC_FOUND_ROWS l.id, l.customers_id, l.module, l.action, l.result, l.ip_address, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from :table_oscom_app_paypal_log l left join :table_customers c on (l.customers_id = c.customers_id) order by l.date_added desc limit :page_set_offset, :page_set_max_results');
+  $Qlog->setPageSet(MAX_DISPLAY_SEARCH_RESULTS);
+  $Qlog->execute();
 ?>
 
 <table width="100%" style="margin-bottom: 5px;">
   <tr>
     <td><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_dialog_delete'), '#', 'warning', 'data-button="delLogs"'); ?></td>
-    <td style="text-align: right;"><?php echo $log_split->display_links($log_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], 'action=log'); ?></td>
+    <td style="text-align: right;"><?php echo $Qlog->getPageSetLinks(tep_get_all_get_params(array('page'))); ?></td>
   </tr>
 </table>
 
@@ -36,12 +37,12 @@
   <tbody>
 
 <?php
-  if ( tep_db_num_rows($log_query) > 0 ) {
-    while ($log = tep_db_fetch_array($log_query)) {
+  if ($Qlog->getPageSetTotalRows() > 0) {
+    while ($Qlog->fetch()) {
       $customers_name = null;
 
-      if ( $log['customers_id'] > 0 ) {
-        $customers_name = trim($log['customers_firstname'] . ' ' . $log['customers_lastname']);
+      if ( $Qlog->valueInt('customers_id') > 0 ) {
+        $customers_name = trim($Qlog->value('customers_firstname') . ' ' . $Qlog->value('customers_lastname'));
 
         if ( empty($customers_name) ) {
           $customers_name = '- ? -';
@@ -50,12 +51,12 @@
 ?>
 
     <tr>
-      <td style="text-align: center; width: 30px;"><span class="<?php echo ($log['result'] == '1') ? 'logSuccess' : 'logError'; ?>"><?php echo $log['module']; ?></span></td>
-      <td><?php echo $log['action']; ?></td>
-      <td><?php echo long2ip($log['ip_address']); ?></td>
-      <td><?php echo (!empty($customers_name)) ? tep_output_string_protected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
-      <td><?php echo date(PHP_DATE_TIME_FORMAT, $log['date_added']); ?></td>
-      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), OSCOM::link('admin/apps.php', 'PayPal&action=log&page=' . $_GET['page'] . '&lID=' . $log['id'] . '&subaction=view'), 'info'); ?></small></td>
+      <td style="text-align: center; width: 30px;"><span class="<?php echo ($Qlog->valueInt('result') === 1) ? 'logSuccess' : 'logError'; ?>"><?php echo $Qlog->value('module'); ?></span></td>
+      <td><?php echo $Qlog->value('action'); ?></td>
+      <td><?php echo long2ip($Qlog->value('ip_address')); ?></td>
+      <td><?php echo (!empty($customers_name)) ? HTML::outputProtected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
+      <td><?php echo date(PHP_DATE_TIME_FORMAT, $Qlog->value('date_added')); ?></td>
+      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), OSCOM::link('admin/apps.php', 'PayPal&action=log&page=' . $_GET['page'] . '&lID=' . $Qlog->valueInt('id') . '&subaction=view'), 'info'); ?></small></td>
     </tr>
 
 <?php
@@ -76,12 +77,12 @@
 
 <table width="100%">
   <tr>
-    <td valign="top"><?php echo $log_split->display_count($log_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, $_GET['page'], $OSCOM_PayPal->getDef('listing_number_of_log_entries')); ?></td>
-    <td style="text-align: right;"><?php echo $log_split->display_links($log_query_numrows, MAX_DISPLAY_SEARCH_RESULTS, MAX_DISPLAY_PAGE_LINKS, $_GET['page'], 'action=log'); ?></td>
+    <td valign="top"><?php echo $Qlog->getPageSetLabel($OSCOM_PayPal->getDef('listing_number_of_log_entries')); ?></td>
+    <td style="text-align: right;"><?php echo $Qlog->getPageSetLinks(tep_get_all_get_params(array('page'))); ?></td>
   </tr>
 </table>
 
-<div id="delLogs-dialog-confirm" title="<?php echo tep_output_string_protected($OSCOM_PayPal->getDef('dialog_delete_title')); ?>">
+<div id="delLogs-dialog-confirm" title="<?php echo HTML::outputProtected($OSCOM_PayPal->getDef('dialog_delete_title')); ?>">
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php echo $OSCOM_PayPal->getDef('dialog_delete_body'); ?></p>
 </div>
 

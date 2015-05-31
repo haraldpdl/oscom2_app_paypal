@@ -10,6 +10,8 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\Registry;
+
   class OSCOM_PayPal {
     var $_code = 'paypal';
     var $_title = 'PayPal App';
@@ -18,10 +20,13 @@
     var $_definitions = array();
 
     function isReqApiCountrySupported($country_id) {
-      $country_query = tep_db_query("select countries_iso_code_2 from " . TABLE_COUNTRIES . " where countries_id = '" . (int)$country_id . "'");
-      $country = tep_db_fetch_array($country_query);
+      $Qcountry = Registry::get('Db')->get('countries', 'countries_iso_code_2', ['countries_id' => $country_id]);
 
-      return in_array($country['countries_iso_code_2'], $this->getReqApiCountries());
+      if ($Qcountry->fetch() !== false) {
+        return in_array($Qcountry->valueInt('countries_iso_code_2'), $this->getReqApiCountries());
+      }
+
+      return false;
     }
 
     function getReqApiCountries() {
@@ -103,7 +108,7 @@
                     'ip_address' => sprintf('%u', ip2long($this->getIpAddress())),
                     'date_added' => 'now()');
 
-      tep_db_perform('oscom_app_paypal_log', $data);
+      Registry::get('Db')->save('oscom_app_paypal_log', $data);
     }
 
     function migrate() {
@@ -580,6 +585,8 @@
     }
 
     function saveParameter($key, $value, $title = null, $description = null, $set_func = null) {
+      $OSCOM_Db = Registry::get('Db');
+
       if ( !defined($key) ) {
         if ( !isset($title) ) {
           $title = 'PayPal App Parameter';
@@ -589,20 +596,30 @@
           $description = 'A parameter for the PayPal Application.';
         }
 
-        tep_db_query("insert into " . TABLE_CONFIGURATION . " (configuration_title, configuration_key, configuration_value, configuration_description, configuration_group_id, sort_order, date_added) values ('" . tep_db_input($title) . "', '" . tep_db_input($key) . "', '" . tep_db_input($value) . "', '" . tep_db_input($description) . "', '6', '0', now())");
+        $data = [
+          'configuration_title' => $title,
+          'configuration_key' => $key,
+          'configuration_value' => $value,
+          'configuration_description' => $description,
+          'configuration_group_id' => '6',
+          'sort_order' => '0',
+          'date_added' => 'now()'
+        ];
 
         if ( isset($set_func) ) {
-          tep_db_query("update " . TABLE_CONFIGURATION . " set set_function = '" . tep_db_input($set_func) . "' where configuration_key = '" . tep_db_input($key) . "'");
+          $data['set_function'] = $set_func;
         }
+
+        $OSCOM_Db->save('configuration', $data);
 
         define($key, $value);
       } else {
-        tep_db_query("update " . TABLE_CONFIGURATION . " set configuration_value = '" . tep_db_input($value) . "' where configuration_key = '" . tep_db_input($key) . "'");
+        $OSCOM_Db->save('configuration', ['configuration_value' => $value], ['configuration_key' => $key]);
       }
     }
 
     function deleteParameter($key) {
-      tep_db_query("delete from " . TABLE_CONFIGURATION . " where configuration_key = '" . tep_db_input($key) . "'");
+      Registry::get('Db')->delete('configuration', ['configuration_key' => $key]);
     }
 
     function formatCurrencyRaw($total, $currency_code = null, $currency_value = null) {
@@ -729,7 +746,9 @@
     }
 
     function uninstall($module) {
-      tep_db_query("delete from " . TABLE_CONFIGURATION . " where configuration_key like 'OSCOM_APP_PAYPAL_" . tep_db_input($module) . "_%'");
+      $Qdelete = Registry::get('Db')->prepare('delete from :table_configuration where configuration_key like :configuration_key');
+      $Qdelete->bindValue(':configuration_key', 'OSCOM_APP_PAYPAL_' . $module . '_%');
+      $Qdelete->execute();
 
       $m_class = 'OSCOM_PayPal_' . $module;
 

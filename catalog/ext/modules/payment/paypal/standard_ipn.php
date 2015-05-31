@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 
   chdir('../../../../');
@@ -63,19 +64,17 @@
     $order_id = (int)$_POST['invoice'];
     $customer_id = (int)$_POST['custom'];
 
-    $check_query = tep_db_query("select orders_status from " . TABLE_ORDERS . " where orders_id = '" . (int)$order_id . "' and customers_id = '" . (int)$customer_id . "'");
+    $Qorder = $OSCOM_Db->get('orders', 'orders_status', ['orders_id' => $order_id, 'customers_id' => $customer_id]);
 
-    if (tep_db_num_rows($check_query)) {
-      $check = tep_db_fetch_array($check_query);
-
-      if ( $check['orders_status'] == OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID ) {
+    if ($Qorder->fetch() !== false) {
+      if ( $Qorder->value('orders_status') == OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID ) {
         $new_order_status = DEFAULT_ORDERS_STATUS_ID;
 
         if ( OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID > 0 ) {
           $new_order_status = OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID;
         }
 
-        tep_db_query("update " . TABLE_ORDERS . " set orders_status = '" . (int)$new_order_status . "', last_modified = now() where orders_id = '" . (int)$order_id . "'");
+        $OSCOM_Db->save('orders', ['orders_status' => $new_order_status, 'last_modified' => 'now()'], ['orders_id' => $order_id]);
 
         $sql_data_array = array('orders_id' => $order_id,
                                 'orders_status_id' => (int)$new_order_status,
@@ -83,16 +82,19 @@
                                 'customer_notified' => (SEND_EMAILS == 'true') ? '1' : '0',
                                 'comments' => '');
 
-        tep_db_perform(TABLE_ORDERS_STATUS_HISTORY, $sql_data_array);
+        $OSCOM_Db->save('orders_status_history', $sql_data_array);
 
         include(DIR_WS_CLASSES . 'order.php');
         $order = new order($order_id);
 
         if (DOWNLOAD_ENABLED == 'true') {
           for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
-            $downloads_query = tep_db_query("select opd.orders_products_filename from " . TABLE_ORDERS . " o, " . TABLE_ORDERS_PRODUCTS . " op, " . TABLE_ORDERS_PRODUCTS_DOWNLOAD . " opd where o.orders_id = '" . (int)$order_id . "' and o.customers_id = '" . (int)$customer_id . "' and o.orders_id = op.orders_id and op.orders_products_id = opd.orders_products_id and opd.orders_products_filename != ''");
+            $Qdownloads = $OSCOM_Db->prepare('select opd.orders_products_filename from :table_orders o, :table_orders_products op, :table_orders_products_download opd where o.orders_id = :orders_id and o.customers_id = :customers_id and o.orders_id = op.orders_id and op.orders_products_id = opd.orders_products_id and opd.orders_products_filename != ""');
+            $Qdownloads->bindInt(':orders_id', $order_id);
+            $Qdownloads->bindInt(':customers_id', $customer_id);
+            $Qdownloads->execute();
 
-            if ( tep_db_num_rows($downloads_query) ) {
+            if ( $Qdownloads->fetch() !== false ) {
               if ( $order->content_type == 'physical' ) {
                 $order->content_type = 'mixed';
 
@@ -119,31 +121,60 @@
 
         for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
           if (STOCK_LIMITED == 'true') {
-            $stock_query = tep_db_query("select products_quantity from " . TABLE_PRODUCTS . " where products_id = '" . tep_get_prid($order->products[$i]['id']) . "'");
-            $stock_values = tep_db_fetch_array($stock_query);
-
-            $stock_left = $stock_values['products_quantity'] - $order->products[$i]['qty'];
-
             if (DOWNLOAD_ENABLED == 'true') {
-              $downloads_query = tep_db_query("select opd.orders_products_filename from " . TABLE_ORDERS . " o, " . TABLE_ORDERS_PRODUCTS . " op, " . TABLE_ORDERS_PRODUCTS_DOWNLOAD . " opd where o.orders_id = '" . (int)$order_id . "' and o.customers_id = '" . (int)$customer_id . "' and o.orders_id = op.orders_id and op.orders_products_id = opd.orders_products_id and opd.orders_products_filename != ''");
-              $downloads_values = tep_db_fetch_array($downloads_query);
+              $stock_query_sql = 'select p.products_quantity, pad.products_attributes_filename
+                                  from :table_products p
+                                  left join :table_products_attributes pa
+                                  on p.products_id = pa.products_id
+                                  left join :table_products_attributes_download pad
+                                  on pa.products_attributes_id = pad.products_attributes_id
+                                  where p.products_id = :products_id';
 
-              if ( tep_db_num_rows($downloads_query) ) {
-                $stock_left = $stock_values['products_quantity'];
+// Will work with only one option for downloadable products
+// otherwise, we have to build the query dynamically with a loop
+              $products_attributes = (isset($order->products[$i]['attributes'])) ? $order->products[$i]['attributes'] : '';
+              if (is_array($products_attributes)) {
+                $stock_query_sql .= ' and pa.options_id = :options_id and pa.options_values_id = :options_values_id';
               }
+
+              $Qstock = $OSCOM_Db->prepare($stock_query_sql);
+              $Qstock->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
+
+              if (is_array($products_attributes)) {
+                $Qstock->bindInt(':options_id', $products_attributes[0]['option_id']);
+                $Qstock->bindInt(':options_values_id', $products_attributes[0]['value_id']);
+              }
+
+              $Qstock->execute();
+            } else {
+              $Qstock = $OSCOM_Db->get('products', 'products_quantity', ['products_id' => tep_get_prid($order->products[$i]['id'])]);
             }
 
-            if ( $stock_values['products_quantity'] != $stock_left ) {
-              tep_db_query("update " . TABLE_PRODUCTS . " set products_quantity = '" . (int)$stock_left . "' where products_id = '" . tep_get_prid($order->products[$i]['id']) . "'");
+            if ($Qstock->fetch() !== false) {
+// do not decrement quantities if products_attributes_filename exists
+              if ((DOWNLOAD_ENABLED != 'true') || !empty($Qstock->value('products_attributes_filename'))) {
+                $stock_left = $Qstock->valueInt('products_quantity') - $order->products[$i]['qty'];
+              } else {
+                $stock_left = $Qstock->valueInt('products_quantity');
+              }
+
+              if ($stock_left != $Qstock->valueInt('products_quantity')) {
+                $OSCOM_Db->save('products', ['products_quantity' => $stock_left], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
+              }
 
               if ( ($stock_left < 1) && (STOCK_ALLOW_CHECKOUT == 'false') ) {
-                tep_db_query("update " . TABLE_PRODUCTS . " set products_status = '0' where products_id = '" . tep_get_prid($order->products[$i]['id']) . "'");
+               $OSCOM_Db->save('products', ['products_status' => '0'], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
               }
             }
           }
 
 // Update products_ordered (for bestsellers list)
-          tep_db_query("update " . TABLE_PRODUCTS . " set products_ordered = products_ordered + " . sprintf('%d', $order->products[$i]['qty']) . " where products_id = '" . tep_get_prid($order->products[$i]['id']) . "'");
+          $Qupdate = $OSCOM_Db->prepare('update :table_products set products_ordered = products_ordered + :products_ordered where products_id = :products_id');
+          $Qupdate->bindInt(':products_ordered', $order->products[$i]['qty']);
+          $Qupdate->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
+          $Qupdate->execute();
+
+          $products_ordered_attributes = '';
 
           if (isset($order->products[$i]['attributes'])) {
             for ($j=0, $n2=sizeof($order->products[$i]['attributes']); $j<$n2; $j++) {
@@ -162,7 +193,7 @@
                        EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
                        EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
         if ($order->info['comments']) {
-          $email_order .= tep_db_output($order->info['comments']) . "\n\n";
+          $email_order .= HTML::outputProtected($order->info['comments']) . "\n\n";
         }
         $email_order .= EMAIL_TEXT_PRODUCTS . "\n" .
                         EMAIL_SEPARATOR . "\n" .
@@ -187,7 +218,7 @@
                         EMAIL_SEPARATOR . "\n" .
                         $paypal_standard->title . "\n\n";
 
-        if ($paypal_standard->email_footer) {
+        if (isset($paypal_standard->email_footer)) {
           $email_order .= $paypal_standard->email_footer . "\n\n";
         }
 
@@ -198,8 +229,8 @@
           tep_mail('', SEND_EXTRA_ORDER_EMAILS_TO, EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
         }
 
-        tep_db_query("delete from " . TABLE_CUSTOMERS_BASKET . " where customers_id = '" . (int)$customer_id . "'");
-        tep_db_query("delete from " . TABLE_CUSTOMERS_BASKET_ATTRIBUTES . " where customers_id = '" . (int)$customer_id . "'");
+        $OSCOM_Db->delete('customers_basket', ['customers_id' => $customer_id]);
+        $OSCOM_Db->delete('customers_basket_attributes', ['customers_id' => $customer_id]);
       }
     }
   }
