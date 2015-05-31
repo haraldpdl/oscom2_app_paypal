@@ -47,7 +47,7 @@
 
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_success'), 'success');
 
-      OSCOM::redirect('admin/apps.php', 'PayPal&action=credentials');
+      OSCOM::redirect('apps.php', 'PayPal&action=credentials');
     } else {
       $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_retrieve_error'), 'error');
     }

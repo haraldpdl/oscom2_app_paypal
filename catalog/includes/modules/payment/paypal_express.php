@@ -34,7 +34,7 @@
       $this->code = 'paypal_express';
       $this->title = $this->_app->getDef('module_ec_title');
       $this->public_title = $this->_app->getDef('module_ec_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('admin/apps.php', 'PayPal&action=configure&module=EC'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=EC'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_EC_SORT_ORDER') ? OSCOM_APP_PAYPAL_EC_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_EC_STATUS') && in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID : 0;
@@ -489,11 +489,11 @@ EOD;
     }
 
     function install() {
-      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=install&module=EC');
+      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=EC');
     }
 
     function remove() {
-      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=uninstall&module=EC');
+      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=EC');
     }
 
     function keys() {

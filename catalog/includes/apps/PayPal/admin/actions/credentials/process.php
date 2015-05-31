@@ -43,5 +43,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_credentials_saved_success'), 'success');
 
-  OSCOM::redirect('admin/apps.php', 'PayPal&action=credentials&module=' . $current_module);
+  OSCOM::redirect('apps.php', 'PayPal&action=credentials&module=' . $current_module);
 ?>

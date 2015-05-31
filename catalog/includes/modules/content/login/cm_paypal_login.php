@@ -39,7 +39,7 @@
       $this->group = basename(dirname(__FILE__));
 
       $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('admin/apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
         $this->sort_order = OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER;
@@ -321,11 +321,11 @@
     }
 
     function install() {
-      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN');
+      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN');
     }
 
     function remove() {
-      OSCOM::redirect('admin/apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN');
+      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN');
     }
 
     function keys() {

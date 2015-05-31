@@ -16,5 +16,5 @@
 
   $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
 
-  OSCOM::redirect('admin/apps.php', 'PayPal&action=log');
+  OSCOM::redirect('apps.php', 'PayPal&action=log');
 ?>
