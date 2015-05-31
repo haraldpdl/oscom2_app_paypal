@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\Registry;
 
   class OSCOM_PayPal {
@@ -692,7 +693,7 @@
             $m = '<ul class="pp-alerts-' . $type . '">';
 
             foreach ( $messages as $message ) {
-              $m .= '<li>' . tep_output_string_protected($message) . '</li>';
+              $m .= '<li>' . HTML::outputProtected($message) . '</li>';
             }
 
             $m .= '</ul>';

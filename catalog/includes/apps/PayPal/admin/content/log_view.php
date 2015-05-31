@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 ?>
 
@@ -30,8 +31,8 @@
 ?>
 
     <tr>
-      <td width="25%"><?php echo tep_output_string_protected($key); ?></td>
-      <td><?php echo tep_output_string_protected($value); ?></td>
+      <td width="25%"><?php echo HTML::outputProtected($key); ?></td>
+      <td><?php echo HTML::outputProtected($value); ?></td>
     </tr>
 
 <?php
@@ -54,8 +55,8 @@
 ?>
 
     <tr>
-      <td width="25%"><?php echo tep_output_string_protected($key); ?></td>
-      <td><?php echo tep_output_string_protected($value); ?></td>
+      <td width="25%"><?php echo HTML::outputProtected($key); ?></td>
+      <td><?php echo HTML::outputProtected($value); ?></td>
     </tr>
 
 <?php

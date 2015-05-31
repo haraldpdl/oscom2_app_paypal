@@ -82,7 +82,7 @@
   </tr>
 </table>
 
-<div id="delLogs-dialog-confirm" title="<?php echo HTML::outputProtected($OSCOM_PayPal->getDef('dialog_delete_title')); ?>">
+<div id="delLogs-dialog-confirm" title="<?php echo HTML::output($OSCOM_PayPal->getDef('dialog_delete_title')); ?>">
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php echo $OSCOM_PayPal->getDef('dialog_delete_body'); ?></p>
 </div>
 

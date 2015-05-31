@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 ?>
 
@@ -110,7 +111,7 @@ $(function() {
     if ( $current_module != 'G' ) {
 ?>
 
-<div id="paypal-dialog-uninstall" title="<?php echo tep_output_string_protected($OSCOM_PayPal->getDef('dialog_uninstall_title')); ?>">
+<div id="paypal-dialog-uninstall" title="<?php echo HTML::output($OSCOM_PayPal->getDef('dialog_uninstall_title')); ?>">
   <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span><?php echo $OSCOM_PayPal->getDef('dialog_uninstall_body'); ?></p>
 </div>
 
