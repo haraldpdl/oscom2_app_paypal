@@ -410,7 +410,7 @@ if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
       <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . OSCOM::link('apps.php', 'PayPal&action=info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . OSCOM::link('apps.php', 'PayPal&action=privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
     </div>
 
-    <a href="<?php echo OSCOM::link('apps.php', 'PayPal&action=' . $action); ?>"><img src="<?php echo tep_catalog_href_link('images/apps/paypal/paypal.png', '', 'SSL'); ?>" /></a>
+    <a href="<?php echo OSCOM::link('apps.php', 'PayPal&action=' . $action); ?>"><img src="<?php echo OSCOM::link('Shop/public/apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
   </div>
 
   <div id="ppAppUpdateNotice" style="padding: 0 12px 0 12px; display: none;">
