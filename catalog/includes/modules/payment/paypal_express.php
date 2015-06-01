@@ -23,7 +23,7 @@
     var $code, $title, $description, $enabled, $_app;
 
     function paypal_express() {
-      global $PHP_SELF, $order, $payment, $request_type;
+      global $PHP_SELF, $order, $request_type;
 
       $this->_app = new OSCOM_PayPal();
       $this->_app->loadLanguageFile('modules/EC/EC.php');
@@ -85,10 +85,10 @@
       }
 
 // When changing the shipping address due to no shipping rates being available, head straight to the checkout confirmation page
-      if ( (basename($PHP_SELF) == 'checkout_payment.php') && tep_session_is_registered('appPayPalEcRightTurn') ) {
-        tep_session_unregister('appPayPalEcRightTurn');
+      if ( (basename($PHP_SELF) == 'checkout_payment.php') && isset($_SESSION['appPayPalEcRightTurn']) ) {
+        unset($_SESSION['appPayPalEcRightTurn']);
 
-        if ( tep_session_is_registered('payment') && ($payment == $this->code) ) {
+        if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->code) ) {
           OSCOM::redirect('checkout_confirmation.php', '', 'SSL');
         }
       }
@@ -118,8 +118,6 @@
     }
 
     function checkout_initialization_method() {
-      global $cart;
-
       if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_IMAGE == '1') ) {
         if (OSCOM_APP_PAYPAL_EC_STATUS == '1') {
           $image_button = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image';
@@ -134,7 +132,7 @@
 
           if ( isset($response_array['PAL']) ) {
             $params[] = 'pal=' . $response_array['PAL'];
-            $params[] = 'ordertotal=' . $this->_app->formatCurrencyRaw($cart->show_total());
+            $params[] = 'ordertotal=' . $this->_app->formatCurrencyRaw($_SESSION['cart']->show_total());
           }
         }
 
@@ -181,22 +179,22 @@ EOD;
     }
 
     function pre_confirmation_check() {
-      global $appPayPalEcResult, $appPayPalEcSecret, $messageStack, $order;
+      global $messageStack, $order;
 
-      if ( !tep_session_is_registered('appPayPalEcResult') ) {
+      if ( !isset($_SESSION['appPayPalEcResult']) ) {
         OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
       }
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
-        if ( !in_array($appPayPalEcResult['ACK'], array('Success', 'SuccessWithWarning')) ) {
-          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($appPayPalEcResult['L_LONGMESSAGE0']), 'SSL');
-        } elseif ( !tep_session_is_registered('appPayPalEcSecret') || ($appPayPalEcResult['PAYMENTREQUEST_0_CUSTOM'] != $appPayPalEcSecret) ) {
+        if ( !in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']), 'SSL');
+        } elseif ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['PAYMENTREQUEST_0_CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
           OSCOM::redirect('shopping_cart.php', '', 'SSL');
         }
       } else { // Payflow
-        if ($appPayPalEcResult['RESULT'] != '0') {
-          OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($appPayPalEcResult['OSCOM_ERROR_MESSAGE']), 'SSL');
-        } elseif ( !tep_session_is_registered('appPayPalEcSecret') || ($appPayPalEcResult['CUSTOM'] != $appPayPalEcSecret) ) {
+        if ($_SESSION['appPayPalEcResult']['RESULT'] != '0') {
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']), 'SSL');
+        } elseif ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
           OSCOM::redirect('shopping_cart.php', '', 'SSL');
         }
       }
@@ -205,17 +203,15 @@ EOD;
     }
 
     function confirmation() {
-      global $comments;
-
-      if (!isset($comments)) {
-        $comments = null;
+      if (!isset($_SESSION['comments'])) {
+        $_SESSION['comments'] = null;
       }
 
       $confirmation = false;
 
-      if (empty($comments)) {
+      if (empty($_SESSION['comments'])) {
         $confirmation = array('fields' => array(array('title' => $this->_app->getDef('module_ec_field_comments'),
-                                                      'field' => HTML::textareaField('ppecomments', '60', '5', $comments))));
+                                                      'field' => HTML::textareaField('ppecomments', '60', '5'))));
       }
 
       return $confirmation;
@@ -234,34 +230,34 @@ EOD;
     }
 
     function before_process_paypal() {
-      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $comments;
+      global $order, $response_array;
 
-      if ( !tep_session_is_registered('appPayPalEcResult') ) {
+      if ( !isset($_SESSION['appPayPalEcResult']) ) {
         OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
       }
 
-      if ( in_array($appPayPalEcResult['ACK'], array('Success', 'SuccessWithWarning')) ) {
-        if ( !tep_session_is_registered('appPayPalEcSecret') || ($appPayPalEcResult['PAYMENTREQUEST_0_CUSTOM'] != $appPayPalEcSecret) ) {
+      if ( in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
+        if ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['PAYMENTREQUEST_0_CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
           OSCOM::redirect('shopping_cart.php', '', 'SSL');
         }
       } else {
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($appPayPalEcResult['L_LONGMESSAGE0']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']), 'SSL');
       }
 
-      if (empty($comments)) {
+      if (empty($_SESSION['comments'])) {
         if (isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments'])) {
-          $comments = HTML::sanitize($_POST['ppecomments']);
+          $_SESSION['comments'] = HTML::sanitize($_POST['ppecomments']);
 
-          $order->info['comments'] = $comments;
+          $order->info['comments'] = $_SESSION['comments'];
         }
       }
 
-      $params = array('TOKEN' => $appPayPalEcResult['TOKEN'],
-                      'PAYERID' => $appPayPalEcResult['PAYERID'],
+      $params = array('TOKEN' => $_SESSION['appPayPalEcResult']['TOKEN'],
+                      'PAYERID' => $_SESSION['appPayPalEcResult']['PAYERID'],
                       'PAYMENTREQUEST_0_AMT' => $this->_app->formatCurrencyRaw($order->info['total']),
                       'PAYMENTREQUEST_0_CURRENCYCODE' => $order->info['currency']);
 
-      if (is_numeric($sendto) && ($sendto > 0)) {
+      if (is_numeric($_SESSION['sendto']) && ($_SESSION['sendto'] > 0)) {
         $params['PAYMENTREQUEST_0_SHIPTONAME'] = $order->delivery['firstname'] . ' ' . $order->delivery['lastname'];
         $params['PAYMENTREQUEST_0_SHIPTOSTREET'] = $order->delivery['street_address'];
         $params['PAYMENTREQUEST_0_SHIPTOCITY'] = $order->delivery['city'];
@@ -280,7 +276,7 @@ EOD;
             $paypal_url = 'https://www.sandbox.paypal.com/cgi-bin/webscr?cmd=_express-checkout';
           }
 
-          $paypal_url .= '&token=' . $appPayPalEcResult['TOKEN'];
+          $paypal_url .= '&token=' . $_SESSION['appPayPalEcResult']['TOKEN'];
 
           HTTP::redirect($paypal_url);
         }
@@ -290,35 +286,35 @@ EOD;
     }
 
     function before_process_payflow() {
-      global $customer_id, $order, $sendto, $appPayPalEcResult, $appPayPalEcSecret, $response_array, $comments;
+      global $order, $response_array;
 
-      if ( !tep_session_is_registered('appPayPalEcResult') ) {
+      if ( !isset($_SESSION['appPayPalEcResult']) ) {
         OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
       }
 
-      if ( $appPayPalEcResult['RESULT'] == '0' ) {
-        if ( !tep_session_is_registered('appPayPalEcSecret') || ($appPayPalEcResult['CUSTOM'] != $appPayPalEcSecret) ) {
+      if ( $_SESSION['appPayPalEcResult']['RESULT'] == '0' ) {
+        if ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
           OSCOM::redirect('shopping_cart.php', '', 'SSL');
         }
       } else {
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($appPayPalEcResult['OSCOM_ERROR_MESSAGE']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']), 'SSL');
       }
 
-      if ( empty($comments) ) {
+      if ( empty($_SESSION['comments']) ) {
         if ( isset($_POST['ppecomments']) && tep_not_null($_POST['ppecomments']) ) {
-          $comments = HTML::sanitize($_POST['ppecomments']);
+          $_SESSION['comments'] = HTML::sanitize($_POST['ppecomments']);
 
-          $order->info['comments'] = $comments;
+          $order->info['comments'] = $_SESSION['comments'];
         }
       }
 
       $params = array('EMAIL' => $order->customer['email_address'],
-                      'TOKEN' => $appPayPalEcResult['TOKEN'],
-                      'PAYERID' => $appPayPalEcResult['PAYERID'],
+                      'TOKEN' => $_SESSION['appPayPalEcResult']['TOKEN'],
+                      'PAYERID' => $_SESSION['appPayPalEcResult']['PAYERID'],
                       'AMT' => $this->_app->formatCurrencyRaw($order->info['total']),
                       'CURRENCY' => $order->info['currency']);
 
-      if ( is_numeric($sendto) && ($sendto > 0) ) {
+      if ( is_numeric($_SESSION['sendto']) && ($_SESSION['sendto'] > 0) ) {
         $params['SHIPTONAME'] = $order->delivery['firstname'] . ' ' . $order->delivery['lastname'];
         $params['SHIPTOSTREET'] = $order->delivery['street_address'];
         $params['SHIPTOCITY'] = $order->delivery['city'];
@@ -343,13 +339,13 @@ EOD;
     }
 
     function after_process_paypal() {
-      global $response_array, $insert_id, $appPayPalEcResult;
+      global $response_array, $insert_id;
 
       $OSCOM_Db = Registry::get('Db');
 
       $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_TRANSACTIONID']) . "\n" .
-                   'Payer Status: ' . HTML::outputProtected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
-                   'Address Status: ' . HTML::outputProtected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
+                   'Payer Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['PAYERSTATUS']) . "\n" .
+                   'Address Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['ADDRESSSTATUS']) . "\n" .
                    'Payment Status: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PAYMENTSTATUS']) . "\n" .
                    'Payment Type: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PAYMENTTYPE']) . "\n" .
                    'Pending Reason: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_PENDINGREASON']);
@@ -362,20 +358,20 @@ EOD;
 
       $OSCOM_Db->save('orders_status_history', $sql_data_array);
 
-      tep_session_unregister('appPayPalEcResult');
-      tep_session_unregister('appPayPalEcSecret');
+      unset($_SESSION['appPayPalEcResult']);
+      unset($_SESSION['appPayPalEcSecret']);
     }
 
     function after_process_payflow() {
-      global $response_array, $insert_id, $appPayPalEcResult;
+      global $response_array, $insert_id;
 
       $OSCOM_Db = Registry::get('Db');
 
       $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PNREF']) . "\n" .
                    'Gateway: Payflow' . "\n" .
                    'PayPal ID: ' . HTML::outputProtected($response_array['PPREF']) . "\n" .
-                   'Payer Status: ' . HTML::outputProtected($appPayPalEcResult['PAYERSTATUS']) . "\n" .
-                   'Address Status: ' . HTML::outputProtected($appPayPalEcResult['ADDRESSSTATUS']) . "\n" .
+                   'Payer Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['PAYERSTATUS']) . "\n" .
+                   'Address Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['ADDRESSSTATUS']) . "\n" .
                    'Payment Status: ' . HTML::outputProtected($response_array['PENDINGREASON']) . "\n" .
                    'Payment Type: ' . HTML::outputProtected($response_array['PAYMENTTYPE']) . "\n" .
                    'Response: ' . HTML::outputProtected($response_array['RESPMSG']) . "\n";
@@ -388,8 +384,8 @@ EOD;
 
       $OSCOM_Db->save('orders_status_history', $sql_data_array);
 
-      tep_session_unregister('appPayPalEcResult');
-      tep_session_unregister('appPayPalEcSecret');
+      unset($_SESSION['appPayPalEcResult']);
+      unset($_SESSION['appPayPalEcSecret']);
 
 // Manually call PayflowInquiry to retrieve more details about the transaction and to allow admin post-transaction actions
       $response = $this->_app->getApiResult('APP', 'PayflowInquiry', array('ORIGID' => $response_array['PNREF']));

@@ -49,8 +49,6 @@
     }
 
     function log($module, $action, $result, $request, $response, $server, $is_ipn = false) {
-      global $customer_id;
-
       $do_log = false;
 
       if ( in_array(OSCOM_APP_PAYPAL_LOG_TRANSACTIONS, array('1', '0')) ) {
@@ -99,7 +97,7 @@
         $response_string = $response;
       }
 
-      $data = array('customers_id' => tep_session_is_registered('customer_id') ? $customer_id : 0,
+      $data = array('customers_id' => isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : 0,
                     'module' => $module,
                     'action' => $action . (($is_ipn === true) ? ' [IPN]' : ''),
                     'result' => $result,
@@ -624,10 +622,10 @@
     }
 
     function formatCurrencyRaw($total, $currency_code = null, $currency_value = null) {
-      global $currencies, $currency;
+      global $currencies;
 
       if ( !isset($currency_code) ) {
-        $currency_code = tep_session_is_registered('currency') ? $currency : DEFAULT_CURRENCY;
+        $currency_code = isset($_SESSION['currency']) ? $_SESSION['currency'] : DEFAULT_CURRENCY;
       }
 
       if ( !isset($currency_value) || !is_numeric($currency_value) ) {
@@ -664,31 +662,26 @@
     }
 
     function hasAlert() {
-      return tep_session_is_registered('OSCOM_PayPal_Alerts');
+      return isset($_SESSION['OSCOM_PayPal_Alerts']);
     }
 
     function addAlert($message, $type) {
-      global $OSCOM_PayPal_Alerts;
-
       if ( in_array($type, array('error', 'warning', 'success')) ) {
-        if ( !tep_session_is_registered('OSCOM_PayPal_Alerts') ) {
-          $OSCOM_PayPal_Alerts = array();
-          tep_session_register('OSCOM_PayPal_Alerts');
+        if ( !isset($_SESSION['OSCOM_PayPal_Alerts']) ) {
+          $_SESSION['OSCOM_PayPal_Alerts'] = array();
         }
 
-        $OSCOM_PayPal_Alerts[$type][] = $message;
+        $_SESSION['OSCOM_PayPal_Alerts'][$type][] = $message;
       }
     }
 
     function getAlerts() {
-      global $OSCOM_PayPal_Alerts;
-
       $output = '';
 
-      if ( tep_session_is_registered('OSCOM_PayPal_Alerts') && !empty($OSCOM_PayPal_Alerts) ) {
+      if ( isset($_SESSION['OSCOM_PayPal_Alerts']) && !empty($_SESSION['OSCOM_PayPal_Alerts']) ) {
         $result = array();
 
-        foreach ( $OSCOM_PayPal_Alerts as $type => $messages ) {
+        foreach ( $_SESSION['OSCOM_PayPal_Alerts'] as $type => $messages ) {
           if ( in_array($type, array('error', 'warning', 'success')) ) {
             $m = '<ul class="pp-alerts-' . $type . '">';
 
@@ -705,9 +698,9 @@
         if ( !empty($result) ) {
           $output .= '<div class="pp-alerts">' . implode("\n", $result) . '</div>';
         }
-      }
 
-      tep_session_unregister('OSCOM_PayPal_Alerts');
+        unset($_SESSION['OSCOM_PayPal_Alerts']);
+      }
 
       return $output;
     }

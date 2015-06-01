@@ -68,6 +68,10 @@
     function execute() {
       global $oscTemplate;
 
+      if (isset($_SESSION['customer_id'])) {
+        return false;
+      }
+
       if ( isset($_GET['action']) ) {
         if ( $_GET['action'] == 'paypal_login' ) {
           $this->preLogin();
@@ -101,14 +105,12 @@
     }
 
     function preLogin() {
-      global $paypal_login_access_token, $paypal_login_customer_id, $sendto, $billto;
-
       $OSCOM_Db = Registry::get('Db');
 
       $return_url = OSCOM::link('login.php', '', 'SSL');
 
       if ( isset($_GET['code']) ) {
-        $paypal_login_customer_id = false;
+        $_SESSION['paypal_login_customer_id'] = false;
 
         $params = array('code' => $_GET['code'],
                         'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('login.php', 'action=paypal_login', 'SSL')));
@@ -127,52 +129,42 @@
           $response = $this->_app->getApiResult('LOGIN', 'UserInfo', $params);
 
           if ( isset($response['email']) ) {
-            $paypal_login_access_token = $response_token['access_token'];
-            tep_session_register('paypal_login_access_token');
-
-            $force_login = false;
+            $_SESSION['paypal_login_access_token'] = $response_token['access_token'];
 
 // check if e-mail address exists in database and login or create customer account
-            if ( !tep_session_is_registered('customer_id') ) {
-              $customer_id = 0;
-              $customer_default_address_id = 0;
+            $email_address = HTML::sanitize($response['email']);
 
-              $force_login = true;
+            $Qcheck = $OSCOM_Db->get('customers', 'customers_id', ['customers_email_address' => $email_address], null, 1);
 
-              $email_address = HTML::sanitize($response['email']);
+            if ($Qcheck->fetch() !== false) {
+              $_SESSION['paypal_login_customer_id'] = $Qcheck->valueInt('customers_id');
+            } else {
+              $customers_firstname = HTML::sanitize($response['given_name']);
+              $customers_lastname = HTML::sanitize($response['family_name']);
 
-              $Qcheck = $OSCOM_Db->get('customers', 'customers_id', ['customers_email_address' => $email_address], null, 1);
+              $sql_data_array = array('customers_firstname' => $customers_firstname,
+                                      'customers_lastname' => $customers_lastname,
+                                      'customers_email_address' => $email_address,
+                                      'customers_telephone' => '',
+                                      'customers_fax' => '',
+                                      'customers_newsletter' => '0',
+                                      'customers_password' => '');
 
-              if ($Qcheck->fetch() !== false) {
-                $customer_id = $Qcheck->valueInt('customers_id');
-              } else {
-                $customers_firstname = HTML::sanitize($response['given_name']);
-                $customers_lastname = HTML::sanitize($response['family_name']);
+              if ($this->hasAttribute('phone') && isset($response['phone_number']) && tep_not_null($response['phone_number'])) {
+                $customers_telephone = HTML::sanitize($response['phone_number']);
 
-                $sql_data_array = array('customers_firstname' => $customers_firstname,
-                                        'customers_lastname' => $customers_lastname,
-                                        'customers_email_address' => $email_address,
-                                        'customers_telephone' => '',
-                                        'customers_fax' => '',
-                                        'customers_newsletter' => '0',
-                                        'customers_password' => '');
-
-                if ($this->hasAttribute('phone') && isset($response['phone_number']) && tep_not_null($response['phone_number'])) {
-                  $customers_telephone = HTML::sanitize($response['phone_number']);
-
-                  $sql_data_array['customers_telephone'] = $customers_telephone;
-                }
-
-                $OSCOM_Db->save('customers', $sql_data_array);
-
-                $customer_id = $OSCOM_Db->lastInsertId();
-
-                $OSCOM_Db->save('customers_info', [
-                  'customers_info_id' => $customer_id,
-                  'customers_info_number_of_logons' => '0',
-                  'customers_info_date_account_created' => 'now()'
-                ]);
+                $sql_data_array['customers_telephone'] = $customers_telephone;
               }
+
+              $OSCOM_Db->save('customers', $sql_data_array);
+
+              $_SESSION['paypal_login_customer_id'] = $OSCOM_Db->lastInsertId();
+
+              $OSCOM_Db->save('customers_info', [
+                'customers_info_id' => $_SESSION['paypal_login_customer_id'],
+                'customers_info_number_of_logons' => '0',
+                'customers_info_date_account_created' => 'now()'
+              ]);
             }
 
 // check if paypal shipping address exists in the address book
@@ -207,7 +199,7 @@
             }
 
             $Qcheck = $OSCOM_Db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
-            $Qcheck->bindInt(':customers_id', $customer_id);
+            $Qcheck->bindInt(':customers_id', $_SESSION['paypal_login_customer_id']);
             $Qcheck->bindValue(':entry_firstname', $ship_firstname);
             $Qcheck->bindValue(':entry_lastname', $ship_lastname);
             $Qcheck->bindValue(':entry_street_address', $ship_address);
@@ -219,9 +211,9 @@
             $Qcheck->execute();
 
             if ($Qcheck->fetch() !== false) {
-              $sendto = $Qcheck->valueInt('address_book_id');
+              $_SESSION['sendto'] = $Qcheck->valueInt('address_book_id');
             } else {
-              $sql_data_array = array('customers_id' => $customer_id,
+              $sql_data_array = array('customers_id' => $_SESSION['paypal_login_customer_id'],
                                       'entry_firstname' => $ship_firstname,
                                       'entry_lastname' => $ship_lastname,
                                       'entry_street_address' => $ship_address,
@@ -243,33 +235,16 @@
 
               $address_id = $OSCOM_Db->lastInsertId();
 
-              $sendto = $address_id;
+              $_SESSION['sendto'] = $address_id;
 
-              if ($customer_default_address_id < 1) {
-                $OSCOM_Db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $customer_id]);
-                $customer_default_address_id = $address_id;
+              if (!isset($_SESSION['customer_default_address_id'])) {
+                $OSCOM_Db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $_SESSION['paypal_login_customer_id']]);
+
+                $_SESSION['customer_default_address_id'] = $address_id;
               }
             }
 
-            if ($force_login == true) {
-              $paypal_login_customer_id = $customer_id;
-            } else {
-              $paypal_login_customer_id = false;
-            }
-
-            if ( !tep_session_is_registered('paypal_login_customer_id') ) {
-              tep_session_register('paypal_login_customer_id');
-            }
-
-            $billto = $sendto;
-
-            if ( !tep_session_is_registered('sendto') ) {
-              tep_session_register('sendto');
-            }
-
-            if ( !tep_session_is_registered('billto') ) {
-              tep_session_register('billto');
-            }
+            $_SESSION['billto'] = $_SESSION['sendto'];
 
             $return_url = OSCOM::link('login.php', 'action=paypal_login_process', 'SSL');
           }
@@ -282,33 +257,32 @@
     }
 
     function postLogin() {
-      global $paypal_login_customer_id, $login_customer_id, $payment;
+      global $login_customer_id;
 
-      if ( tep_session_is_registered('paypal_login_customer_id') ) {
-        if ( $paypal_login_customer_id !== false ) {
-          $login_customer_id = $paypal_login_customer_id;
-        }
-
-        tep_session_unregister('paypal_login_customer_id');
-      }
+      if ( isset($_SESSION['paypal_login_customer_id']) ) {
+        if ( $_SESSION['paypal_login_customer_id'] !== false ) {
+          $login_customer_id = $_SESSION['paypal_login_customer_id'];
 
 // Register PayPal Express Checkout as the default payment method
-      if ( !tep_session_is_registered('payment') || ($payment != 'paypal_express') ) {
-        if (defined('MODULE_PAYMENT_INSTALLED') && tep_not_null(MODULE_PAYMENT_INSTALLED)) {
-          if ( in_array('paypal_express.php', explode(';', MODULE_PAYMENT_INSTALLED)) ) {
-            if ( !class_exists('paypal_express') ) {
-              include(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_express.php');
-              include(DIR_WS_MODULES . 'payment/paypal_express.php');
-            }
+          if ( !isset($_SESSION['payment']) || ($_SESSION['payment'] != 'paypal_express') ) {
+            if (defined('MODULE_PAYMENT_INSTALLED') && !empty(MODULE_PAYMENT_INSTALLED)) {
+              if ( in_array('paypal_express.php', explode(';', MODULE_PAYMENT_INSTALLED)) ) {
+                if ( !class_exists('paypal_express') ) {
+                  include(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_express.php');
+                  include(DIR_WS_MODULES . 'payment/paypal_express.php');
+                }
 
-            $ppe = new paypal_express();
+                $ppe = new paypal_express();
 
-            if ( $ppe->enabled ) {
-              $payment = 'paypal_express';
-              tep_session_register('payment');
+                if ( $ppe->enabled ) {
+                  $_SESSION['payment'] = 'paypal_express';
+                }
+              }
             }
           }
         }
+
+        unset($_SESSION['paypal_login_customer_id']);
       }
     }
 
