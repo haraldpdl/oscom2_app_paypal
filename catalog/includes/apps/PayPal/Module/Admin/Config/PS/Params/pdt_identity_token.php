@@ -1,34 +1,30 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\PS\Params;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
 
-  Released under the GNU General Public License
-*/
+class pdt_identity_token extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $sort_order = 650;
 
-  use OSC\OM\HTML;
-
-  class OSCOM_PayPal_PS_Cfg_pdt_identity_token {
-    var $default = '';
-    var $title;
-    var $description;
-    var $sort_order = 650;
-
-    function OSCOM_PayPal_PS_Cfg_pdt_identity_token() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_ps_pdt_identity_token_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_ps_pdt_identity_token_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_ps_pdt_identity_token_title');
+        $this->description = $this->app->getDef('cfg_ps_pdt_identity_token_desc');
     }
 
-    function getSetField() {
-      $input = HTML::inputField('pdt_identity_token', OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN, 'id="inputPsPdtIdentityToken"');
+    public function getSetField()
+    {
+        $input = HTML::inputField('pdt_identity_token', OSCOM_APP_PAYPAL_PS_PDT_IDENTITY_TOKEN, 'id="inputPsPdtIdentityToken"');
 
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label for="inputPsPdtIdentityToken">{$this->title}</label>
@@ -42,7 +38,6 @@
 </div>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

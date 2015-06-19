@@ -1,206 +1,209 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class PayPal extends \OSC\OM\AppAbstract
+{
+    protected $title = 'PayPal';
+    protected $api_version = 112;
+    protected $definitions = [];
 
-  use OSC\OM\HTML;
-  use OSC\OM\Registry;
+    protected $db;
 
-  class OSCOM_PayPal {
-    var $_code = 'paypal';
-    var $_title = 'PayPal App';
-    var $_version;
-    var $_api_version = '112';
-    var $_definitions = array();
-
-    function isReqApiCountrySupported($country_id) {
-      $Qcountry = Registry::get('Db')->get('countries', 'countries_iso_code_2', ['countries_id' => $country_id]);
-
-      if ($Qcountry->fetch() !== false) {
-        return in_array($Qcountry->valueInt('countries_iso_code_2'), $this->getReqApiCountries());
-      }
-
-      return false;
+    protected function init()
+    {
+        $this->db = Registry::get('Db');
     }
 
-    function getReqApiCountries() {
-      static $countries;
+    public function isReqApiCountrySupported($country_id)
+    {
+        $Qcountry = $this->db->get('countries', 'countries_iso_code_2', ['countries_id' => $country_id]);
 
-      if ( !isset($countries) ) {
-        $countries = array();
-
-        foreach ( file(DIR_FS_CATALOG . 'includes/apps/PayPal/req_api_countries.txt') as $c ) {
-          $c = trim($c);
-
-          if ( !empty($c) ) {
-            $countries[]= $c;
-          }
+        if ($Qcountry->fetch() !== false) {
+            return in_array($Qcountry->valueInt('countries_iso_code_2'), $this->getReqApiCountries());
         }
-      }
 
-      return $countries;
-    }
-
-    function log($module, $action, $result, $request, $response, $server, $is_ipn = false) {
-      $do_log = false;
-
-      if ( in_array(OSCOM_APP_PAYPAL_LOG_TRANSACTIONS, array('1', '0')) ) {
-        $do_log = true;
-
-        if ( (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '0') && ($result === 1) ) {
-          $do_log = false;
-        }
-      }
-
-      if ( $do_log !== true ) {
         return false;
-      }
-
-      $filter = array('ACCT', 'CVV2', 'ISSUENUMBER');
-
-      $request_string = '';
-
-      if ( is_array($request) ) {
-        foreach ( $request as $key => $value ) {
-          if ( (strpos($key, '_nh-dns') !== false) || in_array($key, $filter) ) {
-            $value = '**********';
-          }
-
-          $request_string .= $key . ': ' . $value . "\n";
-        }
-      } else {
-        $request_string = $request;
-      }
-
-      $response_string = '';
-
-      if ( is_array($response) ) {
-        foreach ( $response as $key => $value ) {
-          if ( is_array($value) ) {
-            if ( function_exists('http_build_query') ) {
-              $value = http_build_query($value);
-            }
-          } elseif ( (strpos($key, '_nh-dns') !== false) || in_array($key, $filter) ) {
-            $value = '**********';
-          }
-
-          $response_string .= $key . ': ' . $value . "\n";
-        }
-      } else {
-        $response_string = $response;
-      }
-
-      $data = array('customers_id' => isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : 0,
-                    'module' => $module,
-                    'action' => $action . (($is_ipn === true) ? ' [IPN]' : ''),
-                    'result' => $result,
-                    'server' => ($server == 'live') ? 1 : -1,
-                    'request' => trim($request_string),
-                    'response' => trim($response_string),
-                    'ip_address' => sprintf('%u', ip2long(tep_get_ip_address())),
-                    'date_added' => 'now()');
-
-      Registry::get('Db')->save('oscom_app_paypal_log', $data);
     }
 
-    function migrate() {
-      $migrated = false;
+    public function getReqApiCountries()
+    {
+        static $countries;
 
-      foreach ( $this->getModules() as $module ) {
-        if ( !defined('OSCOM_APP_PAYPAL_' . $module . '_STATUS') ) {
-          $this->saveParameter('OSCOM_APP_PAYPAL_' . $module . '_STATUS', '');
+        if (!isset($countries)) {
+            $countries = [];
 
-          $class = 'OSCOM_PayPal_' . $module;
+            if (file_exists(OSCOM::BASE_DIR . 'apps/PayPal/req_api_countries.txt')) {
+                foreach (file(OSCOM::BASE_DIR . 'apps/PayPal/req_api_countries.txt') as $c) {
+                    $c = trim($c);
 
-          if ( !class_exists($class) ) {
-            $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
-
-            include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
-          }
-
-          $m = new $class();
-
-          if ( method_exists($m, 'canMigrate') && $m->canMigrate() ) {
-            $m->migrate($this);
-
-            if ( $migrated === false ) {
-              $migrated = true;
+                    if (!empty($c)) {
+                        $countries[] = $c;
+                    }
+                }
             }
-          }
         }
-      }
 
-      return $migrated;
+        return $countries;
     }
 
-    function getModules() {
-      static $result;
+    public function log($module, $action, $result, $request, $response, $server, $is_ipn = false)
+    {
+        $do_log = false;
 
-      if ( !isset($result) ) {
-        $result = array();
+        if (in_array(OSCOM_APP_PAYPAL_LOG_TRANSACTIONS, ['1', '0'])) {
+            $do_log = true;
 
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/') ) {
-          while ( $file = $dir->read() ) {
-            if ( !in_array($file, array('.', '..')) && is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $file) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $file . '/' . $file . '.php') ) {
-              $sort_order = $this->getModuleInfo($file, 'sort_order');
+            if ((OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '0') && ($result === 1)) {
+                $do_log = false;
+            }
+        }
 
-              if ( is_numeric($sort_order) ) {
-                $counter = (int)$sort_order;
-              } else {
-                $counter = count($result);
-              }
+        if ($do_log !== true) {
+            return false;
+        }
 
-              while ( true ) {
-                if ( isset($result[$counter]) ) {
-                  $counter++;
+        $filter = ['ACCT', 'CVV2', 'ISSUENUMBER'];
 
-                  continue;
+        $request_string = '';
+
+        if (is_array($request)) {
+            foreach ($request as $key => $value) {
+                if ((strpos($key, '_nh-dns') !== false) || in_array($key, $filter)) {
+                    $value = '**********';
                 }
 
-                $result[$counter] = $file;
-
-                break;
-              }
+                $request_string .= $key . ': ' . $value . "\n";
             }
-          }
-
-          ksort($result, SORT_NUMERIC);
+        } else {
+            $request_string = $request;
         }
-      }
 
-      return $result;
+        $response_string = '';
+
+        if (is_array($response)) {
+            foreach ($response as $key => $value) {
+                if (is_array($value)) {
+                    $value = http_build_query($value);
+                } elseif ((strpos($key, '_nh-dns') !== false) || in_array($key, $filter)) {
+                    $value = '**********';
+                }
+
+                $response_string .= $key . ': ' . $value . "\n";
+            }
+        } else {
+            $response_string = $response;
+        }
+
+        $this->db->save('oscom_app_paypal_log', [
+            'customers_id' => isset($_SESSION['customer_id']) ? $_SESSION['customer_id'] : 0,
+            'module' => $module,
+            'action' => $action . (($is_ipn === true) ? ' [IPN]' : ''),
+            'result' => $result,
+            'server' => ($server == 'live') ? 1 : -1,
+            'request' => trim($request_string),
+            'response' => trim($response_string),
+            'ip_address' => sprintf('%u', ip2long(tep_get_ip_address())),
+            'date_added' => 'now()'
+        ]);
     }
 
-    function isInstalled($module) {
-      if ( file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . basename($module) . '/' . basename($module) . '.php') ) {
-        return defined('OSCOM_APP_PAYPAL_' . basename($module) . '_STATUS') && tep_not_null(constant('OSCOM_APP_PAYPAL_' . basename($module) . '_STATUS'));
-      }
+    public function migrate()
+    {
+        $migrated = false;
 
-      return false;
+        foreach ($this->getModules() as $module) {
+            if (!defined('OSCOM_APP_PAYPAL_' . $module . '_STATUS') && $this->getModuleInfo($module, 'is_migratable')) {
+                $this->saveParameter('OSCOM_APP_PAYPAL_' . $module . '_STATUS', '');
+
+                $m = Registry::get('PayPalAdminConfig' . $module);
+
+                if ($m->canMigrate()) {
+                    $m->migrate();
+
+                    if ($migrated === false) {
+                        $migrated = true;
+                    }
+                }
+            }
+        }
+
+        return $migrated;
     }
 
-    function getModuleInfo($module, $info) {
-      $class = 'OSCOM_PayPal_' . $module;
+    public function getModules()
+    {
+        static $result;
 
-      if ( !class_exists($class) ) {
-        $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
+        if (!isset($result)) {
+            $result = [];
 
-        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
-      }
+            $directory = OSCOM::BASE_DIR . 'apps/PayPal/Module/Admin/Config';
 
-      $m = new $class();
+            if ($dir = new \DirectoryIterator($directory)) {
+                foreach ($dir as $file) {
+                    if (!$file->isDot() && $file->isDir() && file_exists($file->getPathname() . '/' . $file->getFilename() . '.php')) {
+                        $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename();
 
-      return $m->{'_' . $info};
+                        if (is_subclass_of($class, 'OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract')) {
+                            $sort_order = $this->getModuleInfo($file->getFilename(), 'sort_order');
+
+                            if ($sort_order > 0) {
+                                $counter = $sort_order;
+                            } else {
+                                $counter = count($result);
+                            }
+
+                            while (true) {
+                                if (isset($result[$counter])) {
+                                    $counter++;
+
+                                    continue;
+                                }
+
+                                $result[$counter] = $file->getFilename();
+
+                                break;
+                            }
+                        } else {
+                            trigger_error('OSC\OM\Apps\PayPal\PayPal::getModules(): OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename() . ' is not a subclass of OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract and cannot be loaded.');
+                        }
+                    }
+                }
+
+                ksort($result, SORT_NUMERIC);
+            }
+        }
+
+        return $result;
+    }
+
+    public function getModuleInfo($module, $info)
+    {
+        if (!Registry::exists('PayPalAdminConfig' . $module)) {
+            $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $module . '\\' . $module;
+
+            Registry::set('PayPalAdminConfig' . $module, new $class);
+        }
+
+        return Registry::get('PayPalAdminConfig' . $module)->$info;
     }
 
     function hasCredentials($module, $type = null) {
+      if (!defined('OSCOM_APP_PAYPAL_' . $module . '_STATUS')) {
+        return false;
+      }
+
       $server = constant('OSCOM_APP_PAYPAL_' . $module . '_STATUS');
 
       if ( !in_array($server, array('1', '0')) ) {
@@ -286,98 +289,6 @@
       } elseif ( defined('OSCOM_APP_PAYPAL_SANDBOX_API_' . strtoupper($type)) ) {
         return constant('OSCOM_APP_PAYPAL_SANDBOX_API_' . strtoupper($type));
       }
-    }
-
-    function getParameters($module) {
-      $result = array();
-
-      if ( $module == 'G' ) {
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/') ) {
-          while ( $file = $dir->read() ) {
-            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
-              $result[] = 'OSCOM_APP_PAYPAL_' . strtoupper(substr($file, 0, strrpos($file, '.')));
-            }
-          }
-        }
-      } else {
-        if ( $dir = @dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/') ) {
-          while ( $file = $dir->read() ) {
-            if ( !is_dir(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $file) && (substr($file, strrpos($file, '.')) == '.php') ) {
-              $result[] = 'OSCOM_APP_PAYPAL_' . $module . '_' . strtoupper(substr($file, 0, strrpos($file, '.')));
-            }
-          }
-        }
-      }
-
-      return $result;
-    }
-
-    function getInputParameters($module) {
-      $result = array();
-
-      if ( $module == 'G' ) {
-        $cut = 'OSCOM_APP_PAYPAL_';
-      } else {
-        $cut = 'OSCOM_APP_PAYPAL_' . $module . '_';
-      }
-
-      $cut_length = strlen($cut);
-
-      foreach ( $this->getParameters($module) as $key ) {
-        $p = strtolower(substr($key, $cut_length));
-
-        if ( $module == 'G' ) {
-          $cfg_class = 'OSCOM_PayPal_Cfg_' . $p;
-
-          if ( !class_exists($cfg_class) ) {
-            $this->loadLanguageFile('cfg_params/' . $p . '.php');
-
-            include(DIR_FS_CATALOG . 'includes/apps/PayPal/cfg_params/' . $p . '.php');
-          }
-        } else {
-          $cfg_class = 'OSCOM_PayPal_' . $module . '_Cfg_' . $p;
-
-          if ( !class_exists($cfg_class) ) {
-            $this->loadLanguageFile('modules/' . $module . '/cfg_params/' . $p . '.php');
-
-            include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $p . '.php');
-          }
-        }
-
-        $cfg = new $cfg_class();
-
-        if ( !defined($key) ) {
-          $this->saveParameter($key, $cfg->default);
-        }
-
-        if ( !isset($cfg->app_configured) || ($cfg->app_configured !== false) ) {
-          if ( isset($cfg->sort_order) && is_numeric($cfg->sort_order) ) {
-            $counter = (int)$cfg->sort_order;
-          } else {
-            $counter = count($result);
-          }
-
-          while ( true ) {
-            if ( isset($result[$counter]) ) {
-              $counter++;
-
-              continue;
-            }
-
-            $set_field = $cfg->getSetField();
-
-            if ( !empty($set_field) ) {
-              $result[$counter] = $set_field;
-            }
-
-            break;
-          }
-        }
-      }
-
-      ksort($result, SORT_NUMERIC);
-
-      return $result;
     }
 
 // APP calls require $server to be "live" or "sandbox"
@@ -584,7 +495,9 @@
     }
 
     function saveParameter($key, $value, $title = null, $description = null, $set_func = null) {
-      $OSCOM_Db = Registry::get('Db');
+      if (is_null($value)) {
+        $value = '';
+      }
 
       if ( !defined($key) ) {
         if ( !isset($title) ) {
@@ -609,16 +522,16 @@
           $data['set_function'] = $set_func;
         }
 
-        $OSCOM_Db->save('configuration', $data);
+        $this->db->save('configuration', $data);
 
         define($key, $value);
       } else {
-        $OSCOM_Db->save('configuration', ['configuration_value' => $value], ['configuration_key' => $key]);
+        $this->db->save('configuration', ['configuration_value' => $value], ['configuration_key' => $key]);
       }
     }
 
     function deleteParameter($key) {
-      Registry::get('Db')->delete('configuration', ['configuration_key' => $key]);
+      $this->db->delete('configuration', ['configuration_key' => $key]);
     }
 
     function formatCurrencyRaw($total, $currency_code = null, $currency_value = null) {
@@ -635,30 +548,9 @@
       return number_format(tep_round($total * $currency_value, $currencies->currencies[$currency_code]['decimal_places']), $currencies->currencies[$currency_code]['decimal_places'], '.', '');
     }
 
-    function getCode() {
-      return $this->_code;
-    }
-
-    function getTitle() {
-      return $this->_title;
-    }
-
-    function getVersion() {
-      if ( !isset($this->_version) ) {
-        $version = trim(file_get_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/version.txt'));
-
-        if ( is_numeric($version) ) {
-          $this->_version = $version;
-        } else {
-          trigger_error('OSCOM APP [PAYPAL]: Could not read App version number.');
-        }
-      }
-
-      return $this->_version;
-    }
-
-    function getApiVersion() {
-      return $this->_api_version;
+    public function getApiVersion()
+    {
+        return $this->api_version;
     }
 
     function hasAlert() {
@@ -705,60 +597,6 @@
       return $output;
     }
 
-    function install($module) {
-      $cut_length = strlen('OSCOM_APP_PAYPAL_' . $module . '_');
-
-      foreach ( $this->getParameters($module) as $key ) {
-        $p = strtolower(substr($key, $cut_length));
-
-        $cfg_class = 'OSCOM_PayPal_' . $module . '_Cfg_' . $p;
-
-        if ( !class_exists($cfg_class) ) {
-          $this->loadLanguageFile('modules/' . $module . '/cfg_params/' . $p . '.php');
-
-          include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/cfg_params/' . $p . '.php');
-        }
-
-        $cfg = new $cfg_class();
-
-        $this->saveParameter($key, $cfg->default, isset($cfg->title) ? $cfg->title : null, isset($cfg->description) ? $cfg->description : null, isset($cfg->set_func) ? $cfg->set_func : null);
-      }
-
-      $m_class = 'OSCOM_PayPal_' . $module;
-
-      if ( !class_exists($m_class) ) {
-        $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
-
-        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
-      }
-
-      $m = new $m_class();
-
-      if ( method_exists($m, 'install') ) {
-        $m->install($this);
-      }
-    }
-
-    function uninstall($module) {
-      $Qdelete = Registry::get('Db')->prepare('delete from :table_configuration where configuration_key like :configuration_key');
-      $Qdelete->bindValue(':configuration_key', 'OSCOM_APP_PAYPAL_' . $module . '_%');
-      $Qdelete->execute();
-
-      $m_class = 'OSCOM_PayPal_' . $module;
-
-      if ( !class_exists($m_class) ) {
-        $this->loadLanguageFile('modules/' . $module . '/' . $module . '.php');
-
-        include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/' . $module . '.php');
-      }
-
-      $m = new $m_class();
-
-      if ( method_exists($m, 'uninstall') ) {
-        $m->uninstall($this);
-      }
-    }
-
     function logUpdate($message, $version) {
       if ( is_writable(DIR_FS_CATALOG . 'includes/apps/PayPal/work') ) {
         file_put_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
@@ -798,14 +636,14 @@
 
         unset($contents);
 
-        $this->_definitions = array_merge($this->_definitions, $ini_array);
+        $this->definitions = array_merge($this->definitions, $ini_array);
 
         unset($ini_array);
       }
     }
 
     function getDef($key, $values = null) {
-      $def = isset($this->_definitions[$key]) ? $this->_definitions[$key] : $key;
+      $def = isset($this->definitions[$key]) ? $this->definitions[$key] : $key;
 
       if ( is_array($values) ) {
         $keys = array_keys($values);

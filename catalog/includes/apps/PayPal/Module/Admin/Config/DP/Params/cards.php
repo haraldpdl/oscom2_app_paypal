@@ -1,39 +1,43 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\DP\Params;
 
-  Copyright (c) 2014 osCommerce
+class cards extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = 'visa;mastercard;discover;amex;maestro';
+    public $sort_order = 200;
 
-  Released under the GNU General Public License
-*/
+    protected $cards = [
+        'visa' => 'Visa',
+        'mastercard' => 'MasterCard',
+        'discover' => 'Discover Card',
+        'amex' => 'American Express',
+        'maestro' => 'Maestro'
+    ];
 
-  class OSCOM_PayPal_DP_Cfg_cards {
-    var $default = 'visa;mastercard;discover;amex;maestro';
-    var $title;
-    var $description;
-    var $sort_order = 200;
-    var $cards = array('visa' => 'Visa', 'mastercard' => 'MasterCard', 'discover' => 'Discover Card', 'amex' => 'American Express', 'maestro' => 'Maestro');
-
-    function OSCOM_PayPal_DP_Cfg_cards() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_dp_cards_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_dp_cards_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_dp_cards_title');
+        $this->description = $this->app->getDef('cfg_dp_cards_desc');
     }
 
-    function getSetField() {
-      $active = explode(';', OSCOM_APP_PAYPAL_DP_CARDS);
+    public function getSetField()
+    {
+        $active = explode(';', OSCOM_APP_PAYPAL_DP_CARDS);
 
-      $input = '';
+        $input = '';
 
-      foreach ( $this->cards as $key => $value ) {
-        $input .= '<input type="checkbox" id="cardsSelection' . ucfirst($key) . '" name="card_types[]" value="' . $key . '"' . (in_array($key, $active) ? ' checked="checked"' : '') . '><label for="cardsSelection' . ucfirst($key) . '">' . $value . '</label>';
-      }
+        foreach ($this->cards as $key => $value) {
+            $input .= '<input type="checkbox" id="cardsSelection' . ucfirst($key) . '" name="card_types[]" value="' . $key . '"' . (in_array($key, $active) ? ' checked="checked"' : '') . '><label for="cardsSelection' . ucfirst($key) . '">' . $value . '</label>';
+        }
 
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label>{$this->title}</label>
@@ -60,7 +64,6 @@ $(function() {
 </script>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

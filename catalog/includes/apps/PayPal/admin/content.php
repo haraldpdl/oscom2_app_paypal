@@ -11,6 +11,9 @@
 */
 
   use OSC\OM\OSCOM;
+  use OSC\OM\Registry;
+
+  use OSC\OM\Apps\PayPal\PayPal;
 
   $Qcheck = $OSCOM_Db->query('show tables like "oscom_app_paypal_log"');
 
@@ -35,8 +38,8 @@ EOD;
     $OSCOM_Db->exec($sql);
   }
 
-  require(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  $OSCOM_PayPal = new OSCOM_PayPal();
+  Registry::set('PayPal', new PayPal());
+  $OSCOM_PayPal = Registry::get('PayPal');
 
   $content = 'start.php';
   $action = 'start';
@@ -54,8 +57,8 @@ EOD;
     $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
     $adm_class = 'OSC\OM\Apps\PayPal\Module\Admin\Dashboard\PayPal';
 
-    if ( !in_array($adm_class, $admin_dashboard_modules) ) {
-      $admin_dashboard_modules[] = $adm_class;
+    if ( !in_array('PayPal\PayPal', $admin_dashboard_modules) ) {
+      $admin_dashboard_modules[] = 'PayPal\PayPal';
 
       $adm = new $adm_class();
       $adm->install();
@@ -345,7 +348,7 @@ var OSCOM = {
       versionCheckResult: <?php echo (defined('OSCOM_APP_PAYPAL_VERSION_CHECK')) ? '"' . OSCOM_APP_PAYPAL_VERSION_CHECK . '"' : 'undefined'; ?>,
       action: '<?php echo $action; ?>',
       doOnlineVersionCheck: false,
-      canApplyOnlineUpdates: <?php echo class_exists('ZipArchive') && function_exists('json_encode') && function_exists('openssl_verify') ? 'true' : 'false'; ?>,
+      canApplyOnlineUpdates: <?php echo class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false'; ?>,
       accountTypes: {
         live: <?php echo ($OSCOM_PayPal->hasApiCredentials('live') === true) ? 'true' : 'false'; ?>,
         sandbox: <?php echo ($OSCOM_PayPal->hasApiCredentials('sandbox') === true) ? 'true' : 'false'; ?>

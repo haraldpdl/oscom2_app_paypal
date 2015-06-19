@@ -1,35 +1,30 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\EC\Params;
 
-  Copyright (c) 2014 osCommerce
+class account_optional extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = '0';
+    public $sort_order = 300;
 
-  Released under the GNU General Public License
-*/
-
-  class OSCOM_PayPal_EC_Cfg_account_optional {
-    var $default = '0';
-    var $title;
-    var $description;
-    var $sort_order = 300;
-
-    function OSCOM_PayPal_EC_Cfg_account_optional() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_ec_account_optional_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_ec_account_optional_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_ec_account_optional_title');
+        $this->description = $this->app->getDef('cfg_ec_account_optional_desc');
     }
 
-    function getSetField() {
-      global $OSCOM_PayPal;
+    public function getSetField()
+    {
+        $input = '<input type="radio" id="accountOptionalSelectionTrue" name="account_optional" value="1"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionTrue">' . $this->app->getDef('cfg_ec_account_optional_true') . '</label>' .
+                 '<input type="radio" id="accountOptionalSelectionFalse" name="account_optional" value="0"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '0' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionFalse">' . $this->app->getDef('cfg_ec_account_optional_false') . '</label>';
 
-      $input = '<input type="radio" id="accountOptionalSelectionTrue" name="account_optional" value="1"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionTrue">' . $OSCOM_PayPal->getDef('cfg_ec_account_optional_true') . '</label>' .
-               '<input type="radio" id="accountOptionalSelectionFalse" name="account_optional" value="0"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '0' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionFalse">' . $OSCOM_PayPal->getDef('cfg_ec_account_optional_false') . '</label>';
-
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label>{$this->title}</label>
@@ -49,7 +44,6 @@ $(function() {
 </script>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

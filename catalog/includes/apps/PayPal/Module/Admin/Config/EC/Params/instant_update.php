@@ -1,35 +1,30 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\EC\Params;
 
-  Copyright (c) 2014 osCommerce
+class instant_update extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = '1';
+    public $sort_order = 400;
 
-  Released under the GNU General Public License
-*/
-
-  class OSCOM_PayPal_EC_Cfg_instant_update {
-    var $default = '1';
-    var $title;
-    var $description;
-    var $sort_order = 400;
-
-    function OSCOM_PayPal_EC_Cfg_instant_update() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_ec_instant_update_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_ec_instant_update_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_ec_instant_update_title');
+        $this->description = $this->app->getDef('cfg_ec_instant_update_desc');
     }
 
-    function getSetField() {
-      global $OSCOM_PayPal;
+    public function getSetField()
+    {
+        $input = '<input type="radio" id="instantUpdateSelectionEnabled" name="instant_update" value="1"' . (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1' ? ' checked="checked"' : '') . '><label for="instantUpdateSelectionEnabled">' . $this->app->getDef('cfg_ec_instant_update_enabled') . '</label>' .
+                 '<input type="radio" id="instantUpdateSelectionDisabled" name="instant_update" value="0"' . (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '0' ? ' checked="checked"' : '') . '><label for="instantUpdateSelectionDisabled">' . $this->app->getDef('cfg_ec_instant_update_disabled') . '</label>';
 
-      $input = '<input type="radio" id="instantUpdateSelectionEnabled" name="instant_update" value="1"' . (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1' ? ' checked="checked"' : '') . '><label for="instantUpdateSelectionEnabled">' . $OSCOM_PayPal->getDef('cfg_ec_instant_update_enabled') . '</label>' .
-               '<input type="radio" id="instantUpdateSelectionDisabled" name="instant_update" value="0"' . (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '0' ? ' checked="checked"' : '') . '><label for="instantUpdateSelectionDisabled">' . $OSCOM_PayPal->getDef('cfg_ec_instant_update_disabled') . '</label>';
-
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label>{$this->title}</label>
@@ -49,7 +44,6 @@ $(function() {
 </script>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

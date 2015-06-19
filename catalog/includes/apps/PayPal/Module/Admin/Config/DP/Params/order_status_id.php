@@ -1,48 +1,52 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\DP\Params;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class order_status_id extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = '0';
+    public $sort_order = 400;
 
-  use OSC\OM\HTML;
-  use OSC\OM\Registry;
+    protected $db;
 
-  class OSCOM_PayPal_DP_Cfg_order_status_id {
-    var $default = '0';
-    var $title;
-    var $description;
-    var $sort_order = 400;
+    protected function init()
+    {
+        $this->db = Registry::get('Db');
 
-    function OSCOM_PayPal_DP_Cfg_order_status_id() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_dp_order_status_id_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_dp_order_status_id_desc');
+        $this->title = $this->app->getDef('cfg_dp_order_status_id_title');
+        $this->description = $this->app->getDef('cfg_dp_order_status_id_desc');
     }
 
-    function getSetField() {
-      global $OSCOM_PayPal;
+    public function getSetField()
+    {
+        $statuses_array = [
+            [
+                'id' => '0',
+                'text' => $this->app->getDef('cfg_dp_order_status_id_default')
+            ]
+        ];
 
-      $OSCOM_Db = Registry::get('Db');
+        $Qstatuses = $this->db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id']], 'orders_status_name');
 
-      $statuses_array = array(array('id' => '0', 'text' => $OSCOM_PayPal->getDef('cfg_dp_order_status_id_default')));
+        while ($Qstatuses->fetch()) {
+            $statuses_array[] = [
+                'id' => $Qstatuses->valueInt('orders_status_id'),
+                'text' => $Qstatuses->value('orders_status_name')
+            ];
+        }
 
-      $Qstatuses = $OSCOM_Db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id']], 'orders_status_name');
+        $input = HTML::selectField('order_status_id', $statuses_array, OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID, 'id="inputDpOrderStatusId"');
 
-      while ($Qstatuses->next()) {
-        $statuses_array[] = array('id' => $Qstatuses->valueInt('orders_status_id'),
-                                  'text' => $Qstatuses->value('orders_status_name'));
-      }
-
-      $input = HTML::selectField('order_status_id', $statuses_array, OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID, 'id="inputDpOrderStatusId"');
-
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label for="inputDpOrderStatusId">{$this->title}</label>
@@ -56,7 +60,6 @@
 </div>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

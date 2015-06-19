@@ -9,20 +9,21 @@
 namespace OSC\OM\Apps\PayPal\Module\Admin\Menu;
 
 use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-if ( !class_exists('OSCOM_PayPal', false) ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-}
+use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
 class PayPal implements \OSC\OM\ModuleAdminMenuInterface
 {
     public static function execute()
     {
-        global $cl_box_groups, $OSCOM_PayPal;
+        global $cl_box_groups;
 
-        if ( !isset($OSCOM_PayPal) || !is_object($OSCOM_PayPal) || (isset($OSCOM_PayPal) && (get_class($OSCOM_PayPal) != 'OSCOM_PayPal')) ) {
-            $OSCOM_PayPal = new \OSCOM_PayPal();
+        if (!Registry::exists('PayPal')) {
+            Registry::set('PayPal', new PayPalApp());
         }
+
+        $OSCOM_PayPal = Registry::get('PayPal');
 
         $OSCOM_PayPal->loadLanguageFile('admin/modules/boxes/paypal.php');
 
@@ -48,22 +49,22 @@ class PayPal implements \OSC\OM\ModuleAdminMenuInterface
                 $paypal_menu = [
                     [
                         'code' => 'App/PayPal',
-                        'title' => MODULES_ADMIN_MENU_PAYPAL_BALANCE,
+                        'title' => $OSCOM_PayPal->getDef('module_admin_menu_balance'),
                         'link' => OSCOM::link('apps.php', 'PayPal&action=balance')
                     ],
                     [
                         'code' => 'App/PayPal',
-                        'title' => MODULES_ADMIN_MENU_PAYPAL_CONFIGURE,
+                        'title' => $OSCOM_PayPal->getDef('module_admin_menu_configure'),
                         'link' => OSCOM::link('apps.php', 'PayPal&action=configure')
                     ],
                     [
                         'code' => 'App/PayPal',
-                        'title' => MODULES_ADMIN_MENU_PAYPAL_MANAGE_CREDENTIALS,
+                        'title' => $OSCOM_PayPal->getDef('module_admin_menu_manage_credentials'),
                         'link' => OSCOM::link('apps.php', 'PayPal&action=credentials')
                     ],
                     [
                         'code' => 'App/PayPal',
-                        'title' => MODULES_ADMIN_MENU_PAYPAL_LOG,
+                        'title' => $OSCOM_PayPal->getDef('module_admin_menu_log'),
                         'link' => OSCOM::link('apps.php', 'PayPal&action=log')
                     ]
                 ];

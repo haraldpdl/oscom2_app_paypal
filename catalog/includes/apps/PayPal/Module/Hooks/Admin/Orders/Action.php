@@ -288,7 +288,7 @@
         $Qc->bindInt(':orders_status_id', OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID);
         $Qc->execute();
 
-        while ($Qc->next()) {
+        while ($Qc->fetch()) {
           if ( preg_match('/^PayPal App\: Capture \(([0-9\.]+)\)\n/', $Qc->value('comments'), $c_matches) ) {
             $capture_total -= $this->_app->formatCurrencyRaw($c_matches[1], $order['currency'], 1);
           }

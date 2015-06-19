@@ -10,32 +10,35 @@
   Released under the GNU General Public License
 */
 
-  use OSC\OM\HTML;
-  use OSC\OM\OSCOM;
+use OSC\OM\HTML;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
+
+$OSCOM_PayPal_Config = Registry::get('PayPalAdminConfig' . $current_module);
 ?>
 
 <div id="appPayPalToolbar" style="padding-bottom: 15px;">
 
 <?php
-  foreach ( $OSCOM_PayPal->getModules() as $m ) {
-    if ( $OSCOM_PayPal->isInstalled($m) ) {
-      echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getModuleInfo($m, 'short_title'), OSCOM::link('apps.php', 'PayPal&action=configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
+foreach ($OSCOM_PayPal->getModules() as $m) {
+    if ($OSCOM_PayPal->getModuleInfo($m, 'is_installed') === true) {
+        echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getModuleInfo($m, 'short_title'), OSCOM::link('apps.php', 'PayPal&action=configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
     }
-  }
+}
+
+echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_more'), '#', 'info', 'data-module="appPayPalToolbarMoreButton"');
 ?>
 
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_general'), OSCOM::link('apps.php', 'PayPal&action=configure&module=G'), 'info', 'data-module="G"'); ?>
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_more'), '#', 'info', 'data-module="appPayPalToolbarMoreButton"'); ?>
 </div>
 
 <ul id="appPayPalToolbarMore" class="pp-button-menu">
 
 <?php
-  foreach ( $OSCOM_PayPal->getModules() as $m ) {
-    if ( !$OSCOM_PayPal->isInstalled($m) ) {
-      echo '<li><a href="' . OSCOM::link('apps.php', 'PayPal&action=configure&module=' . $m) . '">' . $OSCOM_PayPal->getModuleInfo($m, 'title') . '</a></li>';
+foreach ($OSCOM_PayPal->getModules() as $m) {
+    if ($OSCOM_PayPal->getModuleInfo($m, 'is_installed') === false) {
+        echo '<li><a href="' . OSCOM::link('apps.php', 'PayPal&action=configure&module=' . $m) . '">' . $OSCOM_PayPal->getModuleInfo($m, 'title') . '</a></li>';
     }
-  }
+}
 ?>
 
 </ul>
@@ -69,25 +72,20 @@ $(function() {
 </script>
 
 <?php
-  if ( $OSCOM_PayPal->isInstalled($current_module) || ($current_module == 'G') ) {
-    $current_module_title = ($current_module != 'G') ? $OSCOM_PayPal->getModuleInfo($current_module, 'title') : $OSCOM_PayPal->getDef('section_general');
-    $req_notes = ($current_module != 'G') ? $OSCOM_PayPal->getModuleInfo($current_module, 'req_notes') : null;
-
-    if ( is_array($req_notes) && !empty($req_notes) ) {
-      foreach ( $req_notes as $rn ) {
+if ($OSCOM_PayPal_Config->is_installed === true) {
+    foreach ($OSCOM_PayPal_Config->req_notes as $rn) {
         echo '<div class="pp-panel pp-panel-warning"><p>' . $rn . '</p></div>';
-      }
     }
 ?>
 
 <form name="paypalConfigure" action="<?php echo OSCOM::link('apps.php', 'PayPal&action=configure&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
 
-<h3 class="pp-panel-header-info"><?php echo $current_module_title; ?></h3>
+<h3 class="pp-panel-header-info"><?php echo $OSCOM_PayPal->getModuleInfo($current_module, 'title'); ?></h3>
 <div class="pp-panel pp-panel-info" style="padding-bottom: 15px;">
 
 <?php
-    foreach ( $OSCOM_PayPal->getInputParameters($current_module) as $cfg ) {
-      echo $cfg;
+    foreach ($OSCOM_PayPal_Config->getInputParameters() as $cfg) {
+        echo $cfg;
     }
 ?>
 
@@ -98,8 +96,8 @@ $(function() {
 <?php
     echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_save'), null, 'success');
 
-    if ( $current_module != 'G' ) {
-      echo '  <span style="float: right;">' . $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_dialog_uninstall'), '#', 'warning', 'data-button="paypalButtonUninstallModule"') . '</span>';
+    if ($OSCOM_PayPal->getModuleInfo($current_module, 'is_uninstallable') === true) {
+        echo '  <span style="float: right;">' . $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_dialog_uninstall'), '#', 'warning', 'data-button="paypalButtonUninstallModule"') . '</span>';
     }
 ?>
 
@@ -108,7 +106,7 @@ $(function() {
 </form>
 
 <?php
-    if ( $current_module != 'G' ) {
+    if ($OSCOM_PayPal->getModuleInfo($current_module, 'is_uninstallable') === true) {
 ?>
 
 <div id="paypal-dialog-uninstall" title="<?php echo HTML::output($OSCOM_PayPal->getDef('dialog_uninstall_title')); ?>">
@@ -141,7 +139,7 @@ $(function() {
 
 <?php
     }
-  } else {
+} else {
 ?>
 
 <h3 class="pp-panel-header-warning"><?php echo $OSCOM_PayPal->getModuleInfo($current_module, 'title'); ?></h3>
@@ -154,11 +152,11 @@ $(function() {
 </p>
 
 <?php
-  }
+}
 ?>
 
 <script>
 $(function() {
-  $('#appPayPalToolbar a[data-module="<?php echo $current_module; ?>"]').addClass('pp-button-primary');
+  $('#appPayPalToolbar a[data-module="<?php echo (($OSCOM_PayPal->getModuleInfo($current_module, 'is_installed') === true) ? $current_module : 'appPayPalToolbarMoreButton'); ?>"]').addClass('pp-button-primary');
 });
 </script>

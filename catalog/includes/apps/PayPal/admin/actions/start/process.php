@@ -35,7 +35,7 @@
         $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_MERCHANT_ID', $result['merchant_id']);
         $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_SECRET', $result['secret']);
 
-        HTTP:redirect($result['redirect_url']);
+        HTTP::redirect($result['redirect_url']);
       } else {
         $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_initialization_error'), 'error');
       }

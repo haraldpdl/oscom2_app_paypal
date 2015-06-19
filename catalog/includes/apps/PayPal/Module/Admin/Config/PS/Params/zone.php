@@ -1,48 +1,52 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\PS\Params;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class zone extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = '0';
+    public $sort_order = 600;
 
-  use OSC\OM\HTML;
-  use OSC\OM\Registry;
+    protected $db;
 
-  class OSCOM_PayPal_PS_Cfg_zone {
-    var $default = '0';
-    var $title;
-    var $description;
-    var $sort_order = 600;
+    protected function init()
+    {
+        $this->db = Registry::get('Db');
 
-    function OSCOM_PayPal_PS_Cfg_zone() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_ps_zone_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_ps_zone_desc');
+        $this->title = $this->app->getDef('cfg_ps_zone_title');
+        $this->description = $this->app->getDef('cfg_ps_zone_desc');
     }
 
-    function getSetField() {
-      global $OSCOM_PayPal;
+    public function getSetField()
+    {
+        $zone_class_array = [
+            [
+                'id' => '0',
+                'text' => $this->app->getDef('cfg_ps_zone_global')
+            ]
+        ];
 
-      $OSCOM_Db = Registry::get('Db');
+        $Qclasses = $this->db->get('geo_zones', ['geo_zone_id', 'geo_zone_name'], null, 'geo_zone_name');
 
-      $zone_class_array = array(array('id' => '0', 'text' => $OSCOM_PayPal->getDef('cfg_ps_zone_global')));
+        while ($Qclasses->fetch()) {
+            $zone_class_array[] = [
+                'id' => $Qclasses->valueInt('geo_zone_id'),
+                'text' => $Qclasses->value('geo_zone_name')
+            ];
+        }
 
-      $Qclasses = $OSCOM_Db->get('geo_zones', ['geo_zone_id', 'geo_zone_name'], null, 'geo_zone_name');
+        $input = HTML::selectField('zone', $zone_class_array, OSCOM_APP_PAYPAL_PS_ZONE, 'id="inputPsZone"');
 
-      while ($Qclasses->fetch()) {
-        $zone_class_array[] = array('id' => $Qclasses->valueInt('geo_zone_id'),
-                                    'text' => $Qclasses->value('geo_zone_name'));
-      }
-
-      $input = HTML::selectField('zone', $zone_class_array, OSCOM_APP_PAYPAL_PS_ZONE, 'id="inputPsZone"');
-
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label for="inputPsZone">{$this->title}</label>
@@ -56,7 +60,6 @@
 </div>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

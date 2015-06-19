@@ -10,11 +10,12 @@
   Released under the GNU General Public License
 */
 
-  use OSC\OM\OSCOM;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  $OSCOM_PayPal->install($current_module);
+$m = Registry::get('PayPalAdminConfig' . $current_module);
+$m->install();
 
-  $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
+$OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
 
-  OSCOM::redirect('apps.php', 'PayPal&action=configure&module=' . $current_module);
-?>
+OSCOM::redirect('apps.php', 'PayPal&action=configure&module=' . $current_module);

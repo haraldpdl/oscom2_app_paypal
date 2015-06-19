@@ -1,34 +1,31 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\G\Params;
 
-  Copyright (c) 2014 osCommerce
+class log_transactions extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $default = '1';
+    public $sort_order = 500;
 
-  Released under the GNU General Public License
-*/
-
-  class OSCOM_PayPal_Cfg_log_transactions {
-    var $default = '1';
-    var $sort_order = 500;
-
-    function OSCOM_PayPal_Cfg_log_transactions() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_log_transactions_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_log_transactions_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_log_transactions_title');
+        $this->description = $this->app->getDef('cfg_log_transactions_desc');
     }
 
-    function getSetField() {
-      global $OSCOM_PayPal;
+    public function getSetField()
+    {
+        $input = '<input type="radio" id="logTransactionsSelectionAll" name="log_transactions" value="1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionAll">' . $this->app->getDef('cfg_log_transactions_all') . '</label>' .
+                 '<input type="radio" id="logTransactionsSelectionErrors" name="log_transactions" value="0"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '0' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionErrors">' . $this->app->getDef('cfg_log_transactions_errors') . '</label>' .
+                 '<input type="radio" id="logTransactionsSelectionDisabled" name="log_transactions" value="-1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '-1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionDisabled">' . $this->app->getDef('cfg_log_transactions_disabled') . '</label>';
 
-      $input = '<input type="radio" id="logTransactionsSelectionAll" name="log_transactions" value="1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionAll">' . $OSCOM_PayPal->getDef('cfg_log_transactions_all') . '</label>' .
-               '<input type="radio" id="logTransactionsSelectionErrors" name="log_transactions" value="0"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '0' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionErrors">' . $OSCOM_PayPal->getDef('cfg_log_transactions_errors') . '</label>' .
-               '<input type="radio" id="logTransactionsSelectionDisabled" name="log_transactions" value="-1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '-1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionDisabled">' . $OSCOM_PayPal->getDef('cfg_log_transactions_disabled') . '</label>';
-
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label>{$this->title}</label>
@@ -48,7 +45,6 @@ $(function() {
 </script>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

@@ -41,19 +41,7 @@
     }
   }
 
-  if ( function_exists('json_encode') ) {
-    echo json_encode($ppBalanceResult);
-  } else {
-    $ppBalanceResultCompat = 'rpcStatus=' . $ppBalanceResult['rpcStatus'] . "\n";
-
-    if ( isset($ppBalanceResult['balance']) ) {
-      foreach ( $ppBalanceResult['balance'] as $key => $value ) {
-        $ppBalanceResultCompat .= $key . '=' . $value . "\n";
-      }
-    }
-
-    echo trim($ppBalanceResultCompat);
-  }
+  echo json_encode($ppBalanceResult);
 
   exit;
 ?>

@@ -1,34 +1,30 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\PS\Params;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
 
-  Released under the GNU General Public License
-*/
+class ewp_public_cert_id extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $sort_order = 1000;
 
-  use OSC\OM\HTML;
-
-  class OSCOM_PayPal_PS_Cfg_ewp_public_cert_id {
-    var $default = '';
-    var $title;
-    var $description;
-    var $sort_order = 1000;
-
-    function OSCOM_PayPal_PS_Cfg_ewp_public_cert_id() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_ps_ewp_public_cert_id_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_ps_ewp_public_cert_id_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_ps_ewp_public_cert_id_title');
+        $this->description = $this->app->getDef('cfg_ps_ewp_public_cert_id_desc');
     }
 
-    function getSetField() {
-      $input = HTML::inputField('ewp_public_cert_id', OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT_ID, 'id="inputPsEwpPublicCertId"');
+    public function getSetField()
+    {
+        $input = HTML::inputField('ewp_public_cert_id', OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT_ID, 'id="inputPsEwpPublicCertId"');
 
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label for="inputPsEwpPublicCertId">{$this->title}</label>
@@ -42,7 +38,6 @@
 </div>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

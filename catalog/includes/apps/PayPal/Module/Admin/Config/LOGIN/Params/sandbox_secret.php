@@ -1,32 +1,30 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTML;
 
-  Released under the GNU General Public License
-*/
+class sandbox_secret extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+{
+    public $sort_order = 500;
 
-  use OSC\OM\HTML;
-
-  class OSCOM_PayPal_LOGIN_Cfg_sandbox_secret {
-    var $default = '';
-    var $sort_order = 500;
-
-    function OSCOM_PayPal_LOGIN_Cfg_sandbox_secret() {
-      global $OSCOM_PayPal;
-
-      $this->title = $OSCOM_PayPal->getDef('cfg_login_sandbox_secret_title');
-      $this->description = $OSCOM_PayPal->getDef('cfg_login_sandbox_secret_desc');
+    protected function init()
+    {
+        $this->title = $this->app->getDef('cfg_login_sandbox_secret_title');
+        $this->description = $this->app->getDef('cfg_login_sandbox_secret_desc');
     }
 
-    function getSetField() {
-      $input = HTML::inputField('sandbox_secret', OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET, 'id="inputLogInSandboxSecret"');
+    public function getSetField()
+    {
+        $input = HTML::inputField('sandbox_secret', OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET, 'id="inputLogInSandboxSecret"');
 
-      $result = <<<EOT
+        $result = <<<EOT
 <div>
   <p>
     <label for="inputLogInSandboxSecret">{$this->title}</label>
@@ -40,7 +38,6 @@
 </div>
 EOT;
 
-      return $result;
+        return $result;
     }
-  }
-?>
+}

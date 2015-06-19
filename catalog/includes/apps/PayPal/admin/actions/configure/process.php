@@ -10,25 +10,27 @@
   Released under the GNU General Public License
 */
 
-  use OSC\OM\OSCOM;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  if ( $current_module == 'G' ) {
+$m = Registry::get('PayPalAdminConfig' . $current_module);
+
+if ($current_module == 'G') {
     $cut = 'OSCOM_APP_PAYPAL_';
-  } else {
+} else {
     $cut = 'OSCOM_APP_PAYPAL_' . $current_module . '_';
-  }
+}
 
-  $cut_length = strlen($cut);
+$cut_length = strlen($cut);
 
-  foreach ( $OSCOM_PayPal->getParameters($current_module) as $key ) {
+foreach ($m->getParameters() as $key) {
     $p = strtolower(substr($key, $cut_length));
 
-    if ( isset($_POST[$p]) ) {
-      $OSCOM_PayPal->saveParameter($key, $_POST[$p]);
+    if (isset($_POST[$p])) {
+        $OSCOM_PayPal->saveParameter($key, $_POST[$p]);
     }
-  }
+}
 
-  $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_cfg_saved_success'), 'success');
+$OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_cfg_saved_success'), 'success');
 
-  OSCOM::redirect('apps.php', 'PayPal&action=configure&module=' . $current_module);
-?>
+OSCOM::redirect('apps.php', 'PayPal&action=configure&module=' . $current_module);
