@@ -122,8 +122,8 @@ class PayPal extends \OSC\OM\AppAbstract
     {
         $migrated = false;
 
-        foreach ($this->getModules() as $module) {
-            if (!defined('OSCOM_APP_PAYPAL_' . $module . '_STATUS') && $this->getModuleInfo($module, 'is_migratable')) {
+        foreach ($this->getConfigModules() as $module) {
+            if (!defined('OSCOM_APP_PAYPAL_' . $module . '_STATUS') && $this->getConfigModuleInfo($module, 'is_migratable')) {
                 $this->saveParameter('OSCOM_APP_PAYPAL_' . $module . '_STATUS', '');
 
                 $m = Registry::get('PayPalAdminConfig' . $module);
@@ -141,7 +141,7 @@ class PayPal extends \OSC\OM\AppAbstract
         return $migrated;
     }
 
-    public function getModules()
+    public function getConfigModules()
     {
         static $result;
 
@@ -156,7 +156,7 @@ class PayPal extends \OSC\OM\AppAbstract
                         $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename();
 
                         if (is_subclass_of($class, 'OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract')) {
-                            $sort_order = $this->getModuleInfo($file->getFilename(), 'sort_order');
+                            $sort_order = $this->getConfigModuleInfo($file->getFilename(), 'sort_order');
 
                             if ($sort_order > 0) {
                                 $counter = $sort_order;
@@ -176,7 +176,7 @@ class PayPal extends \OSC\OM\AppAbstract
                                 break;
                             }
                         } else {
-                            trigger_error('OSC\OM\Apps\PayPal\PayPal::getModules(): OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename() . ' is not a subclass of OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract and cannot be loaded.');
+                            trigger_error('OSC\OM\Apps\PayPal\PayPal::getConfigModules(): OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename() . ' is not a subclass of OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract and cannot be loaded.');
                         }
                     }
                 }
@@ -188,7 +188,7 @@ class PayPal extends \OSC\OM\AppAbstract
         return $result;
     }
 
-    public function getModuleInfo($module, $info)
+    public function getConfigModuleInfo($module, $info)
     {
         if (!Registry::exists('PayPalAdminConfig' . $module)) {
             $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $module . '\\' . $module;

@@ -12,12 +12,12 @@
 
   $content = 'configure.php';
 
-  $modules = $OSCOM_PayPal->getModules();
+  $modules = $OSCOM_PayPal->getConfigModules();
 
   $default_module = 'G';
 
   foreach ( $modules as $m ) {
-    if ( $OSCOM_PayPal->getModuleInfo($m, 'is_installed') === true ) {
+    if ( $OSCOM_PayPal->getConfigModuleInfo($m, 'is_installed') === true ) {
       $default_module = $m;
       break;
     }
