@@ -1,36 +1,36 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+  namespace OSC\OM\Apps\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  }
+  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class paypal_pro_hs {
+  class HS {
     var $code, $title, $description, $enabled, $_app;
 
-    function paypal_pro_hs() {
+    function __construct() {
       global $order;
 
-      $this->_app = new OSCOM_PayPal();
+      if (!Registry::exists('PayPal')) {
+        Registry::set('PayPal', new PayPalApp());
+      }
+
+      $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/HS/HS.php');
 
       $this->signature = 'paypal|paypal_pro_hs|' . $this->_app->getVersion() . '|2.3';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'paypal_pro_hs';
+      $this->code = 'PayPal\HS';
       $this->title = $this->_app->getDef('module_hs_title');
       $this->public_title = $this->_app->getDef('module_hs_public_title');
       $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=HS'), 'primary', null, true) . '</div>';
@@ -246,7 +246,8 @@
                                     'products_price' => $order->products[$i]['price'],
                                     'final_price' => $order->products[$i]['final_price'],
                                     'products_tax' => $order->products[$i]['tax'],
-                                    'products_quantity' => $order->products[$i]['qty']);
+                                    'products_quantity' => $order->products[$i]['qty'],
+                                    'products_full_id' => $order->products[$i]['id']);
 
             $OSCOM_Db->save('orders_products', $sql_data_array);
 
@@ -320,7 +321,7 @@
                         'custom' => $_SESSION['customer_id'],
                         'paymentaction' => OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD == '1' ? 'sale' : 'authorization',
                         'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
-                        'notify_url' => OSCOM::link('ext/modules/payment/paypal/pro_hosted_ipn.php', '', 'SSL', false, false),
+                        'notify_url' => OSCOM::link('public/apps/PayPal/Module/Payment/HS_IPN.php', '', 'SSL', false, false),
                         'shipping' => $this->_app->formatCurrencyRaw($order->info['shipping_cost']),
                         'tax' => $this->_app->formatCurrencyRaw($order->info['tax']),
                         'subtotal' => $this->_app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
@@ -360,7 +361,7 @@
 
       $_SESSION['pphs_key'] = tep_create_random_value(16);
 
-      $iframe_url = OSCOM::link('ext/modules/payment/paypal/hosted_checkout.php', 'key=' . $_SESSION['pphs_key'], 'SSL');
+      $iframe_url = OSCOM::link('public/apps/PayPal/Module/Payment/HS_checkout.php', 'key=' . $_SESSION['pphs_key'], 'SSL');
       $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs', 'SSL');
 
 // include jquery if it doesn't exist in the template
@@ -622,7 +623,7 @@ EOD;
       $error = array('title' => $this->_app->getDef('module_hs_error_general_title'),
                      'error' => $this->_app->getDef('module_hs_error_general'));
 
-      if ( îsset($_SESSION['pphs_error_msg']) ) {
+      if ( isset($_SESSION['pphs_error_msg']) ) {
         $error['error'] = $_SESSION['pphs_error_msg'];
 
         unset($_SESSION['pphs_error_msg']);
@@ -632,7 +633,7 @@ EOD;
     }
 
     function check() {
-      return defined('OSCOM_APP_PAYPAL_HS_STATUS') && !empty(OSCOM_APP_PAYPAL_HS_STATUS);
+      return defined('OSCOM_APP_PAYPAL_HS_STATUS') && (trim(OSCOM_APP_PAYPAL_HS_STATUS) != '');
     }
 
     function install() {

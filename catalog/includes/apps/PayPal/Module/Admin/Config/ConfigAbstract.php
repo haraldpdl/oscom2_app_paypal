@@ -14,6 +14,7 @@ use OSC\OM\Registry;
 abstract class ConfigAbstract
 {
     protected $app;
+    protected $db;
 
     public $code;
     public $title;
@@ -30,6 +31,7 @@ abstract class ConfigAbstract
     final public function __construct()
     {
         $this->app = Registry::get('PayPal');
+        $this->db = Registry::get('Db');
 
         $this->code = (new \ReflectionClass($this))->getShortName();
 
@@ -60,7 +62,7 @@ abstract class ConfigAbstract
 
     public function uninstall()
     {
-        $Qdelete = Registry::get('Db')->prepare('delete from :table_configuration where configuration_key like :configuration_key');
+        $Qdelete = $this->db->prepare('delete from :table_configuration where configuration_key like :configuration_key');
         $Qdelete->bindValue(':configuration_key', 'OSCOM_APP_PAYPAL_' . $this->code . '_%');
         $Qdelete->execute();
 

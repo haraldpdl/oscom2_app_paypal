@@ -13,7 +13,9 @@
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
 
-  chdir('../../../../');
+  use OSC\OM\Apps\PayPal\Module\Payment\PS;
+
+  chdir('../../../../../');
   require('includes/application_top.php');
 
   if ( !defined('OSCOM_APP_PAYPAL_PS_STATUS') || !in_array(OSCOM_APP_PAYPAL_PS_STATUS, array('1', '0')) ) {
@@ -22,10 +24,7 @@
 
   require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/checkout_process.php');
 
-  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_standard.php');
-  require('includes/modules/payment/paypal_standard.php');
-
-  $paypal_standard = new paypal_standard();
+  $paypal_standard = new PS();
 
   $result = false;
 

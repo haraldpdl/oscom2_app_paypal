@@ -14,13 +14,14 @@
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
 
-  chdir('../../../../');
+  use OSC\OM\Apps\PayPal\Module\Payment\EC;
+
+  chdir('../../../../../');
   require('includes/application_top.php');
 
   require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/create_account.php');
 
-  require('includes/modules/payment/paypal_express.php');
-  $paypal_express = new paypal_express();
+  $paypal_express = new EC();
 
   if ( !$paypal_express->check() || !$paypal_express->enabled ) {
     OSCOM::redirect('shopping_cart.php', '', 'SSL');
@@ -58,6 +59,10 @@
 // register a random ID in the session to check throughout the checkout procedure
 // against alterations in the shopping cart contents
   $_SESSION['cartID'] = $_SESSION['cart']->cartID;
+
+  if (!isset($_GET['osC_Action'])) {
+    $_GET['osC_Action'] = null;
+  }
 
   switch ($_GET['osC_Action']) {
     case 'cancel':
@@ -822,7 +827,7 @@ EOD;
                                             'name' => $quote['module'],
                                             'label' => $rate['title'],
                                             'cost' => $rate['cost'],
-                                            'tax' => $quote['tax']);
+                                            'tax' => (isset($quote['tax']) ? $quote['tax'] : null));
                   }
                 }
               }
@@ -886,7 +891,7 @@ EOD;
           $item_params['L_SHIPPINGOPTIONISDEFAULT' . $default_shipping] = 'true';
 
 // Instant Update
-          $item_params['CALLBACK'] = OSCOM::link('ext/modules/payment/paypal/express.php', 'osC_Action=callbackSet', 'SSL', false, false);
+          $item_params['CALLBACK'] = OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', 'osC_Action=callbackSet', 'SSL', false, false);
           $item_params['CALLBACKTIMEOUT'] = '6';
           $item_params['CALLBACKVERSION'] = $paypal_express->api_version;
 
@@ -910,7 +915,7 @@ EOD;
           if (DISPLAY_PRICE_WITH_TAX == 'true') $order->info['shipping_cost'] = $order->info['shipping_cost'] / (1.0 + ($quotes_array[$default_shipping]['tax'] / 100));
           $module = substr($_SESSION['shipping']['id'], 0, strpos($_SESSION['shipping']['id'], '_'));
           $order->info['tax'] -= tep_calculate_tax($order->info['shipping_cost'], $quotes_array[$default_shipping]['tax']);
-          $order->info['tax_groups'][tep_get_tax_description($module->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id'])] -= tep_calculate_tax($order->info['shipping_cost'], $quotes_array[$default_shipping]['tax']);
+          $order->info['tax_groups'][tep_get_tax_description($GLOBALS[$module]->tax_class, $order->delivery['country']['id'], $order->delivery['zone_id'])] -= tep_calculate_tax($order->info['shipping_cost'], $quotes_array[$default_shipping]['tax']);
           $order->info['total'] -= tep_calculate_tax($order->info['shipping_cost'], $quotes_array[$default_shipping]['tax']);
         }
 

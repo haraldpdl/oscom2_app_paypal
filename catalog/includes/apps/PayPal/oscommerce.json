@@ -1,0 +1,31 @@
+{
+	"title":	"PayPal",
+	"vendor":	"PayPal",
+	"version":	5.0,
+	"license":	"GPL",
+	"authors":	[
+		{
+			"name":		"Harald Ponce de Leon",
+			"company":	"osCommerce",
+			"email":	"hpdl@oscommerce.com",
+			"website":	"http://www.oscommerce.com"
+		}
+	],
+	"modules":	{
+		"adminDashboard":	{
+			"PayPal":	"Module\\Admin\\Dashboard\\PayPal"
+		},
+		"adminMenu":		{
+			"PayPal":	"Module\\Admin\\Menu\\PayPal"
+		},
+		"payment":			{
+			"DP":	"Module\\Payment\\DP",
+			"EC":	"Module\\Payment\\EC",
+			"HS":	"Module\\Payment\\HS",
+			"PS":	"Module\\Payment\\PS"
+		},
+		"content":			{
+			"LOGIN":	"Module\\Content\\LOGIN"
+		}
+	}
+}

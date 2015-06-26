@@ -1,36 +1,36 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+  namespace OSC\OM\Apps\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  }
+  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class paypal_pro_dp {
+  class DP {
     var $code, $title, $description, $enabled, $_app;
 
-    function paypal_pro_dp() {
+    function __construct() {
       global $order;
 
-      $this->_app = new OSCOM_PayPal();
+      if (!Registry::exists('PayPal')) {
+        Registry::set('PayPal', new PayPalApp());
+      }
+
+      $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/DP/DP.php');
 
       $this->signature = 'paypal|paypal_pro_dp|' . $this->_app->getVersion() . '|2.3';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'paypal_pro_dp';
+      $this->code = 'PayPal\DP';
       $this->title = $this->_app->getDef('module_dp_title');
       $this->public_title = $this->_app->getDef('module_dp_public_title');
       $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_dp_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=DP'), 'primary', null, true) . '</div>';
@@ -38,7 +38,7 @@
       $this->enabled = defined('OSCOM_APP_PAYPAL_DP_STATUS') && in_array(OSCOM_APP_PAYPAL_DP_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID : 0;
 
-      if ( !defined('MODULE_PAYMENT_INSTALLED') || !tep_not_null(MODULE_PAYMENT_INSTALLED) || !in_array('paypal_express.php', explode(';', MODULE_PAYMENT_INSTALLED)) || !defined('OSCOM_APP_PAYPAL_EC_STATUS') || !in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ) {
+      if ( !defined('MODULE_PAYMENT_INSTALLED') || !tep_not_null(MODULE_PAYMENT_INSTALLED) || !in_array('PayPal\EC', explode(';', MODULE_PAYMENT_INSTALLED)) || !defined('OSCOM_APP_PAYPAL_EC_STATUS') || !in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ) {
         $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_dp_error_express_module') . '</div>';
 
         $this->enabled = false;
@@ -524,7 +524,7 @@
     }
 
     function check() {
-      return defined('OSCOM_APP_PAYPAL_DP_STATUS') && !empty(OSCOM_APP_PAYPAL_DP_STATUS);
+      return defined('OSCOM_APP_PAYPAL_DP_STATUS') && (trim(OSCOM_APP_PAYPAL_DP_STATUS) != '');
     }
 
     function install() {

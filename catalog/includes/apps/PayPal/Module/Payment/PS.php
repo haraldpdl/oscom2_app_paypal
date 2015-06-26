@@ -1,36 +1,36 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+  namespace OSC\OM\Apps\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  }
+  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class paypal_standard {
+  class PS {
     var $code, $title, $description, $enabled, $_app;
 
-    function paypal_standard() {
+    function __construct() {
       global $PHP_SELF, $order;
 
-      $this->_app = new OSCOM_PayPal();
+      if (!Registry::exists('PayPal')) {
+        Registry::set('PayPal', new PayPalApp());
+      }
+
+      $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/PS/PS.php');
 
       $this->signature = 'paypal|paypal_standard|' . $this->_app->getVersion() . '|2.3';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'paypal_standard';
+      $this->code = 'PayPal\PS';
       $this->title = $this->_app->getDef('module_ps_title');
       $this->public_title = $this->_app->getDef('module_ps_public_title');
       $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=PS'), 'primary', null, true) . '</div>';
@@ -260,7 +260,8 @@
                                     'products_price' => $order->products[$i]['price'],
                                     'final_price' => $order->products[$i]['final_price'],
                                     'products_tax' => $order->products[$i]['tax'],
-                                    'products_quantity' => $order->products[$i]['qty']);
+                                    'products_quantity' => $order->products[$i]['qty'],
+                                    'products_full_id' => $order->products[$i]['id']);
 
             $OSCOM_Db->save('orders_products', $sql_data_array);
 
@@ -345,7 +346,7 @@
         include(DIR_WS_CLASSES . 'language.php');
       }
 
-      $lng = new language();
+      $lng = new \language();
 
       if ( count($lng->catalog_languages) > 1 ) {
         foreach ( $lng->catalog_languages as $key => $value ) {
@@ -367,7 +368,7 @@
                           'invoice' => substr($_SESSION['cart_PayPal_Standard_ID'], strpos($_SESSION['cart_PayPal_Standard_ID'], '-')+1),
                           'custom' => $_SESSION['customer_id'],
                           'no_note' => '1',
-                          'notify_url' => OSCOM::link('ext/modules/payment/paypal/standard_ipn.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
+                          'notify_url' => OSCOM::link('public/apps/PayPal/Module/Payment/PS_IPN.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
                           'rm' => '2',
                           'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
                           'cancel_return' => OSCOM::link('checkout_payment.php', '', 'SSL'),
@@ -865,7 +866,7 @@
     }
 
     function check() {
-      return defined('OSCOM_APP_PAYPAL_PS_STATUS') && !empty(OSCOM_APP_PAYPAL_PS_STATUS);
+      return defined('OSCOM_APP_PAYPAL_PS_STATUS') && (trim(OSCOM_APP_PAYPAL_PS_STATUS) != '');
     }
 
     function install() {

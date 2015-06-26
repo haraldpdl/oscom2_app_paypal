@@ -17,41 +17,43 @@ class PayPal extends \OSC\OM\ModuleAdminDashboardAbstract
 {
     protected $app;
 
-    public function __construct() {
-      if (!Registry::exists('PayPal')) {
-        Registry::set('PayPal', new PayPalApp());
-      }
+    protected function init()
+    {
+        if (!Registry::exists('PayPal')) {
+            Registry::set('PayPal', new PayPalApp());
+        }
 
-      $this->app = Registry::get('PayPal');
+        $this->app = Registry::get('PayPal');
 
-      $this->app->loadLanguageFile('admin/balance.php');
-      $this->app->loadLanguageFile('admin/modules/dashboard/d_paypal_app.php');
+        $this->app->loadLanguageFile('admin/balance.php');
+        $this->app->loadLanguageFile('admin/modules/dashboard/d_paypal_app.php');
 
-      $this->title = $this->app->getDef('module_admin_dashboard_title');
-      $this->description = $this->app->getDef('module_admin_dashboard_description');
+        $this->title = $this->app->getDef('module_admin_dashboard_title');
+        $this->description = $this->app->getDef('module_admin_dashboard_description');
 
-      if ( defined('MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER') ) {
-        $this->sort_order = MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER;
-        $this->enabled = true;
-      }
+        if ( defined('MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER') ) {
+            $this->sort_order = MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER;
+            $this->enabled = true;
+        }
     }
 
-    public function getOutput() {
-      $version = $this->app->getVersion();
-      $version_check_result = defined('OSCOM_APP_PAYPAL_VERSION_CHECK') ? '"' . OSCOM_APP_PAYPAL_VERSION_CHECK . '"' : 'undefined';
-      $can_apply_online_updates = class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false';
-      $has_live_account = ($this->app->hasApiCredentials('live') === true) ? 'true' : 'false';
-      $has_sandbox_account = ($this->app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
-      $version_check_url = OSCOM::link('apps.php', 'PayPal&action=checkVersion');
-      $new_update_notice = $this->app->getDef('update_available_body', array('button_view_update' => $this->app->drawButton($this->app->getDef('button_view_update'), OSCOM::link('apps.php', 'PayPal&action=update'), 'success', null, true)));
-      $heading_live_account = $this->app->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))));
-      $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))));
-      $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
-      $app_get_started = $this->app->drawButton($this->app->getDef('button_app_get_started'), OSCOM::link('apps.php', 'PayPal'), 'warning', null, true);
-      $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
-      $get_balance_url = OSCOM::link('apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE');
+    public function getOutput()
+    {
+        $version = $this->app->getVersion();
+        $version_check_result = defined('OSCOM_APP_PAYPAL_VERSION_CHECK') ? '"' . OSCOM_APP_PAYPAL_VERSION_CHECK . '"' : 'undefined';
+        $can_apply_online_updates = class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false';
+        $has_live_account = ($this->app->hasApiCredentials('live') === true) ? 'true' : 'false';
+        $has_sandbox_account = ($this->app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
+        $version_check_url = OSCOM::link('apps.php', 'PayPal&action=checkVersion');
+        $new_update_notice = $this->app->getDef('update_available_body', array('button_view_update' => $this->app->drawButton($this->app->getDef('button_view_update'), OSCOM::link('apps.php', 'PayPal&action=update'), 'success', null, true)));
+        $heading_live_account = $this->app->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))));
+        $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))));
+        $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
+        $app_get_started = $this->app->drawButton($this->app->getDef('button_app_get_started'), OSCOM::link('apps.php', 'PayPal'), 'warning', null, true);
+        $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
+        $get_balance_url = OSCOM::link('apps.php', 'PayPal&action=balance&subaction=retrieve&type=PPTYPE');
 
-      $output = <<<EOD
+        $output = <<<EOD
 <style>
 .pp-container {
   font-size: 12px;
@@ -309,27 +311,28 @@ $(function() {
   })();
 });
 </script>
-
 EOD;
 
-      return $output;
+        return $output;
     }
 
-    public function install() {
-      $OSCOM_Db = Registry::get('Db');
-
-      $OSCOM_Db->save('configuration', [
-          'configuration_title' => 'Sort Order',
-          'configuration_key' => 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER',
-          'configuration_value' => '0',
-          'configuration_description' => 'Sort order of display. Lowest is displayed first.',
-          'configuration_group_id' => '6',
-          'sort_order' => '0',
-          'date_added' => 'now()'
-      ]);
+    public function install()
+    {
+        $this->db->save('configuration', [
+            'configuration_title' => 'Sort Order',
+            'configuration_key' => 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER',
+            'configuration_value' => '0',
+            'configuration_description' => 'Sort order of display. Lowest is displayed first.',
+            'configuration_group_id' => '6',
+            'sort_order' => '0',
+            'date_added' => 'now()'
+        ]);
     }
 
-    public function keys() {
-      return array('MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER');
+    public function keys()
+    {
+        return [
+            'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER'
+        ];
     }
 }

@@ -10,20 +10,19 @@
   Released under the GNU General Public License
 */
 
-  chdir('../../../../');
+  use OSC\OM\Apps\PayPal\Module\Payment\HS;
+
+  chdir('../../../../../');
   require('includes/application_top.php');
 
   if ( !defined('OSCOM_APP_PAYPAL_HS_STATUS') || !in_array(OSCOM_APP_PAYPAL_HS_STATUS, array('1', '0')) ) {
     exit;
   }
 
-  require(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_pro_hs.php');
-  require('includes/modules/payment/paypal_pro_hs.php');
-
   $result = false;
 
   if ( isset($_POST['txn_id']) && !empty($_POST['txn_id']) ) {
-    $paypal_pro_hs = new paypal_pro_hs();
+    $paypal_pro_hs = new HS();
 
     $result = $paypal_pro_hs->_app->getApiResult('APP', 'GetTransactionDetails', array('TRANSACTIONID' => $_POST['txn_id']), (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox', true);
   }

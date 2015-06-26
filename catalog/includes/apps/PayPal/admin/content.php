@@ -10,6 +10,7 @@
   Released under the GNU General Public License
 */
 
+  use OSC\OM\Apps;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
@@ -55,19 +56,18 @@ EOD;
 
   if ( ($action == 'start') && $OSCOM_PayPal->migrate() ) {
     $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
-    $adm_class = 'OSC\OM\Apps\PayPal\Module\Admin\Dashboard\PayPal';
 
-    if ( !in_array('PayPal\PayPal', $admin_dashboard_modules) ) {
-      $admin_dashboard_modules[] = 'PayPal\PayPal';
+    foreach (Apps::getModules('adminDashboard', 'PayPal') as $k => $v) {
+      if (!in_array($k, $admin_dashboard_modules)) {
+        $admin_dashboard_modules[] = $k;
 
-      $adm = new $adm_class();
-      $adm->install();
+        $adm = new $v();
+        $adm->install();
+      }
+    }
 
+    if (isset($adm)) {
       $OSCOM_Db->save('configuration', ['configuration_value' => implode(';', $admin_dashboard_modules)], ['configuration_key' => 'MODULE_ADMIN_DASHBOARD_INSTALLED']);
-
-      unset($adm);
-      unset($adm_class);
-      unset($admin_dashboard_modules);
     }
 
     OSCOM::redirect('apps.php', tep_get_all_get_params());

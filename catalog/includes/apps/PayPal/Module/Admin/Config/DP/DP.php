@@ -45,7 +45,7 @@ class DP extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::install();
 
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
-        $installed[] = $this->pm_code . '.php';
+        $installed[] = $this->app->code . '\\' . $this->code;
 
         $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
     }
@@ -55,7 +55,7 @@ class DP extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::uninstall();
 
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
-        $installed_pos = array_search($this->pm_code . '.php', $installed);
+        $installed_pos = array_search($this->app->code . '\\' . $this->code, $installed);
 
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);

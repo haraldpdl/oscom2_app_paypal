@@ -14,7 +14,6 @@ use OSC\OM\Registry;
 
 class PayPal extends \OSC\OM\AppAbstract
 {
-    protected $title = 'PayPal';
     protected $api_version = 112;
     protected $definitions = [];
 
@@ -307,7 +306,7 @@ class PayPal extends \OSC\OM\AppAbstract
         $function = 'OSCOM_PayPal_' . $module . '_Api_' . $call;
 
         if ( !function_exists($function) ) {
-          include(DIR_FS_CATALOG . 'includes/apps/PayPal/modules/' . $module . '/api/' . $call . '.php');
+          include(DIR_FS_CATALOG . 'includes/apps/PayPal/Module/Admin/Config/' . $module . '/api/' . $call . '.php');
         }
       }
 
@@ -354,8 +353,8 @@ class PayPal extends \OSC\OM\AppAbstract
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
-        if ( (substr($server['host'], -10) == 'paypal.com') && file_exists(DIR_FS_CATALOG . 'ext/modules/payment/paypal/paypal.com.crt') ) {
-          curl_setopt($curl, CURLOPT_CAINFO, DIR_FS_CATALOG . 'ext/modules/payment/paypal/paypal.com.crt');
+        if ( (substr($server['host'], -10) == 'paypal.com') && file_exists(OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt') ) {
+          curl_setopt($curl, CURLOPT_CAINFO, OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt');
         } elseif ( file_exists(DIR_FS_CATALOG . 'includes/cacert.pem') ) {
           curl_setopt($curl, CURLOPT_CAINFO, DIR_FS_CATALOG . 'includes/cacert.pem');
         }

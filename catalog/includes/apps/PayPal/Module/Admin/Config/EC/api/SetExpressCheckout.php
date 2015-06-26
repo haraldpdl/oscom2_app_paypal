@@ -22,8 +22,8 @@
     $params = array('VERSION' => $OSCOM_PayPal->getApiVersion(),
                     'METHOD' => 'SetExpressCheckout',
                     'PAYMENTREQUEST_0_PAYMENTACTION' => ((OSCOM_APP_PAYPAL_EC_TRANSACTION_METHOD == '1') || !$OSCOM_PayPal->hasCredentials('EC') ? 'Sale' : 'Authorization'),
-                    'RETURNURL' => OSCOM::link('ext/modules/payment/paypal/express.php', 'osC_Action=retrieve', 'SSL'),
-                    'CANCELURL' => OSCOM::link('ext/modules/payment/paypal/express.php', 'osC_Action=cancel', 'SSL'),
+                    'RETURNURL' => OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', 'osC_Action=retrieve', 'SSL'),
+                    'CANCELURL' => OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', 'osC_Action=cancel', 'SSL'),
                     'BRANDNAME' => STORE_NAME,
                     'SOLUTIONTYPE' => (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1') ? 'Sole' : 'Mark');
 

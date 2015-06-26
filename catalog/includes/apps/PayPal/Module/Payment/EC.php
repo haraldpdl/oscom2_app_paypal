@@ -1,37 +1,37 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+  namespace OSC\OM\Apps\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  }
+  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class paypal_express {
+  class EC {
     var $code, $title, $description, $enabled, $_app;
 
-    function paypal_express() {
+    function __construct() {
       global $PHP_SELF, $order, $request_type;
 
-      $this->_app = new OSCOM_PayPal();
+      if (!Registry::exists('PayPal')) {
+        Registry::set('PayPal', new PayPalApp());
+      }
+
+      $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/EC/EC.php');
 
       $this->signature = 'paypal|paypal_express|' . $this->_app->getVersion() . '|2.3';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'paypal_express';
+      $this->code = 'PayPal\EC';
       $this->title = $this->_app->getDef('module_ec_title');
       $this->public_title = $this->_app->getDef('module_ec_public_title');
       $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=EC'), 'primary', null, true) . '</div>';
@@ -149,7 +149,7 @@
         $button_title .= ' (' . $this->code . '; Sandbox)';
       }
 
-      $string = '<a href="' . OSCOM::link('ext/modules/payment/paypal/express.php', '', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+      $string = '<a href="' . OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
 
       if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
         $string .= <<<EOD
@@ -182,7 +182,7 @@ EOD;
       global $messageStack, $order;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
+        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
@@ -233,7 +233,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
+        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
@@ -289,7 +289,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('ext/modules/payment/paypal/express.php', '', 'SSL');
+        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( $_SESSION['appPayPalEcResult']['RESULT'] == '0' ) {
@@ -481,7 +481,7 @@ EOD;
     }
 
     function check() {
-      return defined('OSCOM_APP_PAYPAL_EC_STATUS') && !empty(OSCOM_APP_PAYPAL_EC_STATUS);
+      return defined('OSCOM_APP_PAYPAL_EC_STATUS') && (trim(OSCOM_APP_PAYPAL_EC_STATUS) != '');
     }
 
     function install() {
