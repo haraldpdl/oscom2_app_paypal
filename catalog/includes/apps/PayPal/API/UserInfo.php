@@ -1,27 +1,27 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\API;
 
-  Copyright (c) 2014 osCommerce
+class UserInfo extends \OSC\OM\Apps\PayPal\APIAbstract
+{
+    protected $type = 'login';
 
-  Released under the GNU General Public License
-*/
+    public function execute(array $extra_params = null)
+    {
+        $this->url = 'https://api.' . ($this->server != 'live' ? 'sandbox.' : '') . 'paypal.com/v1/identity/openidconnect/userinfo/?schema=openid&access_token=' . $extra_params['access_token'];
 
-  function OSCOM_PayPal_LOGIN_Api_UserInfo($OSCOM_PayPal, $server, $extra_params) {
-    if ( $server == 'live' ) {
-      $api_url = 'https://api.paypal.com/v1/identity/openidconnect/userinfo/?schema=openid&access_token=' . $extra_params['access_token'];
-    } else {
-      $api_url = 'https://api.sandbox.paypal.com/v1/identity/openidconnect/userinfo/?schema=openid&access_token=' . $extra_params['access_token'];
+        $response = $this->getResult($params);
+
+        return [
+            'res' => $response,
+            'success' => (is_array($response) && !isset($response['error'])),
+            'req' => $params
+        ];
     }
-
-    $response = $OSCOM_PayPal->makeApiCall($api_url);
-    $response_array = json_decode($response, true);
-
-    return array('res' => $response_array,
-                 'success' => (is_array($response_array) && !isset($response_array['error'])),
-                 'req' => $params);
-  }
-?>
+}

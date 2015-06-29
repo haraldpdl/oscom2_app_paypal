@@ -9,12 +9,13 @@
 namespace OSC\OM\Apps\PayPal;
 
 use OSC\OM\HTML;
+use OSC\OM\HTTP;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class PayPal extends \OSC\OM\AppAbstract
 {
-    protected $api_version = 112;
+    protected $api_version = 123;
     protected $definitions = [];
 
     protected $db;
@@ -291,88 +292,42 @@ class PayPal extends \OSC\OM\AppAbstract
     }
 
 // APP calls require $server to be "live" or "sandbox"
-    function getApiResult($module, $call, $extra_params = null, $server = null, $is_ipn = false) {
-      if ( $module == 'APP' ) {
-        $function = 'OSCOM_PayPal_Api_' . $call;
+    public function getApiResult($module, $call, array $extra_params = null, $server = null, $is_ipn = false)
+    {
+        $class = 'OSC\OM\Apps\PayPal\API\\' . $call;
 
-        if ( !function_exists($function) ) {
-          include(DIR_FS_CATALOG . 'includes/apps/PayPal/api/' . $call . '.php');
-        }
-      } else {
-        if ( !isset($server) ) {
-          $server = (constant('OSCOM_APP_PAYPAL_' . $module . '_STATUS') == '1') ? 'live' : 'sandbox';
-        }
+        $API = new $class($server);
 
-        $function = 'OSCOM_PayPal_' . $module . '_Api_' . $call;
+        $result = $API->execute($extra_params);
 
-        if ( !function_exists($function) ) {
-          include(DIR_FS_CATALOG . 'includes/apps/PayPal/Module/Admin/Config/' . $module . '/api/' . $call . '.php');
-        }
-      }
+        $this->log($module, $call, ($result['success'] === true) ? 1 : -1, $result['req'], $result['res'], $server, $is_ipn);
 
-      $result = $function($this, $server, $extra_params);
-
-      $this->log($module, $call, ($result['success'] === true) ? 1 : -1, $result['req'], $result['res'], $server, $is_ipn);
-
-      return $result['res'];
+        return $result['res'];
     }
 
-    function makeApiCall($url, $parameters = null, $headers = null) {
-      $server = parse_url($url);
+    public function makeApiCall($url, $parameters = null, array $headers = null)
+    {
+        $server = parse_url($url);
 
-      if ( !isset($server['port']) ) {
-        $server['port'] = ($server['scheme'] == 'https') ? 443 : 80;
-      }
+        $p = [
+            'url' => $url,
+            'parameters' => $parameters,
+            'headers' => $headers
+        ];
 
-      if ( !isset($server['path']) ) {
-        $server['path'] = '/';
-      }
-
-      $curl = curl_init($server['scheme'] . '://' . $server['host'] . $server['path'] . (isset($server['query']) ? '?' . $server['query'] : ''));
-      curl_setopt($curl, CURLOPT_PORT, $server['port']);
-      curl_setopt($curl, CURLOPT_HEADER, false);
-      curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-      curl_setopt($curl, CURLOPT_FORBID_REUSE, true);
-      curl_setopt($curl, CURLOPT_FRESH_CONNECT, true);
-      curl_setopt($curl, CURLOPT_ENCODING, ''); // disable gzip
-
-      if ( isset($parameters) ) {
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $parameters);
-      }
-
-      if ( isset($headers) && is_array($headers) && !empty($headers) ) {
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-      }
-
-      if ( isset($server['user']) && isset($server['pass']) ) {
-        curl_setopt($curl, CURLOPT_USERPWD, $server['user'] . ':' . $server['pass']);
-      }
-
-      if ( defined('OSCOM_APP_PAYPAL_VERIFY_SSL') && (OSCOM_APP_PAYPAL_VERIFY_SSL == '1') ) {
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
-
-        if ( (substr($server['host'], -10) == 'paypal.com') && file_exists(OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt') ) {
-          curl_setopt($curl, CURLOPT_CAINFO, OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt');
-        } elseif ( file_exists(DIR_FS_CATALOG . 'includes/cacert.pem') ) {
-          curl_setopt($curl, CURLOPT_CAINFO, DIR_FS_CATALOG . 'includes/cacert.pem');
+        if (defined('OSCOM_APP_PAYPAL_VERIFY_SSL') && (OSCOM_APP_PAYPAL_VERIFY_SSL == '1')) {
+            $p['verify_ssl'] = true;
         }
-      } else {
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
-      }
 
-      if ( defined('OSCOM_APP_PAYPAL_PROXY') && tep_not_null(OSCOM_APP_PAYPAL_PROXY) ) {
-        curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, true);
-        curl_setopt($curl, CURLOPT_PROXY, OSCOM_APP_PAYPAL_PROXY);
-      }
+        if ((substr($server['host'], -10) == 'paypal.com')) {
+            $p['cafile'] = OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt';
+        }
 
-      $result = curl_exec($curl);
+        if (defined('OSCOM_APP_PAYPAL_PROXY')) {
+            $p['proxy'] = OSCOM_APP_PAYPAL_PROXY;
+        }
 
-      curl_close($curl);
-
-      return $result;
+        return HTTP::getResponse($p);
     }
 
     function drawButton($title = null, $link = null, $type = null, $params = null, $force_css = false) {
