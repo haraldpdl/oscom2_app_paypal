@@ -1,42 +1,34 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+  namespace OSC\OM\Apps\PayPal\Module\Content;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  if ( !class_exists('OSCOM_PayPal') ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/OSCOM_PayPal.php');
-  }
+  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class cm_paypal_login {
-    var $code;
-    var $group;
-    var $title;
-    var $description;
-    var $sort_order;
-    var $enabled = false;
-    var $_app;
+  class LOGIN implements \OSC\OM\Modules\ContentInterface {
+    var $code, $group, $title, $description, $sort_order, $enabled, $_app;
 
-    function cm_paypal_login() {
-      global $PHP_SELF;
+    function __construct() {
+      if (!Registry::exists('PayPal')) {
+        Registry::set('PayPal', new PayPalApp());
+      }
 
-      $this->_app = new OSCOM_PayPal();
+      $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/LOGIN/LOGIN.php');
 
-      $this->signature = 'paypal|paypal_login|4.0|2.3';
+      $this->signature = 'paypal|paypal_login|' . $this->_app->getVersion() . '|2.3';
 
-      $this->code = get_class($this);
-      $this->group = basename(dirname(__FILE__));
+      $this->code = 'login/PayPal\LOGIN';
+      $this->group = 'login';
 
       $this->title = $this->_app->getDef('module_login_title');
       $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
@@ -98,7 +90,7 @@
       $cm_paypal_login = $this;
 
       ob_start();
-      include(DIR_WS_MODULES . 'content/' . $this->group . '/templates/paypal_login.php');
+      include(__DIR__ . '/templates/LOGIN.php');
       $template = ob_get_clean();
 
       $oscTemplate->addContent($template, $this->group);

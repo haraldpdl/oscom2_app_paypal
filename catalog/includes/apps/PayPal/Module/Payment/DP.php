@@ -14,7 +14,7 @@
 
   use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class DP {
+  class DP implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
 
     function __construct() {

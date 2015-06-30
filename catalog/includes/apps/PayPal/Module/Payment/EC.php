@@ -15,7 +15,7 @@
 
   use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class EC {
+  class EC implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
 
     function __construct() {

@@ -13,7 +13,7 @@ use OSC\OM\Registry;
 
 use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-class PayPal extends \OSC\OM\ModuleAdminDashboardAbstract
+class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
 {
     protected $app;
 

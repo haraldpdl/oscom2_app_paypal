@@ -14,7 +14,7 @@
 
   use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-  class HS {
+  class HS implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
 
     function __construct() {
@@ -279,7 +279,7 @@
                                        and popt.language_id = :language_id
                                        and popt.language_id = poval.language_id';
                 }
-        
+
                 $Qattributes = $OSCOM_Db->prepare($attributes_query);
                 $Qattributes->bindInt(':products_id', $order->products[$i]['id']);
                 $Qattributes->bindInt(':options_id', $order->products[$i]['attributes'][$j]['option_id']);
@@ -302,7 +302,7 @@
                                           'orders_products_filename' => $Qattributes->value('products_attributes_filename'),
                                           'download_maxdays' => $Qattributes->value('products_attributes_maxdays'),
                                           'download_count' => $Qattributes->value('products_attributes_maxcount'));
-        
+
                   $OSCOM_Db->save('orders_products_download', $sql_data_array);
                 }
               }
@@ -472,12 +472,12 @@ EOD;
 
             $Qstock = $OSCOM_Db->prepare($stock_query_sql);
             $Qstock->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
-    
+
             if (is_array($products_attributes)) {
               $Qstock->bindInt(':options_id', $products_attributes[0]['option_id']);
               $Qstock->bindInt(':options_values_id', $products_attributes[0]['value_id']);
             }
-    
+
             $Qstock->execute();
           } else {
             $Qstock = $OSCOM_Db->prepare('select products_quantity from :table_products where products_id = :products_id');

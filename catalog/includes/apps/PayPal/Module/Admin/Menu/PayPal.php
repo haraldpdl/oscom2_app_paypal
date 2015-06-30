@@ -13,7 +13,7 @@ use OSC\OM\Registry;
 
 use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
 
-class PayPal implements \OSC\OM\ModuleAdminMenuInterface
+class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 {
     public static function execute()
     {

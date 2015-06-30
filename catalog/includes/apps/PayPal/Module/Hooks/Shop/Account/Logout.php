@@ -8,7 +8,7 @@
 
 namespace OSC\OM\Apps\PayPal\Module\Hooks\Shop\Account;
 
-class Logout
+class Logout implements \OSC\OM\Modules\HooksInterface
 {
     public static function execute()
     {
