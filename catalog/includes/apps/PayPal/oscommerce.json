@@ -2,6 +2,7 @@
 	"title":	"PayPal",
 	"vendor":	"PayPal",
 	"version":	5.0,
+	"req_core_version":	2.4,
 	"license":	"GPL",
 	"authors": [
 		{
