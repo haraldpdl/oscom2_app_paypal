@@ -12,6 +12,8 @@ use OSC\OM\HTML;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
+use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
+
 class PageTab implements \OSC\OM\Modules\HooksInterface
 {
     protected $app;
@@ -19,6 +21,10 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
 
     public function __construct()
     {
+        if (!Registry::exists('PayPal')) {
+            Registry::set('PayPal', new PayPalApp());
+        }
+
         $this->app = Registry::get('PayPal');
         $this->db = Registry::get('Db');
     }
@@ -58,14 +64,14 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
 
                 $pp_server = (strpos(strtolower($Qorder->value('payment_method')), 'sandbox') !== false) ? 'sandbox' : 'live';
 
-                $info_button = $this->app->drawButton($this->app->getDef('button_details'), OSCOM::link('admin/orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), 'primary', null, true);
+                $info_button = $this->app->drawButton($this->app->getDef('button_details'), OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), 'primary', null, true);
                 $capture_button = $this->getCaptureButton($status, $Qorder->toArray());
                 $void_button = $this->getVoidButton($status, $Qorder->toArray());
                 $refund_button = $this->getRefundButton($status, $Qorder->toArray());
                 $paypal_button = $this->app->drawButton($this->app->getDef('button_view_at_paypal'), 'https://www.' . ($pp_server == 'sandbox' ? 'sandbox.' : '') . 'paypal.com/cgi-bin/webscr?cmd=_view-a-trans&id=' . $status['Transaction ID'], 'info', 'target="_blank"', true);
 
                 $tab_title = addslashes($this->app->getDef('tab_title'));
-                $tab_link = substr(OSCOM::link('admin/orders.php', tep_get_all_get_params()), strlen($base_url)) . '#section_paypal_content';
+                $tab_link = substr(OSCOM::link('orders.php', tep_get_all_get_params()), strlen($base_url)) . '#section_paypal_content';
 
                 $output = <<<EOD
 <script>
@@ -118,7 +124,7 @@ EOD;
                     $field_last_capture_title = $this->app->getDef('dialog_capture_last_capture_field_title', [
                         'currency' => $order['currency']
                     ]);
-                    $capture_link = OSCOM::link('admin/orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doCapture');
+                    $capture_link = OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doCapture');
                     $capture_currency = $order['currency'];
                     $dialog_button_capture = addslashes($this->app->getDef('dialog_capture_button_capture'));
                     $dialog_button_cancel = addslashes($this->app->getDef('dialog_capture_button_cancel'));
@@ -215,7 +221,7 @@ EOD;
 
                 $dialog_title = HTML::outputProtected($this->app->getDef('dialog_void_title'));
                 $dialog_body = $this->app->getDef('dialog_void_body');
-                $void_link = OSCOM::link('admin/orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doVoid');
+                $void_link = OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doVoid');
                 $dialog_button_void = addslashes($this->app->getDef('dialog_void_button_void'));
                 $dialog_button_cancel = addslashes($this->app->getDef('dialog_void_button_cancel'));
 
@@ -296,7 +302,7 @@ EOD;
 
             $dialog_title = HTML::outputProtected($this->app->getDef('dialog_refund_title'));
             $dialog_body = $this->app->getDef('dialog_refund_body');
-            $refund_link = OSCOM::link('admin/orders.php', 'page=' . $_GET['page'] . '&oID=' . $_GET['oID'] . '&action=edit&tabaction=refundTransaction');
+            $refund_link = OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $_GET['oID'] . '&action=edit&tabaction=refundTransaction');
             $dialog_button_refund = addslashes($this->app->getDef('dialog_refund_button_refund'));
             $dialog_button_cancel = addslashes($this->app->getDef('dialog_refund_button_cancel'));
 

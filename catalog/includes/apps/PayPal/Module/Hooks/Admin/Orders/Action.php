@@ -12,6 +12,8 @@ use OSC\OM\HTML;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
+use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
+
 class Action implements \OSC\OM\Modules\HooksInterface
 {
     protected $app;
@@ -19,6 +21,10 @@ class Action implements \OSC\OM\Modules\HooksInterface
 
     public function __construct()
     {
+        if (!Registry::exists('PayPal')) {
+            Registry::set('PayPal', new PayPalApp());
+        }
+
         $this->app = Registry::get('PayPal');
         $this->db = Registry::get('Db');
 
