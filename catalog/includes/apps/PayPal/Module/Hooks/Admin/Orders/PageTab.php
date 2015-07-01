@@ -35,7 +35,7 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
 
         $output = '';
 
-        $status = array();
+        $status = [];
 
         $Qc = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "Transaction ID:%" order by date_added desc limit 1');
         $Qc->bindInt(':orders_id', $oID);
@@ -115,7 +115,9 @@ EOD;
                     $dialog_title = HTML::outputProtected($this->app->getDef('dialog_capture_title'));
                     $dialog_body = $this->app->getDef('dialog_capture_body');
                     $field_amount_title = $this->app->getDef('dialog_capture_amount_field_title');
-                    $field_last_capture_title = $this->app->getDef('dialog_capture_last_capture_field_title', array('currency' => $order['currency']));
+                    $field_last_capture_title = $this->app->getDef('dialog_capture_last_capture_field_title', [
+                        'currency' => $order['currency']
+                    ]);
                     $capture_link = OSCOM::link('admin/orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doCapture');
                     $capture_currency = $order['currency'];
                     $dialog_button_capture = addslashes($this->app->getDef('dialog_capture_button_capture'));
@@ -257,7 +259,7 @@ EOD;
     {
         $output = '';
 
-        $tids = array();
+        $tids = [];
 
         $Qc = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: %" order by date_added desc');
         $Qc->bindInt(':orders_id', $_GET['oID']);
@@ -303,7 +305,9 @@ EOD;
             $counter = 0;
 
             foreach ($tids as $key => $value) {
-                $refund_fields .= '<p><input type="checkbox" name="ppRefund[]" value="' . $key . '" id="ppRefundPartial' . $counter . '"' . (isset($value['Refund']) ? ' disabled="disabled"' : '') . ' /> <label for="ppRefundPartial' . $counter . '"' . (isset($value['Refund']) ? ' style="text-decoration: line-through;"' : '') . '>' . $this->app->getDef('dialog_refund_payment_title', array('amount' => $value['Amount'])) . '</label></p>';
+                $refund_fields .= '<p><input type="checkbox" name="ppRefund[]" value="' . $key . '" id="ppRefundPartial' . $counter . '"' . (isset($value['Refund']) ? ' disabled="disabled"' : '') . ' /> <label for="ppRefundPartial' . $counter . '"' . (isset($value['Refund']) ? ' style="text-decoration: line-through;"' : '') . '>' . $this->app->getDef('dialog_refund_payment_title', [
+                    'amount' => $value['Amount']
+                ]) . '</label></p>';
 
                 $counter++;
             }

@@ -269,13 +269,17 @@ class Action implements \OSC\OM\Modules\HooksInterface
         $pass = false;
 
         if (!isset($comments['Gateway'])) {
-            $response = $this->app->getApiResult('APP', 'DoVoid', array('AUTHORIZATIONID' => $comments['Transaction ID']), (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
+            $response = $this->app->getApiResult('APP', 'DoVoid', [
+                'AUTHORIZATIONID' => $comments['Transaction ID']
+            ], (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
 
-            if (in_array($response['ACK'], array('Success', 'SuccessWithWarning'))) {
+            if (in_array($response['ACK'], ['Success', 'SuccessWithWarning'])) {
                 $pass = true;
             }
         } elseif ($comments['Gateway'] == 'Payflow') {
-            $response = $this->app->getApiResult('APP', 'PayflowVoid', array('ORIGID' => $comments['Transaction ID']), (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
+            $response = $this->app->getApiResult('APP', 'PayflowVoid', [
+                'ORIGID' => $comments['Transaction ID']
+            ], (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
 
             if (isset($response['RESULT']) && ($response['RESULT'] == '0')) {
                 $pass = true;
@@ -298,11 +302,13 @@ class Action implements \OSC\OM\Modules\HooksInterface
 
             $result = 'PayPal App: Void (' . $capture_total . ')';
 
-            $sql_data_array = array('orders_id' => (int)$order['orders_id'],
-                                    'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
-                                    'date_added' => 'now()',
-                                    'customer_notified' => '0',
-                                    'comments' => $result);
+            $sql_data_array = [
+                'orders_id' => (int)$order['orders_id'],
+                'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
+                'date_added' => 'now()',
+                'customer_notified' => '0',
+                'comments' => $result
+            ];
 
             $this->db->save('orders_status_history', $sql_data_array);
 
@@ -317,7 +323,7 @@ class Action implements \OSC\OM\Modules\HooksInterface
         global $messageStack;
 
         if (isset($_POST['ppRefund'])) {
-            $tids = array();
+            $tids = [];
 
             $Qc = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: %" order by date_added desc');
             $Qc->bindInt(':orders_id', $order['orders_id']);
@@ -340,7 +346,7 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 $tids[$comments['Transaction ID']]['Amount'] = $this->app->formatCurrencyRaw($order['total'], $order['currency'], $order['currency_value']);
             }
 
-            $rids = array();
+            $rids = [];
 
             foreach ($_POST['ppRefund'] as $id) {
                 if (isset($tids[$id]) && !isset($tids[$id]['Refund'])) {
@@ -352,15 +358,19 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 $pass = false;
 
                 if (!isset($comments['Gateway'])) {
-                    $response = $this->app->getApiResult('APP', 'RefundTransaction', array('TRANSACTIONID' => $id), (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
+                    $response = $this->app->getApiResult('APP', 'RefundTransaction', [
+                        'TRANSACTIONID' => $id
+                    ], (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
 
-                    if (in_array($response['ACK'], array('Success', 'SuccessWithWarning'))) {
+                    if (in_array($response['ACK'], ['Success', 'SuccessWithWarning'])) {
                         $transaction_id = $response['REFUNDTRANSACTIONID'];
 
                         $pass = true;
                     }
                 } elseif ($comments['Gateway'] == 'Payflow') {
-                    $response = $this->app->getApiResult('APP', 'PayflowRefund', array('ORIGID' => $id), (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
+                    $response = $this->app->getApiResult('APP', 'PayflowRefund', [
+                        'ORIGID' => $id
+                    ], (strpos($order['payment_method'], 'Sandbox') === false) ? 'live' : 'sandbox');
 
                     if (isset($response['RESULT']) && ($response['RESULT'] == '0')) {
                         $transaction_id = $response['PNREF'];
@@ -374,17 +384,23 @@ class Action implements \OSC\OM\Modules\HooksInterface
                               'Transaction ID: ' . HTML::sanitize($transaction_id) . "\n" .
                               'Parent ID: ' . HTML::sanitize($id);
 
-                    $sql_data_array = array('orders_id' => (int)$order['orders_id'],
-                                            'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
-                                            'date_added' => 'now()',
-                                            'customer_notified' => '0',
-                                            'comments' => $result);
+                    $sql_data_array = [
+                        'orders_id' => (int)$order['orders_id'],
+                        'orders_status_id' => OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID,
+                        'date_added' => 'now()',
+                        'customer_notified' => '0',
+                        'comments' => $result
+                    ];
 
                     $this->db->save('orders_status_history', $sql_data_array);
 
-                    $messageStack->add_session($this->app->getDef('ms_success_refundTransaction', array('refund_amount' => $tids[$id]['Amount'])), 'success');
+                    $messageStack->add_session($this->app->getDef('ms_success_refundTransaction', [
+                        'refund_amount' => $tids[$id]['Amount']
+                    ]), 'success');
                 } else {
-                    $messageStack->add_session($this->app->getDef('ms_error_refundTransaction', array('refund_amount' => $tids[$id]['Amount'])), 'error');
+                    $messageStack->add_session($this->app->getDef('ms_error_refundTransaction', [
+                        'refund_amount' => $tids[$id]['Amount']
+                    ]), 'error');
                 }
             }
         }
