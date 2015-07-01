@@ -10,7 +10,7 @@ namespace OSC\OM\Apps\PayPal\Module\Hooks\Shop\Account;
 
 class Logout implements \OSC\OM\Modules\HooksInterface
 {
-    public static function execute()
+    public function execute()
     {
         if (isset($_SESSION['paypal_login_access_token'])) {
             unset($_SESSION['paypal_login_access_token']);

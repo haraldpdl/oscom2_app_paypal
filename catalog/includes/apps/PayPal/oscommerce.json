@@ -30,6 +30,10 @@
 			}
 		},
 		"Hooks": {
+			"Admin/Orders": {
+				"Action":	"Module\\Hooks\\Admin\\Orders\\Action",
+				"PageTab":	"Module\\Hooks\\Admin\\Orders\\PageTab"
+			},
 			"Shop/Account": {
 				"Logout":	"Module\\Hooks\\Shop\\Account\\Logout"
 			}
