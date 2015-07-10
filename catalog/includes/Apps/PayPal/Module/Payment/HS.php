@@ -321,7 +321,7 @@
                         'custom' => $_SESSION['customer_id'],
                         'paymentaction' => OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD == '1' ? 'sale' : 'authorization',
                         'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
-                        'notify_url' => OSCOM::link('public/apps/PayPal/Module/Payment/HS_IPN.php', '', 'SSL', false, false),
+                        'notify_url' => OSCOM::link('public/Apps/PayPal/Module/Payment/HS_IPN.php', '', 'SSL', false, false),
                         'shipping' => $this->_app->formatCurrencyRaw($order->info['shipping_cost']),
                         'tax' => $this->_app->formatCurrencyRaw($order->info['tax']),
                         'subtotal' => $this->_app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
@@ -361,7 +361,7 @@
 
       $_SESSION['pphs_key'] = tep_create_random_value(16);
 
-      $iframe_url = OSCOM::link('public/apps/PayPal/Module/Payment/HS_checkout.php', 'key=' . $_SESSION['pphs_key'], 'SSL');
+      $iframe_url = OSCOM::link('public/Apps/PayPal/Module/Payment/HS_checkout.php', 'key=' . $_SESSION['pphs_key'], 'SSL');
       $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs', 'SSL');
 
 // include jquery if it doesn't exist in the template

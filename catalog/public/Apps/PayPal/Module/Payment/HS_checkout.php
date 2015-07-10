@@ -56,7 +56,7 @@
 <body>
 
 <div style="text-align: center;">
-  <?php echo HTML::image('public/apps/PayPal/images/HS_load.gif');?>
+  <?php echo HTML::image('public/Apps/PayPal/images/HS_load.gif');?>
 </div>
 
 <form name="pphs" action="<?php echo $form_url; ?>" method="post" <?php echo ($error == true ? 'target="_top"' : ''); ?>>

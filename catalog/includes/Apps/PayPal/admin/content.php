@@ -48,7 +48,7 @@ EOD;
 
   $OSCOM_PayPal->loadLanguageFile('admin.php');
 
-  if ( isset($_GET['action']) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . basename($_GET['action']) . '.php') ) {
+  if ( isset($_GET['action']) && file_exists(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . basename($_GET['action']) . '.php') ) {
     $action = basename($_GET['action']);
   }
 
@@ -73,14 +73,14 @@ EOD;
     OSCOM::redirect('apps.php', tep_get_all_get_params());
   }
 
-  include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '.php');
+  include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '.php');
 
-  if ( isset($_GET['subaction']) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '/' . basename($_GET['subaction']) . '.php') ) {
+  if ( isset($_GET['subaction']) && file_exists(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '/' . basename($_GET['subaction']) . '.php') ) {
     $subaction = basename($_GET['subaction']);
   }
 
   if ( !empty($subaction) ) {
-    include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/actions/' . $action . '/' . $subaction . '.php');
+    include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '/' . $subaction . '.php');
   }
 
   include(DIR_WS_INCLUDES . 'template_top.php');
@@ -413,7 +413,7 @@ if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
       <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . OSCOM::link('apps.php', 'PayPal&action=info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . OSCOM::link('apps.php', 'PayPal&action=privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
     </div>
 
-    <a href="<?php echo OSCOM::link('apps.php', 'PayPal&action=' . $action); ?>"><img src="<?php echo OSCOM::link('Shop/public/apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
+    <a href="<?php echo OSCOM::link('apps.php', 'PayPal&action=' . $action); ?>"><img src="<?php echo OSCOM::link('Shop/public/Apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
   </div>
 
   <div id="ppAppUpdateNotice" style="padding: 0 12px 0 12px; display: none;">
@@ -436,7 +436,7 @@ if ( !$.isFunction($.Deferred) ) {
 }
 </script>
 
-    <?php include(DIR_FS_CATALOG . 'includes/apps/PayPal/admin/content/' . basename($content)); ?>
+    <?php include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/content/' . basename($content)); ?>
   </div>
 </div>
 

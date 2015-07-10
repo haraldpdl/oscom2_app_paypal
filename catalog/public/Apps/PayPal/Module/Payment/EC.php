@@ -891,7 +891,7 @@ EOD;
           $item_params['L_SHIPPINGOPTIONISDEFAULT' . $default_shipping] = 'true';
 
 // Instant Update
-          $item_params['CALLBACK'] = OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', 'osC_Action=callbackSet', 'SSL', false, false);
+          $item_params['CALLBACK'] = OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', 'osC_Action=callbackSet', 'SSL', false, false);
           $item_params['CALLBACKTIMEOUT'] = '6';
           $item_params['CALLBACKVERSION'] = $paypal_express->api_version;
 

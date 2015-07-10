@@ -73,7 +73,7 @@ abstract class ConfigAbstract
     {
         $result = [];
 
-        $directory = OSCOM::BASE_DIR . 'apps/PayPal/Module/Admin/Config/' . $this->code . '/Params';
+        $directory = OSCOM::BASE_DIR . 'Apps/PayPal/Module/Admin/Config/' . $this->code . '/Params';
 
         if ($dir = new \DirectoryIterator($directory)) {
             foreach ($dir as $file) {

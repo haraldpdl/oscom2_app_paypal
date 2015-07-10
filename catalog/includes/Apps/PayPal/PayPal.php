@@ -43,8 +43,8 @@ class PayPal extends \OSC\OM\AppAbstract
         if (!isset($countries)) {
             $countries = [];
 
-            if (file_exists(OSCOM::BASE_DIR . 'apps/PayPal/req_api_countries.txt')) {
-                foreach (file(OSCOM::BASE_DIR . 'apps/PayPal/req_api_countries.txt') as $c) {
+            if (file_exists(OSCOM::BASE_DIR . 'Apps/PayPal/req_api_countries.txt')) {
+                foreach (file(OSCOM::BASE_DIR . 'Apps/PayPal/req_api_countries.txt') as $c) {
                     $c = trim($c);
 
                     if (!empty($c)) {
@@ -148,7 +148,7 @@ class PayPal extends \OSC\OM\AppAbstract
         if (!isset($result)) {
             $result = [];
 
-            $directory = OSCOM::BASE_DIR . 'apps/PayPal/Module/Admin/Config';
+            $directory = OSCOM::BASE_DIR . 'Apps/PayPal/Module/Admin/Config';
 
             if ($dir = new \DirectoryIterator($directory)) {
                 foreach ($dir as $file) {
@@ -320,7 +320,7 @@ class PayPal extends \OSC\OM\AppAbstract
         }
 
         if ((substr($server['host'], -10) == 'paypal.com')) {
-            $p['cafile'] = OSCOM::BASE_DIR . 'apps/PayPal/paypal.com.crt';
+            $p['cafile'] = OSCOM::BASE_DIR . 'Apps/PayPal/paypal.com.crt';
         }
 
         if (defined('OSCOM_APP_PAYPAL_PROXY')) {
@@ -552,8 +552,8 @@ class PayPal extends \OSC\OM\AppAbstract
     }
 
     function logUpdate($message, $version) {
-      if ( is_writable(DIR_FS_CATALOG . 'includes/apps/PayPal/work') ) {
-        file_put_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
+      if ( is_writable(DIR_FS_CATALOG . 'includes/Apps/PayPal/work') ) {
+        file_put_contents(DIR_FS_CATALOG . 'includes/Apps/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
       }
     }
 
@@ -564,7 +564,7 @@ class PayPal extends \OSC\OM\AppAbstract
         $this->loadLanguageFile($filename, 'english');
       }
 
-      $pathname = DIR_FS_CATALOG . 'includes/apps/PayPal/languages/' . $lang . '/' . $filename;
+      $pathname = DIR_FS_CATALOG . 'includes/Apps/PayPal/languages/' . $lang . '/' . $filename;
 
       if ( file_exists($pathname) ) {
         $contents = file($pathname);

@@ -12,9 +12,9 @@
 
   $ppUpdateLogResult = array('rpcStatus' => -1);
 
-  if ( isset($_GET['v']) && is_numeric($_GET['v']) && file_exists(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php') ) {
+  if ( isset($_GET['v']) && is_numeric($_GET['v']) && file_exists(DIR_FS_CATALOG . 'includes/Apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php') ) {
     $ppUpdateLogResult['rpcStatus'] = 1;
-    $ppUpdateLogResult['log'] = file_get_contents(DIR_FS_CATALOG . 'includes/apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php');
+    $ppUpdateLogResult['log'] = file_get_contents(DIR_FS_CATALOG . 'includes/Apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php');
   }
 
   echo json_encode($ppUpdateLogResult);

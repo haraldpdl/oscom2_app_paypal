@@ -149,7 +149,7 @@
         $button_title .= ' (' . $this->code . '; Sandbox)';
       }
 
-      $string = '<a href="' . OSCOM::link('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+      $string = '<a href="' . OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
 
       if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
         $string .= <<<EOD
@@ -182,7 +182,7 @@ EOD;
       global $messageStack, $order;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
@@ -233,7 +233,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
@@ -289,7 +289,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
       }
 
       if ( $_SESSION['appPayPalEcResult']['RESULT'] == '0' ) {

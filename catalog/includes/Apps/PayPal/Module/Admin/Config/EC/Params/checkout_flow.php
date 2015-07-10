@@ -23,7 +23,7 @@ class checkout_flow extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstra
 
     public function getSetField()
     {
-        if (!file_exists(OSCOM::BASE_DIR . 'apps/PayPal/with_beta.txt')) {
+        if (!file_exists(OSCOM::BASE_DIR . 'Apps/PayPal/with_beta.txt')) {
             return false;
         }
 

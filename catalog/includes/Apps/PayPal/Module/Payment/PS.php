@@ -368,7 +368,7 @@
                           'invoice' => substr($_SESSION['cart_PayPal_Standard_ID'], strpos($_SESSION['cart_PayPal_Standard_ID'], '-')+1),
                           'custom' => $_SESSION['customer_id'],
                           'no_note' => '1',
-                          'notify_url' => OSCOM::link('public/apps/PayPal/Module/Payment/PS_IPN.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
+                          'notify_url' => OSCOM::link('public/Apps/PayPal/Module/Payment/PS_IPN.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
                           'rm' => '2',
                           'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
                           'cancel_return' => OSCOM::link('checkout_payment.php', '', 'SSL'),
