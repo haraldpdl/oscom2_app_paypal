@@ -15,16 +15,16 @@
 ?>
 
 <div id="appPayPalToolbar" style="padding-bottom: 15px;">
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_paypal'), OSCOM::link('apps.php', 'PayPal&action=credentials&module=PP'), 'info', 'data-module="PP"'); ?>
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_payflow'), OSCOM::link('apps.php', 'PayPal&action=credentials&module=PF'), 'info', 'data-module="PF"'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_paypal'), OSCOM::link('index.php', 'A&PayPal&action=credentials&module=PP'), 'info', 'data-module="PP"'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_payflow'), OSCOM::link('index.php', 'A&PayPal&action=credentials&module=PF'), 'info', 'data-module="PF"'); ?>
 
 <?php
   if ( ($current_module == 'PP') && $OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY) ) {
 ?>
 
   <span style="float: right;">
-    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), OSCOM::link('apps.php', 'PayPal&action=start&subaction=process&type=live'), 'warning'); ?>
-    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), OSCOM::link('apps.php', 'PayPal&action=start&subaction=process&type=sandbox'), 'warning'); ?>
+    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), OSCOM::link('index.php', 'A&PayPal&action=start&subaction=process&type=live'), 'warning'); ?>
+    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), OSCOM::link('index.php', 'A&PayPal&action=start&subaction=process&type=sandbox'), 'warning'); ?>
   </span>
 
 <?php
@@ -33,7 +33,7 @@
 
 </div>
 
-<form name="paypalCredentials" action="<?php echo OSCOM::link('apps.php', 'PayPal&action=credentials&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
+<form name="paypalCredentials" action="<?php echo OSCOM::link('index.php', 'A&PayPal&action=credentials&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
 
 <?php
   if ( $current_module == 'PP' ) {

@@ -14,7 +14,7 @@
   use OSC\OM\OSCOM;
 
   if ( isset($_GET['type']) && in_array($_GET['type'], array('live', 'sandbox')) ) {
-    $params = array('return_url' => OSCOM::link('apps.php', 'PayPal&action=start&subaction=retrieve', 'SSL'),
+    $params = array('return_url' => OSCOM::link('index.php', 'A&PayPal&action=start&subaction=retrieve', 'SSL'),
                     'type' => $_GET['type']);
 
     $result_string = $OSCOM_PayPal->makeApiCall('https://ssl.oscommerce.com/index.php?RPC&Website&Index&PayPalStart', $params);

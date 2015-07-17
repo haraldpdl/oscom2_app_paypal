@@ -45,7 +45,7 @@ $(function() {
 
   OSCOM.APP.PAYPAL.versionCheck();
 
-  $.getJSON('<?php echo OSCOM::link('apps.php', 'PayPal&action=getNews'); ?>', function (data) {
+  $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&action=getNews'); ?>', function (data) {
     if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
       var ppNewsContent = '<div style="display: block; margin-top: 5px; min-height: 65px;"><a href="' + data.url + '" target="_blank"><img src="' + data.image + '" width="468" height="60" alt="' + data.title + '" border="0" /></a>';
 

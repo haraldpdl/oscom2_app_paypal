@@ -18,4 +18,4 @@ $m->install();
 
 $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
 
-OSCOM::redirect('apps.php', 'PayPal&action=configure&module=' . $current_module);
+OSCOM::redirect('index.php', 'A&PayPal&action=configure&module=' . $current_module);

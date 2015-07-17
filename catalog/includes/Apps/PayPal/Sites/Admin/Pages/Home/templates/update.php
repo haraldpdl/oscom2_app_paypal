@@ -31,7 +31,7 @@ $(function() {
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'update' ) {
       OSCOM.APP.PAYPAL.doUpdate();
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'retrieveFresh' ) {
-      window.location('<?php echo OSCOM::link('apps.php', 'PayPal&action=update'); ?>');
+      window.location('<?php echo OSCOM::link('index.php', 'A&PayPal&action=update'); ?>');
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'manualDownload' ) {
       window.open('http://apps.oscommerce.com/index.php?Info&paypal&app');
     }
@@ -56,7 +56,7 @@ $(function() {
 
     $('#ppUpdateInfo').append('<div class="pp-panel pp-panel-info"><p>' + def['retrieving_update_list'] + '</p></div>');
 
-    $.get('<?php echo OSCOM::link('apps.php', 'PayPal&action=checkVersion'); ?>', function (data) {
+    $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&action=checkVersion'); ?>', function (data) {
       var error = false;
 
       $('#ppUpdateInfo').empty();
@@ -197,11 +197,11 @@ $(function() {
 
         $('#ppUpdateInfo div').append('<p>' + def['downloading_version_progress'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</p>');
 
-        $.getJSON('<?php echo OSCOM::link('apps.php', 'PayPal&action=update&subaction=download&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+        $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&action=update&subaction=download&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
           if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
             $('#ppUpdateInfo div').append('<p>' + def['applying_version_progress'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</p>');
 
-            $.getJSON('<?php echo OSCOM::link('apps.php', 'PayPal&action=update&subaction=apply&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+            $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&action=update&subaction=apply&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
               if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
               } else {
                 updateError = true;
@@ -212,7 +212,7 @@ $(function() {
 
                 $('#ppUpdateInfo').append('<h3 class="pp-panel-header-error">' + def['error_applying_heading'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</h3><div id="ppUpdateErrorLog" class="pp-panel pp-panel-error"><p>' + def['error_applying'] + '</p></div>');
 
-                $.getJSON('<?php echo OSCOM::link('apps.php', 'PayPal&action=update&subaction=log&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+                $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&action=update&subaction=log&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
                   if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
                     $('#ppUpdateErrorLog').append('<p>' + OSCOM.nl2br(OSCOM.htmlSpecialChars(data['log'])) + '</p>');
                   }
