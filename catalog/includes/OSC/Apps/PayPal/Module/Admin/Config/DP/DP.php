@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\DP;
+namespace OSC\Apps\PayPal\Module\Admin\Config\DP;
 
 use OSC\OM\OSCOM;
 
-class DP extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class DP extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $pm_code = 'paypal_pro_dp';
     protected $pm_pf_code = 'paypal_pro_payflow_dp';

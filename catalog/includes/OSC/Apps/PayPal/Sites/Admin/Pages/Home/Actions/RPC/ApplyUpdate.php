@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
+namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
@@ -26,15 +26,15 @@ class ApplyUpdate extends \OSC\OM\PagesActionsAbstract
         if (isset($_GET['v']) && is_numeric($_GET['v']) && ($_GET['v'] > $OSCOM_PayPal->getVersion())) {
             $update_version = basename($_GET['v']);
 
-            $update_zip = OSCOM::BASE_DIR . 'Apps/PayPal/work/update.zip';
+            $update_zip = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update.zip';
 
 // reset the log
-            if (file_exists(OSCOM::BASE_DIR . 'Apps/PayPal/work/update_log-' . $update_version . '.php') && is_writable(OSCOM::BASE_DIR . 'Apps/PayPal/work/update_log-' . $update_version . '.php')) {
-                unlink(OSCOM::BASE_DIR . 'Apps/PayPal/work/update_log-' . $update_version . '.php');
+            if (file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update_log-' . $update_version . '.php') && is_writable(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update_log-' . $update_version . '.php')) {
+                unlink(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update_log-' . $update_version . '.php');
             }
 
             if (file_exists($update_zip)) {
-                $work_dir = OSCOM::BASE_DIR . 'Apps/PayPal/work/update_contents';
+                $work_dir = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update_contents';
 
                 if (file_exists($work_dir)) {
                     $OSCOM_PayPal->rmdir($work_dir);
@@ -55,7 +55,7 @@ class ApplyUpdate extends \OSC\OM\PagesActionsAbstract
                 $update_pkg = $work_dir . '/' . $update_version . '.zip';
 
                 if (file_exists($update_pkg) && file_exists($update_pkg . '.sig')) {
-                    $public = openssl_get_publickey(file_get_contents(OSCOM::BASE_DIR . 'Apps/PayPal/work/paypal.pubkey'));
+                    $public = openssl_get_publickey(file_get_contents(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/paypal.pubkey'));
 
                     if (openssl_verify(sha1_file($update_pkg), file_get_contents($update_pkg . '.sig'), $public) === 1) {
                         mkdir($work_dir . '/' . $update_version);
@@ -94,8 +94,8 @@ class ApplyUpdate extends \OSC\OM\PagesActionsAbstract
                         if ($meta_pass === true) {
                             $errors = [];
 
-                            if (!$OSCOM_PayPal->isWritable(OSCOM::BASE_DIR . 'Apps/PayPal/version.txt')) {
-                                $errors[] = $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'Apps/PayPal/version.txt');
+                            if (!$OSCOM_PayPal->isWritable(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/version.txt')) {
+                                $errors[] = $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/version.txt');
                             }
 
                             $update_pkg_contents = $OSCOM_PayPal->getDirectoryContents($work_dir . '/' . $update_version);
@@ -174,12 +174,12 @@ class ApplyUpdate extends \OSC\OM\PagesActionsAbstract
                                 }
 
                                 if (empty($errors)) {
-                                    if (file_put_contents(OSCOM::BASE_DIR . 'Apps/PayPal/version.txt', $update_version)) {
+                                    if (file_put_contents(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/version.txt', $update_version)) {
                                         $OSCOM_PayPal->logUpdate($OSCOM_PayPal->getDef('log_updated_file', [
-                                            'filepath' => $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'Apps/PayPal/version.txt')
+                                            'filepath' => $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/version.txt')
                                         ]), $update_version);
                                     } else {
-                                        $errors[] = $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'Apps/PayPal/version.txt');
+                                        $errors[] = $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/version.txt');
                                     }
                                 }
 

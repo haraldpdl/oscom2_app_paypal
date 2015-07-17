@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Credentials;
+namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Credentials;
 
 use OSC\OM\HTML;
 use OSC\OM\OSCOM;

@@ -6,14 +6,14 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\OM\Apps\PayPal\Module\Payment;
+  namespace OSC\Apps\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal as PayPalApp;
 
   class EC implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;

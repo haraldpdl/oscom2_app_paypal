@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\EC;
+namespace OSC\Apps\PayPal\Module\Admin\Config\EC;
 
 use OSC\OM\OSCOM;
 
-class EC extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class EC extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $pm_code = 'paypal_express';
     protected $pm_pf_code = 'paypal_pro_payflow_ec';

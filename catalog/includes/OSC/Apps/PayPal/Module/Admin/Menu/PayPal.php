@@ -6,12 +6,12 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Menu;
+namespace OSC\Apps\PayPal\Module\Admin\Menu;
 
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
+use OSC\Apps\PayPal\PayPal as PayPalApp;
 
 class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 {

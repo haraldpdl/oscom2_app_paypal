@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
+namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
 use OSC\OM\Registry;
 

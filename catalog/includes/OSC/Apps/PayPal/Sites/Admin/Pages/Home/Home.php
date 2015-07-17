@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home;
+namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home;
 
 use OSC\OM\Apps;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\OM\Apps\PayPal\PayPal;
+use OSC\Apps\PayPal\PayPal;
 
 class Home extends \OSC\OM\PagesAbstract
 {

@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
+namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
 use OSC\OM\HTTP;
 use OSC\OM\OSCOM;
@@ -25,12 +25,12 @@ class DownloadUpdate extends \OSC\OM\PagesActionsAbstract
         ];
 
         if (isset($_GET['v']) && is_numeric($_GET['v']) && ($_GET['v'] > $OSCOM_PayPal->getVersion())) {
-            if ($OSCOM_PayPal->isWritable(OSCOM::BASE_DIR . 'Apps/PayPal/work')) {
-                if (!file_exists(OSCOM::BASE_DIR . 'Apps/PayPal/work')) {
-                    mkdir(OSCOM::BASE_DIR . 'Apps/PayPal/work', 0777, true);
+            if ($OSCOM_PayPal->isWritable(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work')) {
+                if (!file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work')) {
+                    mkdir(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work', 0777, true);
                 }
 
-                $filepath = OSCOM::BASE_DIR . 'Apps/PayPal/work/update.zip';
+                $filepath = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update.zip';
 
                 if (file_exists($filepath) && is_writable($filepath)) {
                     unlink($filepath);
@@ -51,7 +51,7 @@ class DownloadUpdate extends \OSC\OM\PagesActionsAbstract
                 }
             } else {
                 $result['error'] = $OSCOM_PayPal->getDef('error_download_directory_permissions', [
-                    'filepath' => $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'Apps/PayPal/work')
+                    'filepath' => $OSCOM_PayPal->displayPath(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work')
                 ]);
             }
         }

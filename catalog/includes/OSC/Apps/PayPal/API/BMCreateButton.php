@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\API;
+namespace OSC\Apps\PayPal\API;
 
-class BMCreateButton extends \OSC\OM\Apps\PayPal\APIAbstract
+class BMCreateButton extends \OSC\Apps\PayPal\APIAbstract
 {
     public function execute(array $extra_params = null)
     {

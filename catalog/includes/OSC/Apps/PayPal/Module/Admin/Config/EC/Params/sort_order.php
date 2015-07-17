@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\EC\Params;
+namespace OSC\Apps\PayPal\Module\Admin\Config\EC\Params;
 
 use OSC\OM\HTML;
 
-class sort_order extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class sort_order extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $default = '0';
     public $app_configured = false;

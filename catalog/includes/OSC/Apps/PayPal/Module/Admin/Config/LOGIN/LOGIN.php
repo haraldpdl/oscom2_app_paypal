@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\LOGIN;
+namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN;
 
 use OSC\OM\OSCOM;
 
-class LOGIN extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class LOGIN extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $_cm_code = 'login/cm_paypal_login';
 

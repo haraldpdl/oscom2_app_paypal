@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config;
+namespace OSC\Apps\PayPal\Module\Admin\Config;
 
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
@@ -52,7 +52,7 @@ abstract class ConfigAbstract
         foreach ($this->getParameters() as $key) {
             $p = strtolower(substr($key, $cut_length));
 
-            $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\Params\\' . $p;
+            $class = 'OSC\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\Params\\' . $p;
 
             $cfg = new $class($this->code);
 
@@ -73,21 +73,21 @@ abstract class ConfigAbstract
     {
         $result = [];
 
-        $directory = OSCOM::BASE_DIR . 'Apps/PayPal/Module/Admin/Config/' . $this->code . '/Params';
+        $directory = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/Module/Admin/Config/' . $this->code . '/Params';
 
         if ($dir = new \DirectoryIterator($directory)) {
             foreach ($dir as $file) {
                 if (!$file->isDot() && !$file->isDir() && ($file->getExtension() == 'php')) {
-                    $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php');
+                    $class = 'OSC\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php');
 
-                    if (is_subclass_of($class, 'OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract')) {
+                    if (is_subclass_of($class, 'OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract')) {
                         if ($this->code == 'G') {
                             $result[] = 'OSCOM_APP_PAYPAL_' . strtoupper($file->getBasename('.php'));
                         } else {
                             $result[] = 'OSCOM_APP_PAYPAL_' . $this->code . '_' . strtoupper($file->getBasename('.php'));
                         }
                     } else {
-                        trigger_error('OSC\OM\Apps\PayPal\Module\Admin\Config\\ConfigAbstract::getParameters(): OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php') . ' is not a subclass of OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract and cannot be loaded.');
+                        trigger_error('OSC\Apps\PayPal\Module\Admin\Config\\ConfigAbstract::getParameters(): OSC\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php') . ' is not a subclass of OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract and cannot be loaded.');
                     }
                 }
             }
@@ -111,7 +111,7 @@ abstract class ConfigAbstract
         foreach ($this->getParameters() as $key) {
             $p = strtolower(substr($key, $cut_length));
 
-            $class = 'OSC\OM\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\Params\\' . $p;
+            $class = 'OSC\Apps\PayPal\Module\Admin\Config\\' . $this->code . '\Params\\' . $p;
 
             $cfg = new $class($this->code);
 

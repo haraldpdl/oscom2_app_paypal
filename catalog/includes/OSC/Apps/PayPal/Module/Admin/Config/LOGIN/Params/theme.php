@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
+namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class theme extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class theme extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $default = 'Blue';
     public $sort_order = 600;

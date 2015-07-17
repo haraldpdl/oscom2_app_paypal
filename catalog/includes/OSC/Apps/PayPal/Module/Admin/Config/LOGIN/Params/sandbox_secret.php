@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
+namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
 
 use OSC\OM\HTML;
 
-class sandbox_secret extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class sandbox_secret extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $sort_order = 500;
 

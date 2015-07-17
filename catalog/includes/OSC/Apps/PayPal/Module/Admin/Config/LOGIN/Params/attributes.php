@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
+namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class attributes extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class attributes extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $sort_order = 700;
 

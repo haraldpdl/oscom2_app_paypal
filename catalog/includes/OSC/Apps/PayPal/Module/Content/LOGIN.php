@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\OM\Apps\PayPal\Module\Content;
+  namespace OSC\Apps\PayPal\Module\Content;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\OM\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal as PayPalApp;
 
   class LOGIN implements \OSC\OM\Modules\ContentInterface {
     var $code, $group, $title, $description, $sort_order, $enabled, $_app;

@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\OM\Apps\PayPal\Module\Admin\Config\HS;
+namespace OSC\Apps\PayPal\Module\Admin\Config\HS;
 
 use OSC\OM\OSCOM;
 
-class HS extends \OSC\OM\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class HS extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $pm_code = 'paypal_pro_hs';
 
