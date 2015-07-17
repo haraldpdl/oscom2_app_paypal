@@ -8,22 +8,24 @@
 
 namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
-use OSC\OM\OSCOM;
-use OSC\OM\Registry;
+use OSC\OM\HTTP;
 
-class LogUpdate extends \OSC\OM\PagesActionsAbstract
+class GetNews extends \OSC\OM\PagesActionsAbstract
 {
     public function execute()
     {
-        $OSCOM_PayPal = Registry::get('PayPal');
-
         $result = [
             'rpcStatus' => -1
         ];
 
-        if (isset($_GET['v']) && is_numeric($_GET['v']) && file_exists(OSCOM::BASE_DIR . 'Apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php')) {
+        $response = @json_decode(HTTP::getResponse([
+            'url' => 'http://www.oscommerce.com/index.php?RPC&Website&Index&GetPartnerBanner&forumid=105&onlyjson=true'
+        ]), true);
+
+        if (is_array($response) && isset($response['title'])) {
+            $result = $response;
+
             $result['rpcStatus'] = 1;
-            $result['log'] = file_get_contents(OSCOM::BASE_DIR . 'Apps/PayPal/work/update_log-' . basename($_GET['v']) . '.php');
         }
 
         echo json_encode($result);

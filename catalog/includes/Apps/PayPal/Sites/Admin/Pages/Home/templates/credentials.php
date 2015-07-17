@@ -1,30 +1,33 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\HTML;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  Copyright (c) 2014 osCommerce
+$OSCOM_Page = Registry::get('Site')->getPage();
 
-  Released under the GNU General Public License
-*/
+$current_module = $OSCOM_Page->data['current_module'];
 
-  use OSC\OM\HTML;
-  use OSC\OM\OSCOM;
+require(__DIR__ . '/template_top.php');
 ?>
 
 <div id="appPayPalToolbar" style="padding-bottom: 15px;">
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_paypal'), OSCOM::link('index.php', 'A&PayPal&action=credentials&module=PP'), 'info', 'data-module="PP"'); ?>
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_payflow'), OSCOM::link('index.php', 'A&PayPal&action=credentials&module=PF'), 'info', 'data-module="PF"'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_paypal'), OSCOM::link('index.php', 'A&PayPal&Credentials&module=PP'), 'info', 'data-module="PP"'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_payflow'), OSCOM::link('index.php', 'A&PayPal&Credentials&module=PF'), 'info', 'data-module="PF"'); ?>
 
 <?php
   if ( ($current_module == 'PP') && $OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY) ) {
 ?>
 
   <span style="float: right;">
-    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), OSCOM::link('index.php', 'A&PayPal&action=start&subaction=process&type=live'), 'warning'); ?>
-    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), OSCOM::link('index.php', 'A&PayPal&action=start&subaction=process&type=sandbox'), 'warning'); ?>
+    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), OSCOM::link('index.php', 'A&PayPal&Start&Process&type=live'), 'warning'); ?>
+    <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), OSCOM::link('index.php', 'A&PayPal&Start&Process&type=sandbox'), 'warning'); ?>
   </span>
 
 <?php
@@ -33,7 +36,7 @@
 
 </div>
 
-<form name="paypalCredentials" action="<?php echo OSCOM::link('index.php', 'A&PayPal&action=credentials&subaction=process&module=' . $current_module); ?>" method="post" class="pp-form">
+<form name="paypalCredentials" action="<?php echo OSCOM::link('index.php', 'A&PayPal&Credentials&Process&module=' . $current_module); ?>" method="post" class="pp-form">
 
 <?php
   if ( $current_module == 'PP' ) {
@@ -212,3 +215,7 @@ $(function() {
   $('#appPayPalToolbar a[data-module="<?php echo $current_module; ?>"]').addClass('pp-button-primary');
 });
 </script>
+
+<?php
+require(__DIR__ . '/template_bottom.php');
+?>

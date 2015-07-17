@@ -17,8 +17,8 @@ class SetExpressCheckout extends \OSC\OM\Apps\PayPal\APIAbstract
         $params = [
             'METHOD' => 'SetExpressCheckout',
             'PAYMENTREQUEST_0_PAYMENTACTION' => ((OSCOM_APP_PAYPAL_EC_TRANSACTION_METHOD == '1') || !$this->app->hasCredentials('EC') ? 'Sale' : 'Authorization'),
-            'RETURNURL' => OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', 'osC_Action=retrieve', 'SSL'),
-            'CANCELURL' => OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', 'osC_Action=cancel', 'SSL'),
+            'RETURNURL' => OSCOM::link('index.php', 'order&callback&paypal&ec&action=retrieve', 'SSL'),
+            'CANCELURL' => OSCOM::link('index.php', 'order&callback&paypal&ec&action=cancel', 'SSL'),
             'BRANDNAME' => STORE_NAME,
             'SOLUTIONTYPE' => (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1') ? 'Sole' : 'Mark'
         ];

@@ -1,91 +1,20 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  Copyright (c) 2014 osCommerce
+$OSCOM_Db = Registry::get('Db');
+$OSCOM_PayPal = Registry::get('PayPal');
+$OSCOM_Page = Registry::get('Site')->getPage();
 
-  Released under the GNU General Public License
-*/
-
-  use OSC\OM\Apps;
-  use OSC\OM\OSCOM;
-  use OSC\OM\Registry;
-
-  use OSC\OM\Apps\PayPal\PayPal;
-
-  $Qcheck = $OSCOM_Db->query('show tables like "oscom_app_paypal_log"');
-
-  if ($Qcheck->fetch() === false) {
-    $sql = <<<EOD
-CREATE TABLE oscom_app_paypal_log (
-  id int unsigned NOT NULL auto_increment,
-  customers_id int NOT NULL,
-  module varchar(8) NOT NULL,
-  action varchar(255) NOT NULL,
-  result tinyint NOT NULL,
-  server tinyint NOT NULL,
-  request text NOT NULL,
-  response text NOT NULL,
-  ip_address int unsigned,
-  date_added datetime,
-  PRIMARY KEY (id),
-  KEY idx_oapl_module (module)
-) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-EOD;
-
-    $OSCOM_Db->exec($sql);
-  }
-
-  Registry::set('PayPal', new PayPal());
-  $OSCOM_PayPal = Registry::get('PayPal');
-
-  $content = 'start.php';
-  $action = 'start';
-  $subaction = '';
-
-  $OSCOM_PayPal->loadLanguageFile('admin.php');
-
-  if ( isset($_GET['action']) && file_exists(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . basename($_GET['action']) . '.php') ) {
-    $action = basename($_GET['action']);
-  }
-
-  $OSCOM_PayPal->loadLanguageFile('admin/' . $action . '.php');
-
-  if ( ($action == 'start') && $OSCOM_PayPal->migrate() ) {
-    $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
-
-    foreach (Apps::getModules('adminDashboard', 'PayPal') as $k => $v) {
-      if (!in_array($k, $admin_dashboard_modules)) {
-        $admin_dashboard_modules[] = $k;
-
-        $adm = new $v();
-        $adm->install();
-      }
-    }
-
-    if (isset($adm)) {
-      $OSCOM_Db->save('configuration', ['configuration_value' => implode(';', $admin_dashboard_modules)], ['configuration_key' => 'MODULE_ADMIN_DASHBOARD_INSTALLED']);
-    }
-
-    OSCOM::redirect('apps.php', tep_get_all_get_params());
-  }
-
-  include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '.php');
-
-  if ( isset($_GET['subaction']) && file_exists(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '/' . basename($_GET['subaction']) . '.php') ) {
-    $subaction = basename($_GET['subaction']);
-  }
-
-  if ( !empty($subaction) ) {
-    include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/actions/' . $action . '/' . $subaction . '.php');
-  }
-
-  include(DIR_WS_INCLUDES . 'template_top.php');
+include(DIR_FS_ADMIN . 'includes/template_top.php');
 ?>
-
 <style>
 .pp-container {
   font-size: 12px;
@@ -316,20 +245,6 @@ small .pp-button {
 </style>
 
 <script>
-if ( typeof jQuery == 'undefined' ) {
-  document.write('<scr' + 'ipt src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></scr' + 'ipt>');
-}
-</script>
-<script>
-if ( typeof jQuery.ui == 'undefined' ) {
-  document.write('<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/themes/redmond/jquery-ui.css" />');
-  document.write('<scr' + 'ipt src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></scr' + 'ipt>');
-/* Custom jQuery UI */
-  document.write('<style>.ui-widget { font-family: Lucida Grande, Lucida Sans, Verdana, Arial, sans-serif; font-size: 11px; } .ui-dialog { min-width: 500px; }</style>');
-}
-</script>
-
-<script>
 var OSCOM = {
   dateNow: new Date(),
   htmlSpecialChars: function(string) {
@@ -346,7 +261,7 @@ var OSCOM = {
     PAYPAL: {
       version: '<?php echo $OSCOM_PayPal->getVersion(); ?>',
       versionCheckResult: <?php echo (defined('OSCOM_APP_PAYPAL_VERSION_CHECK')) ? '"' . OSCOM_APP_PAYPAL_VERSION_CHECK . '"' : 'undefined'; ?>,
-      action: '<?php echo $action; ?>',
+      action: '<?php echo $OSCOM_Page->data['action']; ?>',
       doOnlineVersionCheck: false,
       canApplyOnlineUpdates: <?php echo class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false'; ?>,
       accountTypes: {
@@ -354,7 +269,7 @@ var OSCOM = {
         sandbox: <?php echo ($OSCOM_PayPal->hasApiCredentials('sandbox') === true) ? 'true' : 'false'; ?>
       },
       versionCheck: function() {
-        $.get('<?php echo OSCOM::link('apps.php', 'PayPal&action=checkVersion'); ?>', function (data) {
+        $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&CheckVersion'); ?>', function (data) {
           var versions = [];
 
           if ( OSCOM.APP.PAYPAL.canApplyOnlineUpdates == true ) {
@@ -410,15 +325,15 @@ if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
 <div class="pp-container">
   <div class="pp-header">
     <div id="ppAppInfo" style="float: right;">
-      <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . OSCOM::link('apps.php', 'PayPal&action=info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . OSCOM::link('apps.php', 'PayPal&action=privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
+      <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . OSCOM::link('index.php', 'A&PayPal&Info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . OSCOM::link('index.php', 'A&PayPal&Privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
     </div>
 
-    <a href="<?php echo OSCOM::link('apps.php', 'PayPal&action=' . $action); ?>"><img src="<?php echo OSCOM::link('Shop/public/Apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
+    <a href="<?php echo OSCOM::link('index.php', 'A&PayPal&' . $OSCOM_Page->data['action']); ?>"><img src="<?php echo OSCOM::link('Shop/public/Apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
   </div>
 
   <div id="ppAppUpdateNotice" style="padding: 0 12px 0 12px; display: none;">
     <div class="pp-panel pp-panel-success">
-      <?php echo $OSCOM_PayPal->getDef('update_available_body', array('button_view_update' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view_update'), OSCOM::link('apps.php', 'PayPal&action=update'), 'success'))); ?>
+      <?php echo $OSCOM_PayPal->getDef('update_available_body', array('button_view_update' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view_update'), OSCOM::link('index.php', 'A&PayPal&Update'), 'success'))); ?>
     </div>
   </div>
 
@@ -429,39 +344,3 @@ if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
 ?>
 
   <div style="padding: 0 10px 10px 10px;">
-<script>
-// Make sure jQuery >= v1.5 is loaded for jQuery Deferred Objects (eg $.get().fail())
-if ( !$.isFunction($.Deferred) ) {
-  document.write('<div class="pp-panel pp-panel-error"><p>jQuery version is too old (v' + $.fn.jquery + '). Please update your Administration Tool template to use at least v1.5.</p></div>');
-}
-</script>
-
-    <?php include(DIR_FS_CATALOG . 'includes/Apps/PayPal/admin/content/' . basename($content)); ?>
-  </div>
-</div>
-
-<script>
-$(function() {
-  if ( (OSCOM.APP.PAYPAL.action != 'update') && (OSCOM.APP.PAYPAL.action != 'info') ) {
-    if ( typeof OSCOM.APP.PAYPAL.versionCheckResult == 'undefined' ) {
-      OSCOM.APP.PAYPAL.doOnlineVersionCheck = true;
-    } else {
-      if ( typeof OSCOM.APP.PAYPAL.versionCheckResult[0] != 'undefined' ) {
-        if ( OSCOM.dateNow.getDate() != OSCOM.APP.PAYPAL.versionCheckResult[0] ) {
-          OSCOM.APP.PAYPAL.doOnlineVersionCheck = true;
-        }
-      }
-    }
-
-    if ( OSCOM.APP.PAYPAL.doOnlineVersionCheck == true ) {
-      OSCOM.APP.PAYPAL.versionCheck();
-    } else {
-      OSCOM.APP.PAYPAL.versionCheckNotify();
-    }
-  }
-});
-</script>
-
-<?php
-  include(DIR_WS_INCLUDES . 'template_bottom.php');
-?>

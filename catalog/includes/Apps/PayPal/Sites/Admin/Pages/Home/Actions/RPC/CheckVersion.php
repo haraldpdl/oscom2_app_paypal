@@ -1,62 +1,74 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTTP;
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class CheckVersion extends \OSC\OM\PagesActionsAbstract
+{
+    public function execute()
+    {
+        $OSCOM_PayPal = Registry::get('PayPal');
 
-  if ( class_exists('ZipArchive') && function_exists('openssl_verify') ) {
-    $ppUpdateReleasesResult = array('rpcStatus' => -1);
+        if (class_exists('ZipArchive') && function_exists('openssl_verify')) {
+            $result = [
+                'rpcStatus' => -1
+            ];
 
-    $ppUpdateReleasesResponse = @json_decode($OSCOM_PayPal->makeApiCall('http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3))), true);
+            $response = @json_decode(HTTP::getResponse([
+                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3))
+            ]), true);
 
-    if ( is_array($ppUpdateReleasesResponse) && isset($ppUpdateReleasesResponse['rpcStatus']) && ($ppUpdateReleasesResponse['rpcStatus'] === 1) ) {
-      $ppUpdateReleasesResult['rpcStatus'] = 1;
+            if (is_array($response) && isset($response['rpcStatus']) && ($response['rpcStatus'] === 1)) {
+                $result['rpcStatus'] = 1;
 
-      if ( isset($ppUpdateReleasesResponse['app']['releases']) ) {
-        $ppMaxVersion = 0;
+                if (isset($response['app']['releases'])) {
+                    $ppMaxVersion = 0;
 
-        foreach ( $ppUpdateReleasesResponse['app']['releases'] as $ppUpdateRelease ) {
-          if ( is_numeric($ppUpdateRelease['version']) ) {
-            $ppUpdateReleasesResult['releases'][] = $ppUpdateRelease;
+                    foreach ($response['app']['releases'] as $ppUpdateRelease) {
+                        if (is_numeric($ppUpdateRelease['version'])) {
+                            $result['releases'][] = $ppUpdateRelease;
 
-            if ( $ppUpdateRelease['version'] > $ppMaxVersion ) {
-              $ppMaxVersion = $ppUpdateRelease['version'];
+                            if ($ppUpdateRelease['version'] > $ppMaxVersion) {
+                                $ppMaxVersion = $ppUpdateRelease['version'];
+                            }
+                        }
+                    }
+                }
             }
-          }
+
+            echo json_encode($result);
+        } else {
+            $result = 'rpcStatus=-1';
+
+            $response = HTTP::getResponse([
+                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3)) . '&format=simple'
+            ]);
+
+            if (!empty($response) && (strpos($response, 'rpcStatus') !== false)) {
+                parse_str($response, $ppUpdateRelease);
+
+                if (isset($ppUpdateRelease['rpcStatus']) && ($ppUpdateRelease['rpcStatus'] == '1')) {
+                    $result = 'rpcStatus=1' . "\n";
+
+                    if (isset($ppUpdateRelease['version']) && is_numeric($ppUpdateRelease['version'])) {
+                        $result .= 'release=' . $ppUpdateRelease['version'];
+
+                        $ppMaxVersion = $ppUpdateRelease['version'];
+                    }
+                }
+            }
+
+            echo $result;
         }
-      }
+
+        $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_VERSION_CHECK', date('j') . (isset($ppMaxVersion) && ($ppMaxVersion > 0) ? '-' . $ppMaxVersion : ''));
     }
-
-    echo json_encode($ppUpdateReleasesResult);
-  } else {
-    $ppUpdateReleasesResult = 'rpcStatus=-1';
-
-    $ppUpdateReleasesResponse = $OSCOM_PayPal->makeApiCall('http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3)) . '&format=simple');
-
-    if ( !empty($ppUpdateReleasesResponse) && (strpos($ppUpdateReleasesResponse, 'rpcStatus') !== false) ) {
-      parse_str($ppUpdateReleasesResponse, $ppUpdateRelease);
-
-      if ( isset($ppUpdateRelease['rpcStatus']) && ($ppUpdateRelease['rpcStatus'] == '1') ) {
-        $ppUpdateReleasesResult = 'rpcStatus=1' . "\n";
-
-        if ( isset($ppUpdateRelease['version']) && is_numeric($ppUpdateRelease['version']) ) {
-          $ppUpdateReleasesResult .= 'release=' . $ppUpdateRelease['version'];
-
-          $ppMaxVersion = $ppUpdateRelease['version'];
-        }
-      }
-    }
-
-    echo $ppUpdateReleasesResult;
-  }
-
-  $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_VERSION_CHECK', date('j') . (isset($ppMaxVersion) && ($ppMaxVersion > 0) ? '-' . $ppMaxVersion : ''));
-
-  exit;
-?>
+}

@@ -491,7 +491,7 @@ class PayPal extends \OSC\OM\AppAbstract
     function formatCurrencyRaw($total, $currency_code = null, $currency_value = null) {
       global $currencies;
 
-      if ( !isset($currency_code) ) {
+      if ( empty($currency_code) ) {
         $currency_code = isset($_SESSION['currency']) ? $_SESSION['currency'] : DEFAULT_CURRENCY;
       }
 

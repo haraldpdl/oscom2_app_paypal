@@ -33,7 +33,7 @@
       $this->code = 'PayPal\DP';
       $this->title = $this->_app->getDef('module_dp_title');
       $this->public_title = $this->_app->getDef('module_dp_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_dp_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=DP'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_dp_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=DP'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_DP_SORT_ORDER') ? OSCOM_APP_PAYPAL_DP_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_DP_STATUS') && in_array(OSCOM_APP_PAYPAL_DP_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID : 0;
@@ -528,11 +528,11 @@
     }
 
     function install() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=DP');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=DP');
     }
 
     function remove() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=DP');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=DP');
     }
 
     function keys() {

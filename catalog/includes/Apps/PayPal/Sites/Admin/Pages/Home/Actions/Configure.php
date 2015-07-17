@@ -1,69 +1,82 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class Configure extends \OSC\OM\PagesActionsAbstract
+{
+    public function execute()
+    {
+        $OSCOM_Db = Registry::get('Db');
+        $OSCOM_PayPal = Registry::get('PayPal');
 
-  $content = 'configure.php';
+        $this->page->setFile('configure.php');
+        $this->page->data['action'] = 'Configure';
 
-  $modules = $OSCOM_PayPal->getConfigModules();
+        $OSCOM_PayPal->loadLanguageFile('admin/configure.php');
 
-  $default_module = 'G';
+        $modules = $OSCOM_PayPal->getConfigModules();
 
-  foreach ( $modules as $m ) {
-    if ( $OSCOM_PayPal->getConfigModuleInfo($m, 'is_installed') === true ) {
-      $default_module = $m;
-      break;
+        $default_module = 'G';
+
+        foreach ($modules as $m) {
+            if ($OSCOM_PayPal->getConfigModuleInfo($m, 'is_installed') === true ) {
+                $default_module = $m;
+                break;
+            }
+        }
+
+        $this->page->data['current_module'] = (isset($_GET['module']) && in_array($_GET['module'], $modules)) ? $_GET['module'] : $default_module;
+
+        if (!defined('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID')) {
+            $Qcheck = $OSCOM_Db->get('orders_status', 'orders_status_id', [
+                'orders_status_name' => 'PayPal [Transactions]'
+            ], null, 1);
+
+            if ($Qcheck->fetch() === false) {
+                $Qstatus = $OSCOM_Db->get('orders_status', 'max(orders_status_id) as status_id');
+
+                $status_id = $Qstatus->valueInt('status_id') + 1;
+
+                $languages = tep_get_languages();
+
+                foreach ($languages as $lang) {
+                    $OSCOM_Db->save('orders_status', [
+                        'orders_status_id' => $status_id,
+                        'language_id' => $lang['id'],
+                        'orders_status_name' => 'PayPal [Transactions]',
+                        'public_flag' => 0,
+                        'downloads_flag' => 0
+                    ]);
+                }
+            } else {
+                $status_id = $Qcheck->valueInt('orders_status_id');
+            }
+
+            $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID', $status_id);
+        }
+
+        if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
+            $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', '1');
+        }
+
+        if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
+            $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_PROXY', '');
+        }
+
+        if (!defined('OSCOM_APP_PAYPAL_GATEWAY')) {
+            $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_GATEWAY', '1');
+        }
+
+        if (!defined('OSCOM_APP_PAYPAL_LOG_TRANSACTIONS')) {
+            $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_LOG_TRANSACTIONS', '1');
+        }
     }
-  }
-
-  $current_module = (isset($_GET['module']) && in_array($_GET['module'], $modules)) ? $_GET['module'] : $default_module;
-
-  if ( !defined('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID') ) {
-    $Qcheck = $OSCOM_Db->get('orders_status', 'orders_status_id', ['orders_status_name' => 'PayPal [Transactions]'], null, 1);
-
-    if ($Qcheck->fetch() === false) {
-      $Qstatus = $OSCOM_Db->get('orders_status', 'max(orders_status_id) as status_id');
-
-      $status_id = $Qstatus->valueInt('status_id') + 1;
-
-      $languages = tep_get_languages();
-
-      foreach ($languages as $lang) {
-        $OSCOM_Db->save('orders_status', [
-          'orders_status_id' => $status_id,
-          'language_id' => $lang['id'],
-          'orders_status_name' => 'PayPal [Transactions]',
-          'public_flag' => 0,
-          'downloads_flag' => 0
-        ]);
-      }
-    } else {
-      $status_id = $Qcheck->valueInt('orders_status_id');
-    }
-
-    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID', $status_id);
-  }
-
-  if ( !defined('OSCOM_APP_PAYPAL_VERIFY_SSL') ) {
-    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', '1');
-  }
-
-  if ( !defined('OSCOM_APP_PAYPAL_PROXY') ) {
-    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_PROXY', '');
-  }
-
-  if ( !defined('OSCOM_APP_PAYPAL_GATEWAY') ) {
-    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_GATEWAY', '1');
-  }
-
-  if ( !defined('OSCOM_APP_PAYPAL_LOG_TRANSACTIONS') ) {
-    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_LOG_TRANSACTIONS', '1');
-  }
-?>
+}

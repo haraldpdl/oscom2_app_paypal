@@ -1,21 +1,19 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\HTML;
+use OSC\OM\OSCOM;
 
-  Copyright (c) 2014 osCommerce
+require(__DIR__ . '/template_top.php');
 
-  Released under the GNU General Public License
-*/
-
-  use OSC\OM\HTML;
-  use OSC\OM\OSCOM;
-
-  $Qlog = $OSCOM_Db->prepare('select SQL_CALC_FOUND_ROWS l.id, l.customers_id, l.module, l.action, l.result, l.ip_address, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from :table_oscom_app_paypal_log l left join :table_customers c on (l.customers_id = c.customers_id) order by l.date_added desc limit :page_set_offset, :page_set_max_results');
-  $Qlog->setPageSet(MAX_DISPLAY_SEARCH_RESULTS);
-  $Qlog->execute();
+$Qlog = $OSCOM_Db->prepare('select SQL_CALC_FOUND_ROWS l.id, l.customers_id, l.module, l.action, l.result, l.ip_address, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from :table_oscom_app_paypal_log l left join :table_customers c on (l.customers_id = c.customers_id) order by l.date_added desc limit :page_set_offset, :page_set_max_results');
+$Qlog->setPageSet(MAX_DISPLAY_SEARCH_RESULTS);
+$Qlog->execute();
 ?>
 
 <table width="100%" style="margin-bottom: 5px;">
@@ -37,17 +35,17 @@
   <tbody>
 
 <?php
-  if ($Qlog->getPageSetTotalRows() > 0) {
+if ($Qlog->getPageSetTotalRows() > 0) {
     while ($Qlog->fetch()) {
-      $customers_name = null;
+        $customers_name = null;
 
-      if ( $Qlog->valueInt('customers_id') > 0 ) {
-        $customers_name = trim($Qlog->value('customers_firstname') . ' ' . $Qlog->value('customers_lastname'));
+        if ($Qlog->valueInt('customers_id') > 0) {
+            $customers_name = trim($Qlog->value('customers_firstname') . ' ' . $Qlog->value('customers_lastname'));
 
-        if ( empty($customers_name) ) {
-          $customers_name = '- ? -';
+            if (empty($customers_name)) {
+                $customers_name = '- ? -';
+            }
         }
-      }
 ?>
 
     <tr>
@@ -56,7 +54,7 @@
       <td><?php echo long2ip($Qlog->value('ip_address')); ?></td>
       <td><?php echo (!empty($customers_name)) ? HTML::outputProtected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
       <td><?php echo date(PHP_DATE_TIME_FORMAT, $Qlog->value('date_added')); ?></td>
-      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), OSCOM::link('index.php', 'A&PayPal&action=log&page=' . $_GET['page'] . '&lID=' . $Qlog->valueInt('id') . '&subaction=view'), 'info'); ?></small></td>
+      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), OSCOM::link('index.php', 'A&PayPal&Log&View&page=' . $_GET['page'] . '&lID=' . $Qlog->valueInt('id')), 'info'); ?></small></td>
     </tr>
 
 <?php
@@ -95,7 +93,7 @@ $(function() {
     modal: true,
     buttons: {
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_delete')); ?>": function() {
-        window.location = '<?php echo OSCOM::link('index.php', 'A&PayPal&action=log&subaction=deleteAll'); ?>';
+        window.location = '<?php echo OSCOM::link('index.php', 'A&PayPal&Log&DeleteAll'); ?>';
       },
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_cancel')); ?>": function() {
         $( this ).dialog('close');
@@ -110,3 +108,7 @@ $(function() {
   });
 });
 </script>
+
+<?php
+require(__DIR__ . '/template_bottom.php');
+?>

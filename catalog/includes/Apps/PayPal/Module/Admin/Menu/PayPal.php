@@ -31,7 +31,7 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
             [
                 'code' => 'App/PayPal',
                 'title' => $OSCOM_PayPal->getDef('module_admin_menu_start'),
-                'link' => OSCOM::link('apps.php', 'PayPal')
+                'link' => OSCOM::link('index.php', 'A&PayPal')
             ]
         ];
 
@@ -50,22 +50,22 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
                     [
                         'code' => 'App/PayPal',
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_balance'),
-                        'link' => OSCOM::link('apps.php', 'PayPal&action=balance')
+                        'link' => OSCOM::link('index.php', 'A&PayPal&Balance')
                     ],
                     [
                         'code' => 'App/PayPal',
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_configure'),
-                        'link' => OSCOM::link('apps.php', 'PayPal&action=configure')
+                        'link' => OSCOM::link('index.php', 'A&PayPal&Configure')
                     ],
                     [
                         'code' => 'App/PayPal',
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_manage_credentials'),
-                        'link' => OSCOM::link('apps.php', 'PayPal&action=credentials')
+                        'link' => OSCOM::link('index.php', 'A&PayPal&Credentials')
                     ],
                     [
                         'code' => 'App/PayPal',
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_log'),
-                        'link' => OSCOM::link('apps.php', 'PayPal&action=log')
+                        'link' => OSCOM::link('index.php', 'A&PayPal&Log')
                     ]
                 ];
 

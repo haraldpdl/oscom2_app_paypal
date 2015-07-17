@@ -1,21 +1,22 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\HTML;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  Copyright (c) 2014 osCommerce
+$OSCOM_Page = Registry::get('Site')->getPage();
 
-  Released under the GNU General Public License
-*/
-
-  use OSC\OM\HTML;
-  use OSC\OM\OSCOM;
+require(__DIR__ . '/template_top.php');
 ?>
 
 <div style="text-align: right; padding-bottom: 15px;">
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_back'), OSCOM::link('index.php', 'A&PayPal&action=log&page=' . $_GET['page']), 'info'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_back'), OSCOM::link('index.php', 'A&PayPal&Log&page=' . $_GET['page']), 'info'); ?>
 </div>
 
 <table class="pp-table pp-table-hover" width="100%">
@@ -27,7 +28,7 @@
   <tbody>
 
 <?php
-  foreach ( $log_request as $key => $value ) {
+foreach ($OSCOM_Page->data['log_request'] as $key => $value) {
 ?>
 
     <tr>
@@ -36,7 +37,7 @@
     </tr>
 
 <?php
-  }
+}
 ?>
 
   </tbody>
@@ -51,7 +52,7 @@
   <tbody>
 
 <?php
-  foreach ( $log_response as $key => $value ) {
+foreach ($OSCOM_Page->data['log_response'] as $key => $value) {
 ?>
 
     <tr>
@@ -60,8 +61,12 @@
     </tr>
 
 <?php
-  }
+}
 ?>
 
   </tbody>
 </table>
+
+<?php
+require(__DIR__ . '/template_bottom.php');
+?>

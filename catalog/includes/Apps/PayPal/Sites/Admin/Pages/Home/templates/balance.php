@@ -1,16 +1,14 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\OSCOM;
 
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
-
-  use OSC\OM\OSCOM;
+require(__DIR__ . '/template_top.php');
 ?>
 
 <div id="ppAccountBalanceLive">
@@ -41,7 +39,7 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
 
   var divId = 'ppBalance' + type.charAt(0).toUpperCase() + type.slice(1) + 'Info';
 
-  $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&action=balance&subaction=retrieve&type=PPTYPE'); ?>'.replace('PPTYPE', type), function (data) {
+  $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&GetBalance&type=PPTYPE'); ?>'.replace('PPTYPE', type), function (data) {
     var balance = {};
 
     $('#' + divId).empty();
@@ -111,3 +109,7 @@ $(function() {
   })();
 });
 </script>
+
+<?php
+require(__DIR__ . '/template_bottom.php');
+?>

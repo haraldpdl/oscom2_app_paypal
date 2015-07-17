@@ -1,16 +1,14 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+use OSC\OM\OSCOM;
 
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
-
-  use OSC\OM\OSCOM;
+require(__DIR__ . '/template_top.php');
 ?>
 
 <div id="ppStartDashboard" style="width: 100%;">
@@ -45,7 +43,7 @@ $(function() {
 
   OSCOM.APP.PAYPAL.versionCheck();
 
-  $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&action=getNews'); ?>', function (data) {
+  $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&GetNews'); ?>', function (data) {
     if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
       var ppNewsContent = '<div style="display: block; margin-top: 5px; min-height: 65px;"><a href="' + data.url + '" target="_blank"><img src="' + data.image + '" width="468" height="60" alt="' + data.title + '" border="0" /></a>';
 
@@ -60,3 +58,7 @@ $(function() {
   });
 });
 </script>
+
+<?php
+require(__DIR__ . '/template_bottom.php');
+?>

@@ -31,7 +31,7 @@
       $this->group = 'login';
 
       $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=LOGIN'), 'primary', null, true) . '</div>';
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
         $this->sort_order = OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER;
@@ -99,13 +99,13 @@
     function preLogin() {
       $OSCOM_Db = Registry::get('Db');
 
-      $return_url = OSCOM::link('login.php', '', 'SSL');
+      $return_url = OSCOM::link('index.php', 'Account&LogIn', 'SSL');
 
       if ( isset($_GET['code']) ) {
         $_SESSION['paypal_login_customer_id'] = false;
 
         $params = array('code' => $_GET['code'],
-                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('login.php', 'action=paypal_login', 'SSL')));
+                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login', 'SSL')));
 
         $response_token = $this->_app->getApiResult('LOGIN', 'GrantToken', $params);
 
@@ -238,7 +238,7 @@
 
             $_SESSION['billto'] = $_SESSION['sendto'];
 
-            $return_url = OSCOM::link('login.php', 'action=paypal_login_process', 'SSL');
+            $return_url = OSCOM::link('index.php', 'Account&LogIn&action=paypal_login_process', 'SSL');
           }
         }
       }
@@ -287,11 +287,11 @@
     }
 
     function install() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=LOGIN');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=LOGIN');
     }
 
     function remove() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=LOGIN');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=LOGIN');
     }
 
     function keys() {

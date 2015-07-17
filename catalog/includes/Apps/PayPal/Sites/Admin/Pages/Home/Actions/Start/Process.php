@@ -1,48 +1,63 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
+namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Start;
 
-  Copyright (c) 2014 osCommerce
+use OSC\OM\HTTP;
+use OSC\OM\OSCOM;
+use OSC\OM\Registry;
 
-  Released under the GNU General Public License
-*/
+class Process extends \OSC\OM\PagesActionsAbstract
+{
+    public function execute()
+    {
+        $OSCOM_PayPal = Registry::get('PayPal');
 
-  use OSC\OM\HTTP;
-  use OSC\OM\OSCOM;
+        if (isset($_GET['type']) && in_array($_GET['type'], [
+            'live',
+            'sandbox'
+        ])) {
+            $params = [
+                'return_url' => OSCOM::link('index.php', 'A&PayPal&Start&Retrieve', 'SSL'),
+                'type' => $_GET['type']
+            ];
 
-  if ( isset($_GET['type']) && in_array($_GET['type'], array('live', 'sandbox')) ) {
-    $params = array('return_url' => OSCOM::link('index.php', 'A&PayPal&action=start&subaction=retrieve', 'SSL'),
-                    'type' => $_GET['type']);
+            $result_string = HTTP::getResponse([
+              'url' => 'https://ssl.oscommerce.com/index.php?RPC&Website&Index&PayPalStart',
+              'parameters' => $params
+            ]);
 
-    $result_string = $OSCOM_PayPal->makeApiCall('https://ssl.oscommerce.com/index.php?RPC&Website&Index&PayPalStart', $params);
-    $result = array();
+            $result = [];
 
-    if ( !empty($result_string) && (substr($result_string, 0, 9) == 'rpcStatus') ) {
-      $raw = explode("\n", $result_string);
+            if (!empty($result_string) && (substr($result_string, 0, 9) == 'rpcStatus')) {
+                $raw = explode("\n", $result_string);
 
-      foreach ( $raw as $r ) {
-        $key = explode('=', $r, 2);
+                foreach ($raw as $r) {
+                    $key = explode('=', $r, 2);
 
-        if ( is_array($key) && (count($key) === 2) && !empty($key[0]) && !empty($key[1]) ) {
-          $result[$key[0]] = $key[1];
+                    if (is_array($key) && (count($key) === 2) && !empty($key[0]) && !empty($key[1])) {
+                        $result[$key[0]] = $key[1];
+                    }
+                }
+
+                if (isset($result['rpcStatus']) && ($result['rpcStatus'] === '1') && isset($result['merchant_id']) && (preg_match('/^[A-Za-z0-9]{32}$/', $result['merchant_id']) === 1) && isset($result['redirect_url']) && isset($result['secret'])) {
+                    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_MERCHANT_ID', $result['merchant_id']);
+                    $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_SECRET', $result['secret']);
+
+                    HTTP::redirect($result['redirect_url']);
+                } else {
+                    $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_initialization_error'), 'error');
+                }
+            } else {
+                $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_connection_error'), 'error');
+            }
+        } else {
+            $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_account_type_error'), 'error');
         }
-      }
-
-      if ( isset($result['rpcStatus']) && ($result['rpcStatus'] === '1') && isset($result['merchant_id']) && (preg_match('/^[A-Za-z0-9]{32}$/', $result['merchant_id']) === 1) && isset($result['redirect_url']) && isset($result['secret']) ) {
-        $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_MERCHANT_ID', $result['merchant_id']);
-        $OSCOM_PayPal->saveParameter('OSCOM_APP_PAYPAL_START_SECRET', $result['secret']);
-
-        HTTP::redirect($result['redirect_url']);
-      } else {
-        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_initialization_error'), 'error');
-      }
-    } else {
-      $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_connection_error'), 'error');
     }
-  } else {
-    $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_account_type_error'), 'error');
-  }
-?>
+}

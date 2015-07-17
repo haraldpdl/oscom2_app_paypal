@@ -39,5 +39,14 @@
 				"Logout":	"Module\\Hooks\\Shop\\Account\\Logout"
 			}
 		}
+	},
+	"routes": {
+		"Admin":	"Sites\\Admin\\Pages\\Home",
+		"Shop": {
+			"order&callback&paypal&ec":	"Sites\\Shop\\Pages\\EC",
+			"order&paypal&checkout&hs":	"Sites\\Shop\\Pages\\HS",
+			"order&ipn&paypal&ps":		"Sites\\Shop\\Pages\\PS",
+			"order&ipn&paypal&hs":		"Sites\\Shop\\Pages\\HS"
+		}
 	}
 }

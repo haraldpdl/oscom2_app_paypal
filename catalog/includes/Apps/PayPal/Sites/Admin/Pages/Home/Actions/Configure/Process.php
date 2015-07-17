@@ -1,36 +1,44 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Configure;
 
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-$m = Registry::get('PayPalAdminConfig' . $current_module);
+class Process extends \OSC\OM\PagesActionsAbstract
+{
+    public function execute()
+    {
+        $OSCOM_PayPal = Registry::get('PayPal');
 
-if ($current_module == 'G') {
-    $cut = 'OSCOM_APP_PAYPAL_';
-} else {
-    $cut = 'OSCOM_APP_PAYPAL_' . $current_module . '_';
-}
+        $current_module = $this->page->data['current_module'];
 
-$cut_length = strlen($cut);
+        $m = Registry::get('PayPalAdminConfig' . $current_module);
 
-foreach ($m->getParameters() as $key) {
-    $p = strtolower(substr($key, $cut_length));
+        if ($current_module == 'G') {
+            $cut = 'OSCOM_APP_PAYPAL_';
+        } else {
+            $cut = 'OSCOM_APP_PAYPAL_' . $current_module . '_';
+        }
 
-    if (isset($_POST[$p])) {
-        $OSCOM_PayPal->saveParameter($key, $_POST[$p]);
+        $cut_length = strlen($cut);
+
+        foreach ($m->getParameters() as $key) {
+            $p = strtolower(substr($key, $cut_length));
+
+            if (isset($_POST[$p])) {
+                $OSCOM_PayPal->saveParameter($key, $_POST[$p]);
+            }
+        }
+
+        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_cfg_saved_success'), 'success');
+
+        OSCOM::redirect('index.php', 'A&PayPal&Configure&module=' . $current_module);
     }
 }
-
-$OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_cfg_saved_success'), 'success');
-
-OSCOM::redirect('index.php', 'A&PayPal&action=configure&module=' . $current_module);

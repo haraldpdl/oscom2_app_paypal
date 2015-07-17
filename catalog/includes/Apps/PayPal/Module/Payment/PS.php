@@ -33,7 +33,7 @@
       $this->code = 'PayPal\PS';
       $this->title = $this->_app->getDef('module_ps_title');
       $this->public_title = $this->_app->getDef('module_ps_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=PS'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=PS'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_PS_SORT_ORDER') ? OSCOM_APP_PAYPAL_PS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_PS_STATUS') && in_array(OSCOM_APP_PAYPAL_PS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID : 0;
@@ -342,10 +342,6 @@
 
       $ipn_language = null;
 
-      if ( !class_exists('language') ) {
-        include(DIR_WS_CLASSES . 'language.php');
-      }
-
       $lng = new \language();
 
       if ( count($lng->catalog_languages) > 1 ) {
@@ -368,7 +364,7 @@
                           'invoice' => substr($_SESSION['cart_PayPal_Standard_ID'], strpos($_SESSION['cart_PayPal_Standard_ID'], '-')+1),
                           'custom' => $_SESSION['customer_id'],
                           'no_note' => '1',
-                          'notify_url' => OSCOM::link('public/Apps/PayPal/Module/Payment/PS_IPN.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
+                          'notify_url' => OSCOM::link('index.php', 'order&ipn&paypal&ps' . (isset($ipn_language) ? '&language=' . $ipn_language : ''), 'SSL', false, false),
                           'rm' => '2',
                           'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
                           'cancel_return' => OSCOM::link('checkout_payment.php', '', 'SSL'),
@@ -870,11 +866,11 @@
     }
 
     function install() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=PS');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=PS');
     }
 
     function remove() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=PS');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=PS');
     }
 
     function keys() {

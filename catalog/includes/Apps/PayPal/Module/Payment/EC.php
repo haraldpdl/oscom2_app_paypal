@@ -34,7 +34,7 @@
       $this->code = 'PayPal\EC';
       $this->title = $this->_app->getDef('module_ec_title');
       $this->public_title = $this->_app->getDef('module_ec_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=EC'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=EC'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_EC_SORT_ORDER') ? OSCOM_APP_PAYPAL_EC_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_EC_STATUS') && in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID : 0;
@@ -149,7 +149,7 @@
         $button_title .= ' (' . $this->code . '; Sandbox)';
       }
 
-      $string = '<a href="' . OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+      $string = '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
 
       if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
         $string .= <<<EOD
@@ -182,7 +182,7 @@ EOD;
       global $messageStack, $order;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
       }
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
@@ -233,7 +233,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
       }
 
       if ( in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
@@ -289,7 +289,7 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('public/Apps/PayPal/Module/Payment/EC.php', '', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
       }
 
       if ( $_SESSION['appPayPalEcResult']['RESULT'] == '0' ) {
@@ -485,11 +485,11 @@ EOD;
     }
 
     function install() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=EC');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=EC');
     }
 
     function remove() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=EC');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=EC');
     }
 
     function keys() {

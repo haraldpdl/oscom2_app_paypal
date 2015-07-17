@@ -37,7 +37,7 @@ paypal.use( ["login"], function(login) {
     "appid": "<?php echo (OSCOM_APP_PAYPAL_LOGIN_STATUS == '1') ? OSCOM_APP_PAYPAL_LOGIN_LIVE_CLIENT_ID : OSCOM_APP_PAYPAL_LOGIN_SANDBOX_CLIENT_ID; ?>",
     "scopes": "<?php echo implode(' ', $use_scopes); ?>",
     "containerid": "PayPalLoginButton",
-    "returnurl": "<?php echo str_replace('&amp;', '&', OSCOM::link('login.php', 'action=paypal_login', 'SSL', false)); ?>"
+    "returnurl": "<?php echo str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login', 'SSL', false)); ?>"
   });
 });
 </script>

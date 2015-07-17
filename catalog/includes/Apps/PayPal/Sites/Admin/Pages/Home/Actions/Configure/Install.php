@@ -1,21 +1,29 @@
 <?php
-/*
-  $Id$
+/**
+  * osCommerce Online Merchant
+  *
+  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
+  * @license GPL; http://www.oscommerce.com/gpllicense.txt
+  */
 
-  osCommerce, Open Source E-Commerce Solutions
-  http://www.oscommerce.com
-
-  Copyright (c) 2014 osCommerce
-
-  Released under the GNU General Public License
-*/
+namespace OSC\OM\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Configure;
 
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-$m = Registry::get('PayPalAdminConfig' . $current_module);
-$m->install();
+class Install extends \OSC\OM\PagesActionsAbstract
+{
+    public function execute()
+    {
+        $OSCOM_PayPal = Registry::get('PayPal');
 
-$OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
+        $current_module = $this->page->data['current_module'];
 
-OSCOM::redirect('index.php', 'A&PayPal&action=configure&module=' . $current_module);
+        $m = Registry::get('PayPalAdminConfig' . $current_module);
+        $m->install();
+
+        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_install_success'), 'success');
+
+        OSCOM::redirect('index.php', 'A&PayPal&Configure&module=' . $current_module);
+    }
+}

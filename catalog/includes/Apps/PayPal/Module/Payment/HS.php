@@ -33,7 +33,7 @@
       $this->code = 'PayPal\HS';
       $this->title = $this->_app->getDef('module_hs_title');
       $this->public_title = $this->_app->getDef('module_hs_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), OSCOM::link('apps.php', 'PayPal&action=configure&module=HS'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=HS'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_HS_SORT_ORDER') ? OSCOM_APP_PAYPAL_HS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_HS_STATUS') && in_array(OSCOM_APP_PAYPAL_HS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID : 0;
@@ -321,7 +321,7 @@
                         'custom' => $_SESSION['customer_id'],
                         'paymentaction' => OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD == '1' ? 'sale' : 'authorization',
                         'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
-                        'notify_url' => OSCOM::link('public/Apps/PayPal/Module/Payment/HS_IPN.php', '', 'SSL', false, false),
+                        'notify_url' => OSCOM::link('index.php', 'order&ipn&paypal&hs', 'SSL', false, false),
                         'shipping' => $this->_app->formatCurrencyRaw($order->info['shipping_cost']),
                         'tax' => $this->_app->formatCurrencyRaw($order->info['tax']),
                         'subtotal' => $this->_app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
@@ -361,7 +361,7 @@
 
       $_SESSION['pphs_key'] = tep_create_random_value(16);
 
-      $iframe_url = OSCOM::link('public/Apps/PayPal/Module/Payment/HS_checkout.php', 'key=' . $_SESSION['pphs_key'], 'SSL');
+      $iframe_url = OSCOM::link('index.php', 'order&paypal&checkout&hs&key=' . $_SESSION['pphs_key'], 'SSL');
       $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs', 'SSL');
 
 // include jquery if it doesn't exist in the template
@@ -637,11 +637,11 @@ EOD;
     }
 
     function install() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=install&module=HS');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=HS');
     }
 
     function remove() {
-      OSCOM::redirect('apps.php', 'PayPal&action=configure&subaction=uninstall&module=HS');
+      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=HS');
     }
 
     function keys() {

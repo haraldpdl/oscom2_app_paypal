@@ -24,7 +24,7 @@ class PayflowSetExpressCheckout extends \OSC\OM\Apps\PayPal\APIAbstract
             'TENDER' => 'P',
             'TRXTYPE' => (OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD == '1') ? 'S' : 'A',
             'ACTION' => 'S',
-            'RETURNURL' => OSCOM::link('public/Apps/PayPal/Module/Payment/EC.php', 'osC_Action=retrieve', 'SSL'),
+            'RETURNURL' => OSCOM::link('index.php', 'order&callback&paypal&ec&action=retrieve', 'SSL'),
             'CANCELURL' => OSCOM::link('shopping_cart.php', '', 'SSL')
         ];
 
