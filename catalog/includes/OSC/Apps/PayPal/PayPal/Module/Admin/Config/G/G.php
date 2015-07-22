@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\G;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G;
 
-class G extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class G extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
 {
     public $is_installed = true;
     public $sort_order = 100000;

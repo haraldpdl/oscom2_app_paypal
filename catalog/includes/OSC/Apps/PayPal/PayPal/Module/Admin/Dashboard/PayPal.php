@@ -6,12 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Dashboard;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Dashboard;
 
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\Apps\PayPal\PayPal as PayPalApp;
+use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
 class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
 {
@@ -44,14 +43,14 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
         $can_apply_online_updates = class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false';
         $has_live_account = ($this->app->hasApiCredentials('live') === true) ? 'true' : 'false';
         $has_sandbox_account = ($this->app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
-        $version_check_url = OSCOM::link('index.php', 'A&PayPal&RPC&CheckVersion');
-        $new_update_notice = $this->app->getDef('update_available_body', array('button_view_update' => $this->app->drawButton($this->app->getDef('button_view_update'), OSCOM::link('index.php', 'A&PayPal&Update'), 'success', null, true)));
+        $version_check_url = addslashes($this->app->link('RPC&CheckVersion'));
+        $new_update_notice = $this->app->getDef('update_available_body', array('button_view_update' => $this->app->drawButton($this->app->getDef('button_view_update'), $this->app->link('Update'), 'success', null, true)));
         $heading_live_account = $this->app->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))));
         $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))));
         $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
-        $app_get_started = $this->app->drawButton($this->app->getDef('button_app_get_started'), OSCOM::link('index.php', 'A&PayPal'), 'warning', null, true);
+        $app_get_started = $this->app->drawButton($this->app->getDef('button_app_get_started'), $this->app->link(), 'warning', null, true);
         $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
-        $get_balance_url = OSCOM::link('index.php', 'A&PayPal&RPC&GetBalance&type=PPTYPE');
+        $get_balance_url = addslashes($this->app->link('RPC&GetBalance&type=PPTYPE'));
 
         $output = <<<EOD
 <style>

@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\Apps\PayPal\Module\Payment;
+  namespace OSC\Apps\PayPal\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
   class PS implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
@@ -27,13 +27,13 @@
       $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/PS/PS.php');
 
-      $this->signature = 'paypal|paypal_standard|' . $this->_app->getVersion() . '|2.3';
+      $this->signature = 'paypal|paypal_standard|' . $this->_app->getVersion() . '|2.4';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'PayPal\PS';
+      $this->code = 'PS';
       $this->title = $this->_app->getDef('module_ps_title');
       $this->public_title = $this->_app->getDef('module_ps_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=PS'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ps_legacy_admin_app_button'), $this->_app->link('Configure&module=PS'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_PS_SORT_ORDER') ? OSCOM_APP_PAYPAL_PS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_PS_STATUS') && in_array(OSCOM_APP_PAYPAL_PS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID : 0;
@@ -41,7 +41,7 @@
       if ( defined('OSCOM_APP_PAYPAL_PS_STATUS') ) {
         if ( OSCOM_APP_PAYPAL_PS_STATUS == '0' ) {
           $this->title .= ' [Sandbox]';
-          $this->public_title .= ' (' . $this->code . '; Sandbox)';
+          $this->public_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
         }
 
         if ( OSCOM_APP_PAYPAL_PS_STATUS == '1' ) {
@@ -75,7 +75,7 @@
 // has already beed deducated in the IPN to avoid a quantity == 0 redirect
       if ( $this->enabled === true ) {
         if ( basename($PHP_SELF) == 'checkout_process.php' ) {
-          if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->code) ) {
+          if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code) ) {
             $this->pre_before_check();
           }
         }
@@ -128,7 +128,7 @@
         }
       }
 
-      return array('id' => $this->code,
+      return array('id' => $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code,
                    'module' => $this->public_title);
     }
 
@@ -819,17 +819,10 @@
 
       $email_order .= "\n" . EMAIL_TEXT_BILLING_ADDRESS . "\n" .
                       EMAIL_SEPARATOR . "\n" .
-                      tep_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n";
-
-      if (isset($GLOBALS[$_SESSION['payment']]) && is_object($GLOBALS[$_SESSION['payment']])) {
-        $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
-                        EMAIL_SEPARATOR . "\n";
-        $payment_class = $GLOBALS[$_SESSION['payment']];
-        $email_order .= $payment_class->title . "\n\n";
-        if ($payment_class->email_footer) {
-          $email_order .= $payment_class->email_footer . "\n\n";
-        }
-      }
+                      tep_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n" .
+                      EMAIL_TEXT_PAYMENT_METHOD . "\n" .
+                      EMAIL_SEPARATOR . "\n" .
+                      $this->public_title . "\n\n";
 
       tep_mail($order->customer['firstname'] . ' ' . $order->customer['lastname'], $order->customer['email_address'], EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
 
@@ -866,11 +859,11 @@
     }
 
     function install() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=PS');
+      $this->_app->redirect('Configure&Install&module=PS');
     }
 
     function remove() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=PS');
+      $this->_app->redirect('Configure&Uninstall&module=PS');
     }
 
     function keys() {

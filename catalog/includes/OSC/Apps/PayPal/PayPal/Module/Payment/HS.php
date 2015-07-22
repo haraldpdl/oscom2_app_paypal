@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\Apps\PayPal\Module\Payment;
+  namespace OSC\Apps\PayPal\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
   class HS implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
@@ -27,13 +27,13 @@
       $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/HS/HS.php');
 
-      $this->signature = 'paypal|paypal_pro_hs|' . $this->_app->getVersion() . '|2.3';
+      $this->signature = 'paypal|paypal_pro_hs|' . $this->_app->getVersion() . '|2.4';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'PayPal\HS';
+      $this->code = 'HS';
       $this->title = $this->_app->getDef('module_hs_title');
       $this->public_title = $this->_app->getDef('module_hs_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=HS'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), $this->_app->link('Configure&module=HS'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_HS_SORT_ORDER') ? OSCOM_APP_PAYPAL_HS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_HS_STATUS') && in_array(OSCOM_APP_PAYPAL_HS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID : 0;
@@ -41,7 +41,7 @@
       if ( defined('OSCOM_APP_PAYPAL_HS_STATUS') ) {
         if ( OSCOM_APP_PAYPAL_HS_STATUS == '0' ) {
           $this->title .= ' [Sandbox]';
-          $this->public_title .= ' (' . $this->code . '; Sandbox)';
+          $this->public_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
         }
 
         if ( OSCOM_APP_PAYPAL_HS_STATUS == '1' ) {
@@ -122,7 +122,7 @@
         }
       }
 
-      return array('id' => $this->code,
+      return array('id' => $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code,
                    'module' => $this->public_title);
     }
 
@@ -579,17 +579,10 @@ EOD;
 
       $email_order .= "\n" . EMAIL_TEXT_BILLING_ADDRESS . "\n" .
                       EMAIL_SEPARATOR . "\n" .
-                      tep_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n";
-
-      if (isset($GLOBALS[$_SESSION['payment']]) && is_object($GLOBALS[$_SESSION['payment']])) {
-        $email_order .= EMAIL_TEXT_PAYMENT_METHOD . "\n" .
-                        EMAIL_SEPARATOR . "\n";
-        $payment_class = $GLOBALS[$_SESSION['payment']];
-        $email_order .= $payment_class->title . "\n\n";
-        if ($payment_class->email_footer) {
-          $email_order .= $payment_class->email_footer . "\n\n";
-        }
-      }
+                      tep_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n" .
+                      EMAIL_TEXT_PAYMENT_METHOD . "\n" .
+                      EMAIL_SEPARATOR . "\n" .
+                      $this->public_title . "\n\n";
 
       tep_mail($order->customer['firstname'] . ' ' . $order->customer['lastname'], $order->customer['email_address'], EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
 
@@ -637,11 +630,11 @@ EOD;
     }
 
     function install() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=HS');
+      $this->_app->redirect('Configure&Install&module=HS');
     }
 
     function remove() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=HS');
+      $this->_app->redirect('Configure&Uninstall&module=HS');
     }
 
     function keys() {

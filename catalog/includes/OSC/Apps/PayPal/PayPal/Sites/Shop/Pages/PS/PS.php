@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Shop\Pages\PS;
+namespace OSC\Apps\PayPal\PayPal\Sites\Shop\Pages\PS;
 
 use OSC\OM\HTML;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\Apps\PayPal\Module\Payment\PS as PaymentModulePS;
+use OSC\Apps\PayPal\PayPal\Module\Payment\PS as PaymentModulePS;
 
 class PS extends \OSC\OM\PagesAbstract
 {

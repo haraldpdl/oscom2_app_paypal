@@ -7,7 +7,6 @@
   */
 
 use OSC\OM\HTML;
-use OSC\OM\OSCOM;
 
 require(__DIR__ . '/template_top.php');
 
@@ -54,7 +53,7 @@ if ($Qlog->getPageSetTotalRows() > 0) {
       <td><?php echo long2ip($Qlog->value('ip_address')); ?></td>
       <td><?php echo (!empty($customers_name)) ? HTML::outputProtected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
       <td><?php echo date(PHP_DATE_TIME_FORMAT, $Qlog->value('date_added')); ?></td>
-      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), OSCOM::link('index.php', 'A&PayPal&Log&View&page=' . $_GET['page'] . '&lID=' . $Qlog->valueInt('id')), 'info'); ?></small></td>
+      <td class="pp-table-action"><small><?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view'), $OSCOM_PayPal->link('Log&View&page=' . $_GET['page'] . '&lID=' . $Qlog->valueInt('id')), 'info'); ?></small></td>
     </tr>
 
 <?php
@@ -93,7 +92,7 @@ $(function() {
     modal: true,
     buttons: {
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_delete')); ?>": function() {
-        window.location = '<?php echo OSCOM::link('index.php', 'A&PayPal&Log&DeleteAll'); ?>';
+        window.location = '<?php echo $OSCOM_PayPal->link('Log&DeleteAll'); ?>';
       },
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_cancel')); ?>": function() {
         $( this ).dialog('close');

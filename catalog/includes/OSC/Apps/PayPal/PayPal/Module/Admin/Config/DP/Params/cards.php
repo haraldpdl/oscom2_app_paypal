@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\DP\Params;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\DP\Params;
 
-class cards extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class cards extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $default = 'visa;mastercard;discover;amex;maestro';
     public $sort_order = 200;

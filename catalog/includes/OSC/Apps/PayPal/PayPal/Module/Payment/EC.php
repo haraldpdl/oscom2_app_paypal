@@ -6,14 +6,14 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\Apps\PayPal\Module\Payment;
+  namespace OSC\Apps\PayPal\PayPal\Module\Payment;
 
   use OSC\OM\HTML;
   use OSC\OM\HTTP;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
   class EC implements \OSC\OM\Modules\PaymentInterface {
     var $code, $title, $description, $enabled, $_app;
@@ -28,13 +28,13 @@
       $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/EC/EC.php');
 
-      $this->signature = 'paypal|paypal_express|' . $this->_app->getVersion() . '|2.3';
+      $this->signature = 'paypal|paypal_express|' . $this->_app->getVersion() . '|2.4';
       $this->api_version = $this->_app->getApiVersion();
 
-      $this->code = 'PayPal\EC';
+      $this->code = 'EC';
       $this->title = $this->_app->getDef('module_ec_title');
       $this->public_title = $this->_app->getDef('module_ec_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=EC'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), $this->_app->link('Configure&module=EC'), 'primary', null, true) . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_EC_SORT_ORDER') ? OSCOM_APP_PAYPAL_EC_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_EC_STATUS') && in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID : 0;
@@ -42,7 +42,7 @@
       if ( defined('OSCOM_APP_PAYPAL_EC_STATUS') ) {
         if ( OSCOM_APP_PAYPAL_EC_STATUS == '0' ) {
           $this->title .= ' [Sandbox]';
-          $this->public_title .= ' (' . $this->code . '; Sandbox)';
+          $this->public_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
         }
       }
 
@@ -88,7 +88,7 @@
       if ( (basename($PHP_SELF) == 'checkout_payment.php') && isset($_SESSION['appPayPalEcRightTurn']) ) {
         unset($_SESSION['appPayPalEcRightTurn']);
 
-        if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->code) ) {
+        if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code) ) {
           OSCOM::redirect('checkout_confirmation.php', '', 'SSL');
         }
       }
@@ -146,7 +146,7 @@
       $button_title = HTML::outputProtected($this->_app->getDef('module_ec_button_title'));
 
       if ( OSCOM_APP_PAYPAL_EC_STATUS == '0' ) {
-        $button_title .= ' (' . $this->code . '; Sandbox)';
+        $button_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
       }
 
       $string = '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
@@ -174,7 +174,7 @@ EOD;
     }
 
     function selection() {
-      return array('id' => $this->code,
+      return array('id' => $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code,
                    'module' => $this->public_title);
     }
 
@@ -485,11 +485,11 @@ EOD;
     }
 
     function install() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=EC');
+      $this->_app->redirect('Configure&Install&module=EC');
     }
 
     function remove() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=EC');
+      $this->_app->redirect('Configure&Uninstall&module=EC');
     }
 
     function keys() {

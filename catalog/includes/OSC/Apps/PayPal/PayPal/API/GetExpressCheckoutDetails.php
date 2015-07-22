@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\API;
+namespace OSC\Apps\PayPal\PayPal\API;
 
-class GetExpressCheckoutDetails extends \OSC\Apps\PayPal\APIAbstract
+class GetExpressCheckoutDetails extends \OSC\Apps\PayPal\PayPal\APIAbstract
 {
     public function execute(array $extra_params = null)
     {

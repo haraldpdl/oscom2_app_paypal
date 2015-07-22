@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\EC\Params;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\EC\Params;
 
 use OSC\OM\OSCOM;
 
-class checkout_flow extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class checkout_flow extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $default = '0';
     public $sort_order = 200;
@@ -23,7 +23,7 @@ class checkout_flow extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
 
     public function getSetField()
     {
-        if (!file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/with_beta.txt')) {
+        if (!file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/with_beta.txt')) {
             return false;
         }
 

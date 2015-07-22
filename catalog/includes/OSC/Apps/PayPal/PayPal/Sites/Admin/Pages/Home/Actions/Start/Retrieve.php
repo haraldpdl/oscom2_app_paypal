@@ -6,10 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Start;
+namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\Start;
 
 use OSC\OM\HTTP;
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class Retrieve extends \OSC\OM\PagesActionsAbstract
@@ -59,7 +58,7 @@ class Retrieve extends \OSC\OM\PagesActionsAbstract
 
                 $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_success'), 'success');
 
-                OSCOM::redirect('index.php', 'A&PayPal&Credentials');
+                $OSCOM_PayPal->redirect('Credentials');
             } else {
                 $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_onboarding_retrieve_error'), 'error');
             }

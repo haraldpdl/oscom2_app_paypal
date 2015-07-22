@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\EC;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\EC;
 
 use OSC\OM\OSCOM;
 
-class EC extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class EC extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $pm_code = 'paypal_express';
     protected $pm_pf_code = 'paypal_pro_payflow_ec';
@@ -45,7 +45,7 @@ class EC extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::install();
 
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
-        $installed[] = $this->app->code . '\\' . $this->code;
+        $installed[] = $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
         $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
     }
@@ -55,7 +55,7 @@ class EC extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::uninstall();
 
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
-        $installed_pos = array_search($this->app->code . '\\' . $this->code, $installed);
+        $installed_pos = array_search($this->app->vendor . '\\' . $this->app->code . '\\' . $this->code, $installed);
 
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);

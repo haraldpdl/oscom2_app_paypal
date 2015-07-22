@@ -6,10 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Start;
+namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\Start;
 
 use OSC\OM\HTTP;
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class Process extends \OSC\OM\PagesActionsAbstract
@@ -23,7 +22,7 @@ class Process extends \OSC\OM\PagesActionsAbstract
             'sandbox'
         ])) {
             $params = [
-                'return_url' => OSCOM::link('index.php', 'A&PayPal&Start&Retrieve', 'SSL'),
+                'return_url' => $OSCOM_PayPal->link('Start&Retrieve', 'SSL'),
                 'type' => $_GET['type']
             ];
 

@@ -269,7 +269,7 @@ var OSCOM = {
         sandbox: <?php echo ($OSCOM_PayPal->hasApiCredentials('sandbox') === true) ? 'true' : 'false'; ?>
       },
       versionCheck: function() {
-        $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&CheckVersion'); ?>', function (data) {
+        $.get('<?php echo addslashes($OSCOM_PayPal->link('RPC&CheckVersion')); ?>', function (data) {
           var versions = [];
 
           if ( OSCOM.APP.PAYPAL.canApplyOnlineUpdates == true ) {
@@ -325,15 +325,15 @@ if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
 <div class="pp-container">
   <div class="pp-header">
     <div id="ppAppInfo" style="float: right;">
-      <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . OSCOM::link('index.php', 'A&PayPal&Info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . OSCOM::link('index.php', 'A&PayPal&Privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
+      <?php echo $OSCOM_PayPal->getTitle() . ' v' . $OSCOM_PayPal->getVersion() . ' <a href="' . $OSCOM_PayPal->link('Info') . '">' . $OSCOM_PayPal->getDef('app_link_info') . '</a> <a href="' . $OSCOM_PayPal->link('Privacy') . '">' . $OSCOM_PayPal->getDef('app_link_privacy') . '</a>'; ?>
     </div>
 
-    <a href="<?php echo OSCOM::link('index.php', 'A&PayPal&' . $OSCOM_Page->data['action']); ?>"><img src="<?php echo OSCOM::link('Shop/public/Apps/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
+    <a href="<?php echo $OSCOM_PayPal->link($OSCOM_Page->data['action']); ?>"><img src="<?php echo OSCOM::link('Shop/public/Apps/PayPal/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
   </div>
 
   <div id="ppAppUpdateNotice" style="padding: 0 12px 0 12px; display: none;">
     <div class="pp-panel pp-panel-success">
-      <?php echo $OSCOM_PayPal->getDef('update_available_body', array('button_view_update' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view_update'), OSCOM::link('index.php', 'A&PayPal&Update'), 'success'))); ?>
+      <?php echo $OSCOM_PayPal->getDef('update_available_body', array('button_view_update' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_view_update'), $OSCOM_PayPal->link('Update'), 'success'))); ?>
     </div>
   </div>
 

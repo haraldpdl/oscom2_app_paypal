@@ -6,8 +6,6 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-use OSC\OM\OSCOM;
-
 require(__DIR__ . '/template_top.php');
 ?>
 
@@ -39,7 +37,7 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
 
   var divId = 'ppBalance' + type.charAt(0).toUpperCase() + type.slice(1) + 'Info';
 
-  $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&GetBalance&type=PPTYPE'); ?>'.replace('PPTYPE', type), function (data) {
+  $.get('<?php echo addslashes($OSCOM_PayPal->link('RPC&GetBalance&type=PPTYPE')); ?>'.replace('PPTYPE', type), function (data) {
     var balance = {};
 
     $('#' + divId).empty();

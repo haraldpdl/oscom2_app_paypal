@@ -6,9 +6,8 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Configure;
+namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\Configure;
 
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class Uninstall extends \OSC\OM\PagesActionsAbstract
@@ -24,6 +23,6 @@ class Uninstall extends \OSC\OM\PagesActionsAbstract
 
         $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_uninstall_success'), 'success');
 
-        OSCOM::redirect('index.php', 'A&PayPal&Configure&module=' . $current_module);
+        $OSCOM_PayPal->redirect('Configure&module=' . $current_module);
     }
 }

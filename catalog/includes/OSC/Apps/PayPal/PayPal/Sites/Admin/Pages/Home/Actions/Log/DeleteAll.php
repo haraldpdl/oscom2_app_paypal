@@ -6,9 +6,8 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\Log;
+namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\Log;
 
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class DeleteAll extends \OSC\OM\PagesActionsAbstract
@@ -22,6 +21,6 @@ class DeleteAll extends \OSC\OM\PagesActionsAbstract
 
         $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
 
-        OSCOM::redirect('index.php', 'A&PayPal&Log');
+        $OSCOM_PayPal->redirect('Log');
     }
 }

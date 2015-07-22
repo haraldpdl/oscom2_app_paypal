@@ -6,12 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Menu;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Menu;
 
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\Apps\PayPal\PayPal as PayPalApp;
+use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
 class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 {
@@ -29,9 +28,9 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 
         $paypal_menu = [
             [
-                'code' => 'App/PayPal',
+                'code' => $OSCOM_PayPal->getVendor() . '\\' . $OSCOM_PayPal->getCode(),
                 'title' => $OSCOM_PayPal->getDef('module_admin_menu_start'),
-                'link' => OSCOM::link('index.php', 'A&PayPal')
+                'link' => $OSCOM_PayPal->link()
             ]
         ];
 
@@ -48,24 +47,24 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
             if (defined($value) && !empty(constant($value))) {
                 $paypal_menu = [
                     [
-                        'code' => 'App/PayPal',
+                        'code' => $OSCOM_PayPal->getVendor() . '\\' . $OSCOM_PayPal->getCode(),
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_balance'),
-                        'link' => OSCOM::link('index.php', 'A&PayPal&Balance')
+                        'link' => $OSCOM_PayPal->link('Balance')
                     ],
                     [
-                        'code' => 'App/PayPal',
+                        'code' => $OSCOM_PayPal->getVendor() . '\\' . $OSCOM_PayPal->getCode(),
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_configure'),
-                        'link' => OSCOM::link('index.php', 'A&PayPal&Configure')
+                        'link' => $OSCOM_PayPal->link('Configure')
                     ],
                     [
-                        'code' => 'App/PayPal',
+                        'code' => $OSCOM_PayPal->getVendor() . '\\' . $OSCOM_PayPal->getCode(),
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_manage_credentials'),
-                        'link' => OSCOM::link('index.php', 'A&PayPal&Credentials')
+                        'link' => $OSCOM_PayPal->link('Credentials')
                     ],
                     [
-                        'code' => 'App/PayPal',
+                        'code' => $OSCOM_PayPal->getVendor() . '\\' . $OSCOM_PayPal->getCode(),
                         'title' => $OSCOM_PayPal->getDef('module_admin_menu_log'),
-                        'link' => OSCOM::link('index.php', 'A&PayPal&Log')
+                        'link' => $OSCOM_PayPal->link('Log')
                     ]
                 ];
 

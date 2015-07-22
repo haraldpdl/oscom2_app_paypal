@@ -6,13 +6,14 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-  namespace OSC\Apps\PayPal\Module\Content;
+  namespace OSC\Apps\PayPal\PayPal\Module\Content;
 
   use OSC\OM\HTML;
   use OSC\OM\OSCOM;
   use OSC\OM\Registry;
 
-  use OSC\Apps\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
+  use OSC\Apps\PayPal\PayPal\Module\Payment\EC as PaymentModuleEC;
 
   class LOGIN implements \OSC\OM\Modules\ContentInterface {
     var $code, $group, $title, $description, $sort_order, $enabled, $_app;
@@ -25,16 +26,16 @@
       $this->_app = Registry::get('PayPal');
       $this->_app->loadLanguageFile('modules/LOGIN/LOGIN.php');
 
-      $this->signature = 'paypal|paypal_login|' . $this->_app->getVersion() . '|2.3';
+      $this->signature = 'paypal|paypal_login|' . $this->_app->getVersion() . '|2.4';
 
-      $this->code = 'login/PayPal\LOGIN';
+      $this->code = 'LOGIN';
       $this->group = 'login';
 
       $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), OSCOM::link('index.php', 'A&PayPal&Configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), $this->_app->link('Configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->sort_order = defined('OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER') ? OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER : 0;
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
-        $this->sort_order = OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER;
         $this->enabled = in_array(OSCOM_APP_PAYPAL_LOGIN_STATUS, array('1', '0'));
 
         if ( OSCOM_APP_PAYPAL_LOGIN_STATUS == '0' ) {
@@ -256,18 +257,13 @@
           $login_customer_id = $_SESSION['paypal_login_customer_id'];
 
 // Register PayPal Express Checkout as the default payment method
-          if ( !isset($_SESSION['payment']) || ($_SESSION['payment'] != 'paypal_express') ) {
+          if ( !isset($_SESSION['payment']) || ($_SESSION['payment'] != 'PayPal\PayPal\EC') ) {
             if (defined('MODULE_PAYMENT_INSTALLED') && !empty(MODULE_PAYMENT_INSTALLED)) {
-              if ( in_array('paypal_express.php', explode(';', MODULE_PAYMENT_INSTALLED)) ) {
-                if ( !class_exists('paypal_express') ) {
-                  include(DIR_WS_LANGUAGES . $_SESSION['language'] . '/modules/payment/paypal_express.php');
-                  include(DIR_WS_MODULES . 'payment/paypal_express.php');
-                }
-
-                $ppe = new paypal_express();
+              if ( in_array('PayPal\PayPal\EC', explode(';', MODULE_PAYMENT_INSTALLED)) ) {
+                $ppe = new PaymentModuleEC();
 
                 if ( $ppe->enabled ) {
-                  $_SESSION['payment'] = 'paypal_express';
+                  $_SESSION['payment'] = 'PayPal\PayPal\EC';
                 }
               }
             }
@@ -287,11 +283,11 @@
     }
 
     function install() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Install&module=LOGIN');
+      $this->_app->redirect('Configure&Install&module=LOGIN');
     }
 
     function remove() {
-      OSCOM::redirect('index.php', 'A&PayPal&Configure&Uninstall&module=LOGIN');
+      $this->_app->redirect('Configure&Uninstall&module=LOGIN');
     }
 
     function keys() {

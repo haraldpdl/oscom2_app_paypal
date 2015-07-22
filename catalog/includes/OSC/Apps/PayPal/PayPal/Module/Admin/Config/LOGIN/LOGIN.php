@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN;
 
 use OSC\OM\OSCOM;
 
-class LOGIN extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
+class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
 {
     protected $_cm_code = 'login/cm_paypal_login';
 
@@ -42,7 +42,7 @@ class LOGIN extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::install();
 
         $installed = explode(';', MODULE_CONTENT_INSTALLED);
-        $installed[] = 'login/' . $this->app->code . '\\' . $this->code;
+        $installed[] = 'login/' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
         $this->app->saveParameter('MODULE_CONTENT_INSTALLED', implode(';', $installed));
     }
@@ -52,7 +52,7 @@ class LOGIN extends \OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract
         parent::uninstall();
 
         $installed = explode(';', MODULE_CONTENT_INSTALLED);
-        $installed_pos = array_search('login/' . $this->app->code . '\\' . $this->code, $installed);
+        $installed_pos = array_search('login/' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code, $installed);
 
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);

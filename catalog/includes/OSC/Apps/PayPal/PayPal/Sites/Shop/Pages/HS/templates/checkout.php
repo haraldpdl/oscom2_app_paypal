@@ -14,7 +14,7 @@ $OSCOM_Page = Registry::get('Site')->getPage();
 </head>
 <body>
 <div style="text-align: center;">
-  <?php echo HTML::image('public/Apps/PayPal/images/HS_load.gif'); ?>
+  <?php echo HTML::image('public/Apps/PayPal/PayPal/images/HS_load.gif'); ?>
 </div>
 
 <form name="pphs" action="<?php echo $OSCOM_Page->data['form_url']; ?>" method="post" <?php echo ($OSCOM_Page->data['is_error'] == true ? 'target="_top"' : ''); ?>>

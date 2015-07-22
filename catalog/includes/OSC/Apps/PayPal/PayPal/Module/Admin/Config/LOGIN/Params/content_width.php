@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\LOGIN\Params;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class content_width extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class content_width extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $default = 'Full';
     public $app_configured = false;

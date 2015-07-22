@@ -6,14 +6,14 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Shop\Pages\EC;
+namespace OSC\Apps\PayPal\PayPal\Sites\Shop\Pages\EC;
 
 use OSC\OM\HTML;
 use OSC\OM\HTTP;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\Apps\PayPal\Module\Payment\EC as PaymentModuleEC;
+use OSC\Apps\PayPal\PayPal\Module\Payment\EC as PaymentModuleEC;
 
 class EC extends \OSC\OM\PagesAbstract
 {
@@ -370,7 +370,7 @@ class EC extends \OSC\OM\PagesAbstract
                 }
             }
 
-            $_SESSION['payment'] = $this->pm->code;
+            $_SESSION['payment'] = $this->pm->_app->vendor . '\\' . $this->pm->_app->code . '\\' . $this->pm->code;
 
             $force_login = false;
 

@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\API;
+namespace OSC\Apps\PayPal\PayPal\API;
 
 use OSC\OM\OSCOM;
 
-class PayflowSetExpressCheckout extends \OSC\Apps\PayPal\APIAbstract
+class PayflowSetExpressCheckout extends \OSC\Apps\PayPal\PayPal\APIAbstract
 {
     protected $type = 'payflow';
 

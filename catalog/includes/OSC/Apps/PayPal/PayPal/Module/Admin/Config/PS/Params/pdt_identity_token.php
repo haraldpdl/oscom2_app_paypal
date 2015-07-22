@@ -6,11 +6,11 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Admin\Config\PS\Params;
+namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\PS\Params;
 
 use OSC\OM\HTML;
 
-class pdt_identity_token extends \OSC\Apps\PayPal\Module\Admin\Config\ParamsAbstract
+class pdt_identity_token extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
 {
     public $sort_order = 650;
 

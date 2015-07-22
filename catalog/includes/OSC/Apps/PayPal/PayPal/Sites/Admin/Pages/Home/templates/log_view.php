@@ -7,7 +7,6 @@
   */
 
 use OSC\OM\HTML;
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 $OSCOM_Page = Registry::get('Site')->getPage();
@@ -16,7 +15,7 @@ require(__DIR__ . '/template_top.php');
 ?>
 
 <div style="text-align: right; padding-bottom: 15px;">
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_back'), OSCOM::link('index.php', 'A&PayPal&Log&page=' . $_GET['page']), 'info'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_back'), $OSCOM_PayPal->link('Log&page=' . $_GET['page']), 'info'); ?>
 </div>
 
 <table class="pp-table pp-table-hover" width="100%">

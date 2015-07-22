@@ -7,7 +7,6 @@
   */
 
 use OSC\OM\HTML;
-use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 $OSCOM_Page = Registry::get('Site')->getPage();
@@ -24,7 +23,7 @@ require(__DIR__ . '/template_top.php');
 <?php
 foreach ($OSCOM_PayPal->getConfigModules() as $m) {
     if ($OSCOM_PayPal->getConfigModuleInfo($m, 'is_installed') === true) {
-        echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getConfigModuleInfo($m, 'short_title'), OSCOM::link('index.php', 'A&PayPal&Configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
+        echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getConfigModuleInfo($m, 'short_title'), $OSCOM_PayPal->link('Configure&module=' . $m), 'info', 'data-module="' . $m . '"') . "\n";
     }
 }
 
@@ -38,7 +37,7 @@ echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('section_more'), '#', 'info
 <?php
 foreach ($OSCOM_PayPal->getConfigModules() as $m) {
     if ($OSCOM_PayPal->getConfigModuleInfo($m, 'is_installed') === false) {
-        echo '<li><a href="' . OSCOM::link('index.php', 'A&PayPal&Configure&module=' . $m) . '">' . $OSCOM_PayPal->getConfigModuleInfo($m, 'title') . '</a></li>';
+        echo '<li><a href="' . $OSCOM_PayPal->link('Configure&module=' . $m) . '">' . $OSCOM_PayPal->getConfigModuleInfo($m, 'title') . '</a></li>';
     }
 }
 ?>
@@ -80,7 +79,7 @@ if ($OSCOM_PayPal_Config->is_installed === true) {
     }
 ?>
 
-<form name="paypalConfigure" action="<?php echo OSCOM::link('index.php', 'A&PayPal&Configure&Process&module=' . $current_module); ?>" method="post" class="pp-form">
+<form name="paypalConfigure" action="<?php echo $OSCOM_PayPal->link('Configure&Process&module=' . $current_module); ?>" method="post" class="pp-form">
 
 <h3 class="pp-panel-header-info"><?php echo $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title'); ?></h3>
 <div class="pp-panel pp-panel-info" style="padding-bottom: 15px;">
@@ -123,7 +122,7 @@ $(function() {
     modal: true,
     buttons: {
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_uninstall')); ?>": function() {
-        window.location = '<?php echo OSCOM::link('index.php', 'A&PayPal&Configure&Uninstall&module=' . $current_module); ?>';
+        window.location = '<?php echo addslashes($OSCOM_PayPal->link('Configure&Uninstall&module=' . $current_module)); ?>';
       },
       "<?php echo addslashes($OSCOM_PayPal->getDef('button_cancel')); ?>": function() {
         $(this).dialog('close');
@@ -150,7 +149,7 @@ $(function() {
 </div>
 
 <p>
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_install_title', array('title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title'))), OSCOM::link('index.php', 'A&PayPal&Configure&Install&module=' . $current_module), 'success'); ?>
+  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_install_title', array('title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title'))), $OSCOM_PayPal->link('Configure&Install&module=' . $current_module), 'success'); ?>
 </p>
 
 <?php

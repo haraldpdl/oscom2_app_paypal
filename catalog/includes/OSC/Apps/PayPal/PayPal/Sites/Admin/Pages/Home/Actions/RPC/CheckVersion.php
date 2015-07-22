@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
+namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
 use OSC\OM\HTTP;
 use OSC\OM\Registry;
@@ -23,7 +23,7 @@ class CheckVersion extends \OSC\OM\PagesActionsAbstract
             ];
 
             $response = @json_decode(HTTP::getResponse([
-                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3))
+                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_4&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3))
             ]), true);
 
             if (is_array($response) && isset($response['rpcStatus']) && ($response['rpcStatus'] === 1)) {
@@ -49,7 +49,7 @@ class CheckVersion extends \OSC\OM\PagesActionsAbstract
             $result = 'rpcStatus=-1';
 
             $response = HTTP::getResponse([
-                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_3&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3)) . '&format=simple'
+                'url' => 'http://apps.oscommerce.com/index.php?RPC&GetUpdates&paypal&app&2_4&' . str_replace('.', '_', number_format($OSCOM_PayPal->getVersion(), 3)) . '&format=simple'
             ]);
 
             if (!empty($response) && (strpos($response, 'rpcStatus') !== false)) {

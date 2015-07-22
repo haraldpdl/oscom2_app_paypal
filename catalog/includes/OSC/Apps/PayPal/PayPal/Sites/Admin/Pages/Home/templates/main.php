@@ -6,8 +6,6 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-use OSC\OM\OSCOM;
-
 require(__DIR__ . '/template_top.php');
 ?>
 
@@ -21,7 +19,7 @@ if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
     <div style="padding: 2px;">
       <h3 class="pp-panel-header-info"><?php echo $OSCOM_PayPal->getDef('onboarding_intro_title'); ?></h3>
       <div class="pp-panel pp-panel-info">
-        <?php echo $OSCOM_PayPal->getDef('onboarding_intro_body', array('button_retrieve_live_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), OSCOM::link('index.php', 'A&PayPal&Start&Process&type=live'), 'info'), 'button_retrieve_sandbox_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), OSCOM::link('index.php', 'A&PayPal&Start&Process&type=sandbox'), 'info'))); ?>
+        <?php echo $OSCOM_PayPal->getDef('onboarding_intro_body', array('button_retrieve_live_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), $OSCOM_PayPal->link('Start&Process&type=live'), 'info'), 'button_retrieve_sandbox_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), $OSCOM_PayPal->link('Start&Process&type=sandbox'), 'info'))); ?>
       </div>
     </div>
   </div>
@@ -34,7 +32,7 @@ if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
     <div style="padding: 2px;">
       <h3 class="pp-panel-header-warning"><?php echo $OSCOM_PayPal->getDef('manage_credentials_title'); ?></h3>
       <div class="pp-panel pp-panel-warning">
-        <?php echo $OSCOM_PayPal->getDef('manage_credentials_body', array('button_manage_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_manage_credentials'), OSCOM::link('index.php', 'A&PayPal&Credentials'), 'warning'))); ?>
+        <?php echo $OSCOM_PayPal->getDef('manage_credentials_body', array('button_manage_credentials' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_manage_credentials'), $OSCOM_PayPal->link('Credentials'), 'warning'))); ?>
       </div>
     </div>
   </div>

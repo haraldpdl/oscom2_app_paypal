@@ -6,9 +6,9 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\API;
+namespace OSC\Apps\PayPal\PayPal\API;
 
-class PayflowRefund extends \OSC\Apps\PayPal\APIAbstract
+class PayflowRefund extends \OSC\Apps\PayPal\PayPal\APIAbstract
 {
     protected $type = 'payflow';
 

@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Hooks\Shop\Account;
+namespace OSC\Apps\PayPal\PayPal\Module\Hooks\Shop\Account;
 
 class Logout implements \OSC\OM\Modules\HooksInterface
 {

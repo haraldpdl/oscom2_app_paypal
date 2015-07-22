@@ -6,8 +6,6 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-use OSC\OM\OSCOM;
-
 require(__DIR__ . '/template_top.php');
 ?>
 
@@ -29,9 +27,9 @@ $(function() {
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'update' ) {
       OSCOM.APP.PAYPAL.doUpdate();
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'retrieveFresh' ) {
-      window.location('<?php echo OSCOM::link('index.php', 'A&PayPal&Update'); ?>');
+      window.location('<?php echo $OSCOM_PayPal->link('Update'); ?>');
     } else if ( OSCOM.APP.PAYPAL.getUpdatesProgress == 'manualDownload' ) {
-      window.open('http://apps.oscommerce.com/index.php?Info&paypal&app');
+      window.open('http://apps.oscommerce.com/index.php?Info&paypal&paypal');
     }
   });
 
@@ -54,7 +52,7 @@ $(function() {
 
     $('#ppUpdateInfo').append('<div class="pp-panel pp-panel-info"><p>' + def['retrieving_update_list'] + '</p></div>');
 
-    $.get('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&CheckVersion'); ?>', function (data) {
+    $.get('<?php echo addslashes($OSCOM_PayPal->link('RPC&CheckVersion')); ?>', function (data) {
       var error = false;
 
       $('#ppUpdateInfo').empty();
@@ -195,11 +193,11 @@ $(function() {
 
         $('#ppUpdateInfo div').append('<p>' + def['downloading_version_progress'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</p>');
 
-        $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&DownloadUpdate&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+        $.getJSON('<?php echo addslashes($OSCOM_PayPal->link('RPC&DownloadUpdate&v=APPDLV')); ?>'.replace('APPDLV', versions[i]), function (data) {
           if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
             $('#ppUpdateInfo div').append('<p>' + def['applying_version_progress'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</p>');
 
-            $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&ApplyUpdate&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+            $.getJSON('<?php echo addslashes($OSCOM_PayPal->link('RPC&ApplyUpdate&v=APPDLV')); ?>'.replace('APPDLV', versions[i]), function (data) {
               if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
               } else {
                 updateError = true;
@@ -210,7 +208,7 @@ $(function() {
 
                 $('#ppUpdateInfo').append('<h3 class="pp-panel-header-error">' + def['error_applying_heading'].replace(':version', OSCOM.htmlSpecialChars(versions[i])) + '</h3><div id="ppUpdateErrorLog" class="pp-panel pp-panel-error"><p>' + def['error_applying'] + '</p></div>');
 
-                $.getJSON('<?php echo OSCOM::link('index.php', 'A&PayPal&RPC&LogUpdate&v=APPDLV'); ?>'.replace('APPDLV', versions[i]), function (data) {
+                $.getJSON('<?php echo addslashes($OSCOM_PayPal->link('RPC&LogUpdate&v=APPDLV')); ?>'.replace('APPDLV', versions[i]), function (data) {
                   if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
                     $('#ppUpdateErrorLog').append('<p>' + OSCOM.nl2br(OSCOM.htmlSpecialChars(data['log'])) + '</p>');
                   }

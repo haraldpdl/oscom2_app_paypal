@@ -6,7 +6,7 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal;
+namespace OSC\Apps\PayPal\PayPal;
 
 use OSC\OM\HTML;
 use OSC\OM\HTTP;
@@ -43,8 +43,8 @@ class PayPal extends \OSC\OM\AppAbstract
         if (!isset($countries)) {
             $countries = [];
 
-            if (file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/req_api_countries.txt')) {
-                foreach (file(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/req_api_countries.txt') as $c) {
+            if (file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/req_api_countries.txt')) {
+                foreach (file(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/req_api_countries.txt') as $c) {
                     $c = trim($c);
 
                     if (!empty($c)) {
@@ -148,14 +148,14 @@ class PayPal extends \OSC\OM\AppAbstract
         if (!isset($result)) {
             $result = [];
 
-            $directory = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/Module/Admin/Config';
+            $directory = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/Module/Admin/Config';
 
             if ($dir = new \DirectoryIterator($directory)) {
                 foreach ($dir as $file) {
                     if (!$file->isDot() && $file->isDir() && file_exists($file->getPathname() . '/' . $file->getFilename() . '.php')) {
-                        $class = 'OSC\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename();
+                        $class = 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename();
 
-                        if (is_subclass_of($class, 'OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract')) {
+                        if (is_subclass_of($class, 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract')) {
                             $sort_order = $this->getConfigModuleInfo($file->getFilename(), 'sort_order');
 
                             if ($sort_order > 0) {
@@ -176,7 +176,7 @@ class PayPal extends \OSC\OM\AppAbstract
                                 break;
                             }
                         } else {
-                            trigger_error('OSC\Apps\PayPal\PayPal::getConfigModules(): OSC\Apps\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename() . ' is not a subclass of OSC\Apps\PayPal\Module\Admin\Config\ConfigAbstract and cannot be loaded.');
+                            trigger_error('OSC\Apps\PayPal\PayPal\PayPal::getConfigModules(): OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $file->getFilename() . '\\' . $file->getFilename() . ' is not a subclass of OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract and cannot be loaded.');
                         }
                     }
                 }
@@ -191,7 +191,7 @@ class PayPal extends \OSC\OM\AppAbstract
     public function getConfigModuleInfo($module, $info)
     {
         if (!Registry::exists('PayPalAdminConfig' . $module)) {
-            $class = 'OSC\Apps\PayPal\Module\Admin\Config\\' . $module . '\\' . $module;
+            $class = 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $module . '\\' . $module;
 
             Registry::set('PayPalAdminConfig' . $module, new $class);
         }
@@ -294,7 +294,7 @@ class PayPal extends \OSC\OM\AppAbstract
 // APP calls require $server to be "live" or "sandbox"
     public function getApiResult($module, $call, array $extra_params = null, $server = null, $is_ipn = false)
     {
-        $class = 'OSC\Apps\PayPal\API\\' . $call;
+        $class = 'OSC\Apps\PayPal\PayPal\API\\' . $call;
 
         $API = new $class($server);
 
@@ -320,7 +320,7 @@ class PayPal extends \OSC\OM\AppAbstract
         }
 
         if ((substr($server['host'], -10) == 'paypal.com')) {
-            $p['cafile'] = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/paypal.com.crt';
+            $p['cafile'] = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/paypal.com.crt';
         }
 
         if (defined('OSCOM_APP_PAYPAL_PROXY')) {
@@ -552,8 +552,8 @@ class PayPal extends \OSC\OM\AppAbstract
     }
 
     function logUpdate($message, $version) {
-      if ( is_writable(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work') ) {
-        file_put_contents(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
+      if ( is_writable(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/work') ) {
+        file_put_contents(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/work/update_log-' . $version . '.php', '[' . date('d-M-Y H:i:s') . '] ' . $message . "\n", FILE_APPEND);
       }
     }
 
@@ -564,7 +564,7 @@ class PayPal extends \OSC\OM\AppAbstract
         $this->loadLanguageFile($filename, 'english');
       }
 
-      $pathname = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/languages/' . $lang . '/' . $filename;
+      $pathname = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/languages/' . $lang . '/' . $filename;
 
       if ( file_exists($pathname) ) {
         $contents = file($pathname);

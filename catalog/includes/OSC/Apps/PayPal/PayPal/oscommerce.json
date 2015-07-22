@@ -1,5 +1,6 @@
 {
-	"title":	"PayPal",
+	"title":	"PayPal App",
+	"app":		"PayPal",
 	"vendor":	"PayPal",
 	"version":	5.0,
 	"req_core_version":	2.4,

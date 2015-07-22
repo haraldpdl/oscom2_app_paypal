@@ -6,13 +6,13 @@
   * @license GPL; http://www.oscommerce.com/gpllicense.txt
   */
 
-namespace OSC\Apps\PayPal\Module\Hooks\Admin\Orders;
+namespace OSC\Apps\PayPal\PayPal\Module\Hooks\Admin\Orders;
 
 use OSC\OM\HTML;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
-use OSC\Apps\PayPal\PayPal as PayPalApp;
+use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
 class PageTab implements \OSC\OM\Modules\HooksInterface
 {
