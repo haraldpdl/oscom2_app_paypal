@@ -18,20 +18,18 @@ use OSC\Apps\PayPal\PayPal\Module\Payment\EC as PaymentModuleEC;
 class EC extends \OSC\OM\PagesAbstract
 {
     protected $file = null;
-    protected $db;
+    protected $use_site_template = false;
     protected $pm;
-    public $data;
 
     protected function init()
     {
-        $this->db = Registry::get('Db');
         $this->pm = new PaymentModuleEC();
 
         if (!$this->pm->check() || !$this->pm->enabled) {
             OSCOM::redirect('shopping_cart.php', '', 'SSL');
         }
 
-        include(OSCOM::BASE_DIR . 'languages/' . $_SESSION['language'] . '/create_account.php');
+        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/create_account.php');
 
         if (!isset($_SESSION['sendto'])) {
             if (isset($_SESSION['customer_id'])) {
@@ -168,7 +166,7 @@ class EC extends \OSC\OM\PagesAbstract
             $log_sane['SHIPTOSTATE'] = $_POST['SHIPTOSTATE'];
             $log_sane['SHIPTOCOUNTRY'] = $_POST['SHIPTOCOUNTRY'];
 
-            $Qcountry = $this->db->get('countries', '*', [
+            $Qcountry = $this->pm->app->db->get('countries', '*', [
                 'countries_iso_code_2' => $_SESSION['sendto']['country_name']
             ], null, 1);
 
@@ -181,7 +179,7 @@ class EC extends \OSC\OM\PagesAbstract
             }
 
             if ($_SESSION['sendto']['country_id'] > 0) {
-                $Qzone = $this->db->prepare('select * from :zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+                $Qzone = $this->pm->app->db->prepare('select * from :zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
                 $Qzone->bindInt(':zone_country_id', $_SESSION['sendto']['country_id']);
                 $Qzone->bindValue(':zone_name', $_SESSION['sendto']['zone_name']);
                 $Qzone->bindValue(':zone_code', $_SESSION['sendto']['zone_name']);
@@ -197,7 +195,7 @@ class EC extends \OSC\OM\PagesAbstract
 
             $quotes_array = [];
 
-            include(OSCOM::BASE_DIR . 'classes/order.php');
+            include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order.php');
             $order = new \order();
 
             if ($_SESSION['cart']->get_content_type() != 'virtual') {
@@ -205,7 +203,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $total_count = $_SESSION['cart']->count_contents();
 
 // load all enabled shipping modules
-                include(OSCOM::BASE_DIR . 'classes/shipping.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/shipping.php');
                 $shipping_modules = new \shipping();
 
                 $free_shipping = false;
@@ -234,7 +232,7 @@ class EC extends \OSC\OM\PagesAbstract
                     if (($pass == true) && ($order->info['total'] >= MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER)) {
                         $free_shipping = true;
 
-                        include(OSCOM::BASE_DIR . 'languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
+                        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
                     }
                 }
 
@@ -276,7 +274,7 @@ class EC extends \OSC\OM\PagesAbstract
                 ];
             }
 
-            include(OSCOM::BASE_DIR . 'includes/classes/order_total.php');
+            include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order_total.php');
             $order_total_modules = new \order_total();
             $order_totals = $order_total_modules->process();
 
@@ -295,11 +293,11 @@ class EC extends \OSC\OM\PagesAbstract
                 foreach ($quotes_array as $quote) {
                     $params['L_SHIPPINGOPTIONNAME' . $counter] = $quote['name'];
                     $params['L_SHIPPINGOPTIONLABEL' . $counter] = $quote['label'];
-                    $params['L_SHIPPINGOPTIONAMOUNT' . $counter] = $this->pm->_app->formatCurrencyRaw($quote['cost'] + tep_calculate_tax($quote['cost'], $quote['tax']));
+                    $params['L_SHIPPINGOPTIONAMOUNT' . $counter] = $this->pm->app->formatCurrencyRaw($quote['cost'] + tep_calculate_tax($quote['cost'], $quote['tax']));
                     $params['L_SHIPPINGOPTIONISDEFAULT' . $counter] = 'false';
 
                     if (DISPLAY_PRICE_WITH_TAX == 'false') {
-                        $params['L_TAXAMT' . $counter] = $this->pm->_app->formatCurrencyRaw($order->info['tax']);
+                        $params['L_TAXAMT' . $counter] = $this->pm->app->formatCurrencyRaw($order->info['tax']);
                     }
 
                     $counter++;
@@ -316,12 +314,12 @@ class EC extends \OSC\OM\PagesAbstract
 
             $post_string = substr($post_string, 0, -1);
 
-            $this->pm->_app->log('EC', 'CallbackResponse', 1, $log_sane, $params);
+            $this->pm->app->log('EC', 'CallbackResponse', 1, $log_sane, $params);
 
             echo $post_string;
         }
 
-        tep_session_destroy();
+        Registry::get('Session')->kill();
     }
 
     protected function doRetrieve()
@@ -334,11 +332,11 @@ class EC extends \OSC\OM\PagesAbstract
 
         if (!isset($_SESSION['appPayPalEcResult']) || ($_SESSION['appPayPalEcResult']['TOKEN'] != $_GET['token'])) {
             if (OSCOM_APP_PAYPAL_GATEWAY == '1') { // PayPal
-                $_SESSION['appPayPalEcResult'] = $this->pm->_app->getApiResult('EC', 'GetExpressCheckoutDetails', [
+                $_SESSION['appPayPalEcResult'] = $this->pm->app->getApiResult('EC', 'GetExpressCheckoutDetails', [
                     'TOKEN' => $_GET['token']
                 ]);
             } else { // Payflow
-                $_SESSION['appPayPalEcResult'] = $this->pm->_app->getApiResult('EC', 'PayflowGetExpressCheckoutDetails', [
+                $_SESSION['appPayPalEcResult'] = $this->pm->app->getApiResult('EC', 'PayflowGetExpressCheckoutDetails', [
                     'TOKEN' => $_GET['token']
                 ]);
             }
@@ -370,7 +368,7 @@ class EC extends \OSC\OM\PagesAbstract
                 }
             }
 
-            $_SESSION['payment'] = $this->pm->_app->vendor . '\\' . $this->pm->_app->code . '\\' . $this->pm->code;
+            $_SESSION['payment'] = $this->pm->app->vendor . '\\' . $this->pm->app->code . '\\' . $this->pm->code;
 
             $force_login = false;
 
@@ -384,7 +382,7 @@ class EC extends \OSC\OM\PagesAbstract
                 if (!tep_validate_email($email_address)) {
                     $force_redirect = true;
                 } else {
-                    $Qcheck = $this->db->get('customers', '*', [
+                    $Qcheck = $this->pm->app->db->get('customers', '*', [
                         'customers_email_address' => $email_address
                     ], null, 1);
 
@@ -418,11 +416,11 @@ class EC extends \OSC\OM\PagesAbstract
                             $sql_data_array['customers_telephone'] = $customers_telephone;
                         }
 
-                        $this->db->save('customers', $sql_data_array);
+                        $this->pm->app->db->save('customers', $sql_data_array);
 
-                        $_SESSION['customer_id'] = $this->db->lastInsertId();
+                        $_SESSION['customer_id'] = $this->pm->app->db->lastInsertId();
 
-                        $this->db->save('customers_info', [
+                        $this->pm->app->db->save('customers_info', [
                             'customers_info_id' => $_SESSION['customer_id'],
                             'customers_info_number_of_logons' => '0',
                             'customers_info_date_account_created' => 'now()'
@@ -432,7 +430,7 @@ class EC extends \OSC\OM\PagesAbstract
                         if (!defined('MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS') || (MODULE_CONTENT_ACCOUNT_SET_PASSWORD_STATUS != 'True')) {
                             $customer_password = tep_create_random_value(max(ENTRY_PASSWORD_MIN_LENGTH, 8));
 
-                            $this->db->save('customers', [
+                            $this->pm->app->db->save('customers', [
                                 'customers_password' => tep_encrypt_password($customer_password)
                             ], [
                                 'customers_id' => $_SESSION['customer_id']
@@ -440,14 +438,22 @@ class EC extends \OSC\OM\PagesAbstract
 
 // build the message content
                             $name = $customers_firstname . ' ' . $customers_lastname;
-                            $email_text = sprintf(EMAIL_GREET_NONE, $customers_firstname) . EMAIL_WELCOME . $this->pm->_app->getDef('module_ec_email_account_password', array('email_address' => $email_address, 'password' => $customer_password)) . "\n\n" . EMAIL_TEXT . EMAIL_CONTACT . EMAIL_WARNING;
+                            $email_text = sprintf(EMAIL_GREET_NONE, $customers_firstname) .
+                                          EMAIL_WELCOME .
+                                          $this->pm->app->getDef('module_ec_email_account_password', [
+                                              ':email_address' => $email_address,
+                                              ':password' => $customer_password
+                                          ]) . "\n\n" .
+                                          EMAIL_TEXT .
+                                          EMAIL_CONTACT .
+                                          EMAIL_WARNING;
                             tep_mail($name, $email_address, EMAIL_SUBJECT, $email_text, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
                         }
                     }
                 }
 
                 if ($force_redirect === true) {
-                    $messageStack->add_session('login', $this->pm->_app->getDef('module_ec_error_local_login_required'), 'warning');
+                    $messageStack->add_session('login', $this->pm->app->getDef('module_ec_error_local_login_required'), 'warning');
 
                     $_SESSION['navigation']->set_snapshot();
 
@@ -461,12 +467,7 @@ class EC extends \OSC\OM\PagesAbstract
                     return false;
                 }
 
-                if (SESSION_RECREATE == 'True') {
-                    tep_session_recreate();
-                }
-
-// reset session token
-                $_SESSION['sessiontoken'] = md5(tep_rand() . tep_rand() . tep_rand() . tep_rand());
+                Registry::get('Session')->recreate();
             }
 
 // check if paypal shipping address exists in the address book
@@ -492,7 +493,7 @@ class EC extends \OSC\OM\PagesAbstract
             $ship_country_id = 0;
             $ship_address_format_id = 1;
 
-            $Qcountry = $this->db->get('countries', [
+            $Qcountry = $this->pm->app->db->get('countries', [
                 'countries_id',
                 'address_format_id'
             ], [
@@ -503,7 +504,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $ship_country_id = $Qcountry->valueInt('countries_id');
                 $ship_address_format_id = $Qcountry->valueInt('address_format_id');
 
-                $Qzone = $this->db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+                $Qzone = $this->pm->app->db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
                 $Qzone->bindInt(':zone_country_id', $ship_country_id);
                 $Qzone->bindValue(':zone_name', $ship_zone);
                 $Qzone->bindValue(':zone_code', $ship_zone);
@@ -514,7 +515,7 @@ class EC extends \OSC\OM\PagesAbstract
                 }
             }
 
-            $Qcheck = $this->db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
+            $Qcheck = $this->pm->app->db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
             $Qcheck->bindInt(':customers_id', $_SESSION['customer_id']);
             $Qcheck->bindValue(':entry_firstname', $ship_firstname);
             $Qcheck->bindValue(':entry_lastname', $ship_lastname);
@@ -550,14 +551,14 @@ class EC extends \OSC\OM\PagesAbstract
                     }
                 }
 
-                $this->db->save('address_book', $sql_data_array);
+                $this->pm->app->db->save('address_book', $sql_data_array);
 
-                $address_id = $this->db->lastInsertId();
+                $address_id = $this->pm->app->db->lastInsertId();
 
                 $_SESSION['sendto'] = $address_id;
 
                 if (!isset($_SESSION['customer_default_address_id'])) {
-                    $this->db->save('customers', [
+                    $this->pm->app->db->save('customers', [
                         'customers_default_address_id' => $address_id
                     ], [
                         'customers_id' => $_SESSION['customer_id']
@@ -574,7 +575,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $_SESSION['customer_zone_id'] = $ship_zone_id;
             }
 
-            include(OSCOM::BASE_DIR . 'classes/order.php');
+            include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order.php');
             $order = new \order();
 
             if ($_SESSION['cart']->get_content_type() != 'virtual') {
@@ -582,7 +583,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $total_count = $_SESSION['cart']->count_contents();
 
 // load all enabled shipping modules
-                include(OSCOM::BASE_DIR . 'classes/shipping.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/shipping.php');
                 $shipping_modules = new \shipping();
 
                 $free_shipping = false;
@@ -611,7 +612,7 @@ class EC extends \OSC\OM\PagesAbstract
                     if (($pass == true) && ($order->info['total'] >= MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER)) {
                         $free_shipping = true;
 
-                        include(OSCOM::BASE_DIR . 'languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
+                        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
                     }
                 }
 
@@ -626,14 +627,14 @@ class EC extends \OSC\OM\PagesAbstract
 
                         $shipping_set = false;
 
-                        if ((OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1') && ((OSCOM_APP_PAYPAL_EC_STATUS == '0') || ((OSCOM_APP_PAYPAL_EC_STATUS == '1') && (ENABLE_SSL == true))) && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0')) { // Live server requires SSL to be enabled
+                        if ((OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1') && ((OSCOM_APP_PAYPAL_EC_STATUS == '0') || ((OSCOM_APP_PAYPAL_EC_STATUS == '1') && (OSCOM::getConfig('ssl', 'Shop') == 'true'))) && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0')) { // Live server requires SSL to be enabled
 // if available, set the selected shipping rate from PayPals order review page
                             if (isset($_SESSION['appPayPalEcResult']['SHIPPINGOPTIONNAME']) && isset($_SESSION['appPayPalEcResult']['SHIPPINGOPTIONAMOUNT'])) {
                                 foreach ($quotes as $quote) {
                                     if (!isset($quote['error'])) {
                                         foreach ($quote['methods'] as $rate) {
                                             if ($_SESSION['appPayPalEcResult']['SHIPPINGOPTIONNAME'] == trim($quote['module'] . ' ' . $rate['title'])) {
-                                                $shipping_rate = $this->pm->_app->formatCurrencyRaw($rate['cost'] + tep_calculate_tax($rate['cost'], $quote['tax']));
+                                                $shipping_rate = $this->pm->app->formatCurrencyRaw($rate['cost'] + tep_calculate_tax($rate['cost'], $quote['tax']));
 
                                                 if ($_SESSION['appPayPalEcResult']['SHIPPINGOPTIONAMOUNT'] == $shipping_rate) {
                                                     $_SESSION['shipping'] = $quote['id'] . '_' . $rate['id'];
@@ -656,7 +657,7 @@ class EC extends \OSC\OM\PagesAbstract
                     if (defined('SHIPPING_ALLOW_UNDEFINED_ZONES') && (SHIPPING_ALLOW_UNDEFINED_ZONES == 'False')) {
                         unset($_SESSION['shipping']);
 
-                        $messageStack->add_session('checkout_address', $this->pm->_app->getDef('module_ec_error_no_shipping_available'), 'error');
+                        $messageStack->add_session('checkout_address', $this->pm->app->getDef('module_ec_error_no_shipping_available'), 'error');
 
                         $_SESSION['appPayPalEcRightTurn'] = true;
 
@@ -736,7 +737,7 @@ class EC extends \OSC\OM\PagesAbstract
             }
         }
 
-        include(OSCOM::BASE_DIR . 'classes/order.php');
+        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order.php');
         $order = new \order();
 
         $params = [];
@@ -769,9 +770,9 @@ class EC extends \OSC\OM\PagesAbstract
 
         foreach ($order->products as $product) {
             if (DISPLAY_PRICE_WITH_TAX == 'true') {
-                $product_price = $this->pm->_app->formatCurrencyRaw($product['final_price'] + tep_calculate_tax($product['final_price'], $product['tax']));
+                $product_price = $this->pm->app->formatCurrencyRaw($product['final_price'] + tep_calculate_tax($product['final_price'], $product['tax']));
             } else {
-                $product_price = $this->pm->_app->formatCurrencyRaw($product['final_price']);
+                $product_price = $this->pm->app->formatCurrencyRaw($product['final_price']);
             }
 
             if (OSCOM_APP_PAYPAL_GATEWAY == '1') { // PayPal
@@ -813,9 +814,9 @@ class EC extends \OSC\OM\PagesAbstract
             }
         }
 
-        $paypal_item_total = $this->pm->_app->formatCurrencyRaw($order->info['subtotal']);
+        $paypal_item_total = $this->pm->app->formatCurrencyRaw($order->info['subtotal']);
 
-        if ((OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1') && ((OSCOM_APP_PAYPAL_EC_STATUS == '0') || ((OSCOM_APP_PAYPAL_EC_STATUS == '1') && (ENABLE_SSL == true))) && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0')) { // Live server requires SSL to be enabled
+        if ((OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_INSTANT_UPDATE == '1') && ((OSCOM_APP_PAYPAL_EC_STATUS == '0') || ((OSCOM_APP_PAYPAL_EC_STATUS == '1') && (OSCOM::getConfig('ssl', 'Shop') == 'true'))) && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0')) { // Live server requires SSL to be enabled
             $quotes_array = [];
 
             if ($_SESSION['cart']->get_content_type() != 'virtual') {
@@ -823,7 +824,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $total_count = $_SESSION['cart']->count_contents();
 
 // load all enabled shipping modules
-                include(OSCOM::BASE_DIR . 'classes/shipping.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/shipping.php');
                 $shipping_modules = new \shipping();
 
                 $free_shipping = false;
@@ -852,7 +853,7 @@ class EC extends \OSC\OM\PagesAbstract
                     if (($pass == true) && ($order->info['total'] >= MODULE_ORDER_TOTAL_SHIPPING_FREE_SHIPPING_OVER)) {
                         $free_shipping = true;
 
-                        include(OSCOM::BASE_DIR . 'languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
+                        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/modules/order_total/ot_shipping.php');
                     }
                 }
 
@@ -887,7 +888,7 @@ class EC extends \OSC\OM\PagesAbstract
                     if (defined('SHIPPING_ALLOW_UNDEFINED_ZONES') && (SHIPPING_ALLOW_UNDEFINED_ZONES == 'False')) {
                         unset($_SESSION['shipping']);
 
-                        $messageStack->add_session('checkout_address', $this->pm->_app->getDef('module_ec_error_no_shipping_available'), 'error');
+                        $messageStack->add_session('checkout_address', $this->pm->app->getDef('module_ec_error_no_shipping_available'), 'error');
 
                         OSCOM::redirect('checkout_shipping_address.php', '', 'SSL');
                     }
@@ -899,7 +900,7 @@ class EC extends \OSC\OM\PagesAbstract
             $default_shipping = null;
 
             foreach ($quotes_array as $quote) {
-                $shipping_rate = $this->pm->_app->formatCurrencyRaw($quote['cost'] + tep_calculate_tax($quote['cost'], $quote['tax']));
+                $shipping_rate = $this->pm->app->formatCurrencyRaw($quote['cost'] + tep_calculate_tax($quote['cost'], $quote['tax']));
 
                 $item_params['L_SHIPPINGOPTIONNAME' . $counter] = trim($quote['name'] . ' ' . $quote['label']);
                 $item_params['L_SHIPPINGOPTIONAMOUNT' . $counter] = $shipping_rate;
@@ -920,7 +921,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $_SESSION['shipping'] = [
                     'id' => $quotes_array[0]['id'],
                     'title' => $item_params['L_SHIPPINGOPTIONNAME0'],
-                    'cost' => $this->pm->_app->formatCurrencyRaw($quotes_array[0]['cost'])
+                    'cost' => $this->pm->app->formatCurrencyRaw($quotes_array[0]['cost'])
                 ];
 
                 $default_shipping = 0;
@@ -948,7 +949,7 @@ class EC extends \OSC\OM\PagesAbstract
                 }
             }
 
-            include(OSCOM::BASE_DIR . 'classes/order_total.php');
+            include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order_total.php');
             $order_total_modules = new \order_total();
             $order_totals = $order_total_modules->process();
 
@@ -968,7 +969,7 @@ class EC extends \OSC\OM\PagesAbstract
                 $order->info['total'] -= tep_calculate_tax($order->info['shipping_cost'], $quotes_array[$default_shipping]['tax']);
             }
 
-            $items_total = $this->pm->_app->formatCurrencyRaw($order->info['subtotal']);
+            $items_total = $this->pm->app->formatCurrencyRaw($order->info['subtotal']);
 
             foreach ($order_totals as $ot) {
                 if (!in_array($ot['code'], [
@@ -978,24 +979,24 @@ class EC extends \OSC\OM\PagesAbstract
                     'ot_total'
                 ])) {
                     $item_params['L_PAYMENTREQUEST_0_NAME' . $line_item_no] = $ot['title'];
-                    $item_params['L_PAYMENTREQUEST_0_AMT' . $line_item_no] = $this->pm->_app->formatCurrencyRaw($ot['value']);
+                    $item_params['L_PAYMENTREQUEST_0_AMT' . $line_item_no] = $this->pm->app->formatCurrencyRaw($ot['value']);
 
-                    $items_total += $this->pm->_app->formatCurrencyRaw($ot['value']);
+                    $items_total += $this->pm->app->formatCurrencyRaw($ot['value']);
 
                     $line_item_no++;
                 }
             }
 
-            $params['PAYMENTREQUEST_0_AMT'] = $this->pm->_app->formatCurrencyRaw($order->info['total']);
+            $params['PAYMENTREQUEST_0_AMT'] = $this->pm->app->formatCurrencyRaw($order->info['total']);
 
-            $item_params['MAXAMT'] = $this->pm->_app->formatCurrencyRaw($params['PAYMENTREQUEST_0_AMT'] + $expensive_rate + 100, null, 1); // safely pad higher for dynamic shipping rates (eg, USPS express)
+            $item_params['MAXAMT'] = $this->pm->app->formatCurrencyRaw($params['PAYMENTREQUEST_0_AMT'] + $expensive_rate + 100, null, 1); // safely pad higher for dynamic shipping rates (eg, USPS express)
             $item_params['PAYMENTREQUEST_0_ITEMAMT'] = $items_total;
-            $item_params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->pm->_app->formatCurrencyRaw($order->info['shipping_cost']);
+            $item_params['PAYMENTREQUEST_0_SHIPPINGAMT'] = $this->pm->app->formatCurrencyRaw($order->info['shipping_cost']);
 
             $paypal_item_total = $item_params['PAYMENTREQUEST_0_ITEMAMT'] + $item_params['PAYMENTREQUEST_0_SHIPPINGAMT'];
 
             if (DISPLAY_PRICE_WITH_TAX == 'false') {
-                $item_params['PAYMENTREQUEST_0_TAXAMT'] = $this->pm->_app->formatCurrencyRaw($order->info['tax']);
+                $item_params['PAYMENTREQUEST_0_TAXAMT'] = $this->pm->app->formatCurrencyRaw($order->info['tax']);
 
                 $paypal_item_total += $item_params['PAYMENTREQUEST_0_TAXAMT'];
             }
@@ -1008,11 +1009,11 @@ class EC extends \OSC\OM\PagesAbstract
         }
 
         if (OSCOM_APP_PAYPAL_GATEWAY == '1') { // PayPal
-            if ($this->pm->_app->formatCurrencyRaw($paypal_item_total) == $params['PAYMENTREQUEST_0_AMT']) {
+            if ($this->pm->app->formatCurrencyRaw($paypal_item_total) == $params['PAYMENTREQUEST_0_AMT']) {
                 $params = array_merge($params, $item_params);
             }
         } else { // Payflow
-            if ($this->pm->_app->formatCurrencyRaw($paypal_item_total) == $params['AMT']) {
+            if ($this->pm->app->formatCurrencyRaw($paypal_item_total) == $params['AMT']) {
                 $params = array_merge($params, $item_params);
             }
         }
@@ -1031,12 +1032,21 @@ class EC extends \OSC\OM\PagesAbstract
                 $params['IDENTITYACCESSTOKEN'] = $_SESSION['paypal_login_access_token'];
             }
 
-            $response_array = $this->pm->_app->getApiResult('EC', 'SetExpressCheckout', $params);
+            $response_array = $this->pm->app->getApiResult('EC', 'SetExpressCheckout', $params);
 
             if (in_array($response_array['ACK'], [
                 'Success',
                 'SuccessWithWarning'
             ])) {
+                if (isset($_GET['format']) && ($_GET['format'] == 'json')) {
+                    $result = [
+                        'token' => $response_array['TOKEN']
+                    ];
+
+                    echo json_encode($result);
+                    exit;
+                }
+
                 HTTP::redirect($paypal_url . 'token=' . $response_array['TOKEN']);
             } else {
                 OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');
@@ -1045,26 +1055,19 @@ class EC extends \OSC\OM\PagesAbstract
             $params['CUSTOM'] = $_SESSION['appPayPalEcSecret'];
 
             $params['_headers'] = [
-                'X-VPS-REQUEST-ID: ' . md5($_SESSION['cartID'] . session_id() . $this->pm->_app->formatCurrencyRaw($paypal_item_total)),
+                'X-VPS-REQUEST-ID: ' . md5($_SESSION['cartID'] . session_id() . $this->pm->app->formatCurrencyRaw($paypal_item_total)),
                 'X-VPS-CLIENT-TIMEOUT: 45',
                 'X-VPS-VIT-INTEGRATION-PRODUCT: OSCOM',
                 'X-VPS-VIT-INTEGRATION-VERSION: ' . OSCOM::getVersion()
             ];
 
-            $response_array = $this->pm->_app->getApiResult('EC', 'PayflowSetExpressCheckout', $params);
+            $response_array = $this->pm->app->getApiResult('EC', 'PayflowSetExpressCheckout', $params);
 
             if ($response_array['RESULT'] == '0') {
                 HTTP::redirect($paypal_url . 'token=' . $response_array['TOKEN']);
             } else {
                 OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($response_array['OSCOM_ERROR_MESSAGE']), 'SSL');
             }
-        }
-    }
-
-    public function getFile()
-    {
-        if (isset($this->file)) {
-            return __DIR__ . '/templates/' . $this->file;
         }
     }
 }

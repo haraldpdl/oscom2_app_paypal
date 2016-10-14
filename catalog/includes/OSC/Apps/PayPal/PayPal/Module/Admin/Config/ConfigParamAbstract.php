@@ -10,32 +10,28 @@ namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config;
 
 use OSC\OM\Registry;
 
-abstract class ParamsAbstract
+abstract class ConfigParamAbstract extends \OSC\Sites\Admin\ConfigParamAbstract
 {
     protected $app;
     protected $config_module;
 
-    public $default;
-    public $title;
-    public $description;
-    public $set_func;
-    public $use_func;
+    protected $key_prefix = 'oscom_app_paypal_';
     public $app_configured = true;
-    public $sort_order = 0;
 
-    abstract protected function init();
-    abstract public function getSetField();
-
-    final public function __construct($config_module)
+    public function __construct($config_module)
     {
         $this->app = Registry::get('PayPal');
+
+        if ($config_module != 'G') {
+            $this->key_prefix .= strtolower($config_module) . '_';
+        }
 
         $this->config_module = $config_module;
 
         $this->code = (new \ReflectionClass($this))->getShortName();
 
-        $this->app->loadLanguageFile('modules/' . $config_module . '/Params/' . $this->code . '.php');
+        $this->app->loadDefinitionFile('modules/' . $config_module . '/Params/' . $this->code . '.php');
 
-        $this->init();
+        parent::__construct();
     }
 }

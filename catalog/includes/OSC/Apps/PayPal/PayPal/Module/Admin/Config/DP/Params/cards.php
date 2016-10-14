@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\DP\Params;
 
-class cards extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class cards extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = 'visa;mastercard;discover;amex;maestro';
     public $sort_order = 200;
@@ -27,36 +29,29 @@ class cards extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
         $this->description = $this->app->getDef('cfg_dp_cards_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $active = explode(';', OSCOM_APP_PAYPAL_DP_CARDS);
+        $active = explode(';', $this->getInputValue());
 
         $input = '';
 
         foreach ($this->cards as $key => $value) {
-            $input .= '<input type="checkbox" id="cardsSelection' . ucfirst($key) . '" name="card_types[]" value="' . $key . '"' . (in_array($key, $active) ? ' checked="checked"' : '') . '><label for="cardsSelection' . ucfirst($key) . '">' . $value . '</label>';
+            $input .= '<div class="checkbox">' .
+                      '  <label>' . HTML::checkboxField($this->key . '_cb', $key, in_array($key, $active)) . $value . '</label>' .
+                      '</div>';
         }
 
+        $input .= HTML::hiddenField($this->key);
+
         $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div id="cardsSelection">
-    {$input}
-    <input type="hidden" name="cards" value="" />
-  </div>
+<div id="cardsSelection">
+  {$input}
 </div>
 
 <script>
 $(function() {
-  $('#cardsSelection').buttonset();
-
-  $('form[name="paypalConfigure"]').submit(function() {
-    $('input[name="cards"]').val($('input[name="card_types[]"]:checked').map(function() {
+  $('#cardsSelection input').closest('form').submit(function() {
+    $('#cardsSelection input[name="{$this->key}"]').val($('input[name="{$this->key}_cb"]:checked').map(function() {
       return this.value;
     }).get().join(';'));
   });

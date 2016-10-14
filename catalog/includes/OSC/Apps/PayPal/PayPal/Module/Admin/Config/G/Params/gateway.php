@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G\Params;
 
-class gateway extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class gateway extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '1';
     public $sort_order = 100;
@@ -19,31 +21,15 @@ class gateway extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
         $this->description = $this->app->getDef('cfg_gateway_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="gatewaySelectionPayPal" name="gateway" value="1"' . (OSCOM_APP_PAYPAL_GATEWAY == '1' ? ' checked="checked"' : '') . '><label for="gatewaySelectionPayPal">' . $this->app->getDef('cfg_gateway_paypal') . '</label>' .
-                 '<input type="radio" id="gatewaySelectionPayflow" name="gateway" value="0"' . (OSCOM_APP_PAYPAL_GATEWAY == '0' ? ' checked="checked"' : '') . '><label for="gatewaySelectionPayflow">' . $this->app->getDef('cfg_gateway_payflow') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == '1' ? ' active' : '') . '">' . HTML::radioField($this->key, '1', ($value == '1')) . $this->app->getDef('cfg_gateway_paypal') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '0' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '0')) . $this->app->getDef('cfg_gateway_payflow') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="gatewaySelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#gatewaySelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

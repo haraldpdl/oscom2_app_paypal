@@ -14,10 +14,8 @@ class View extends \OSC\OM\PagesActionsAbstract
 {
     public function execute()
     {
-        $OSCOM_Db = Registry::get('Db');
-
         if (isset($_GET['lID']) && is_numeric($_GET['lID'])) {
-            $Qlog = $OSCOM_Db->prepare('select l.*, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from :table_oscom_app_paypal_log l left join :table_customers c on (l.customers_id = c.customers_id) where id = :id');
+            $Qlog = $this->page->app->db->prepare('select l.*, unix_timestamp(l.date_added) as date_added, c.customers_firstname, c.customers_lastname from :table_oscom_app_paypal_log l left join :table_customers c on (l.customers_id = c.customers_id) where id = :id');
             $Qlog->bindInt(':id', $_GET['lID']);
             $Qlog->execute();
 

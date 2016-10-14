@@ -14,7 +14,6 @@ use OSC\OM\Registry;
 abstract class ConfigAbstract
 {
     protected $app;
-    protected $db;
 
     public $code;
     public $title;
@@ -31,11 +30,10 @@ abstract class ConfigAbstract
     final public function __construct()
     {
         $this->app = Registry::get('PayPal');
-        $this->db = Registry::get('Db');
 
         $this->code = (new \ReflectionClass($this))->getShortName();
 
-        $this->app->loadLanguageFile('modules/' . $this->code . '/' . $this->code . '.php');
+        $this->app->loadDefinitionFile('modules/' . $this->code . '/' . $this->code . '.php');
 
         $this->init();
     }
@@ -56,13 +54,13 @@ abstract class ConfigAbstract
 
             $cfg = new $class($this->code);
 
-            $this->app->saveParameter($key, $cfg->default, isset($cfg->title) ? $cfg->title : null, isset($cfg->description) ? $cfg->description : null, isset($cfg->set_func) ? $cfg->set_func : null);
+            $this->app->saveCfgParam($key, $cfg->default, isset($cfg->title) ? $cfg->title : null, isset($cfg->description) ? $cfg->description : null, isset($cfg->set_func) ? $cfg->set_func : null);
         }
     }
 
     public function uninstall()
     {
-        $Qdelete = $this->db->prepare('delete from :table_configuration where configuration_key like :configuration_key');
+        $Qdelete = $this->app->db->prepare('delete from :table_configuration where configuration_key like :configuration_key');
         $Qdelete->bindValue(':configuration_key', 'OSCOM_APP_PAYPAL_' . $this->code . '_%');
         $Qdelete->execute();
 
@@ -73,21 +71,21 @@ abstract class ConfigAbstract
     {
         $result = [];
 
-        $directory = OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/Module/Admin/Config/' . $this->code . '/Params';
+        $directory = OSCOM::BASE_DIR . 'Apps/PayPal/PayPal/Module/Admin/Config/' . $this->code . '/Params';
 
         if ($dir = new \DirectoryIterator($directory)) {
             foreach ($dir as $file) {
                 if (!$file->isDot() && !$file->isDir() && ($file->getExtension() == 'php')) {
                     $class = 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php');
 
-                    if (is_subclass_of($class, 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract')) {
+                    if (is_subclass_of($class, 'OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract')) {
                         if ($this->code == 'G') {
                             $result[] = 'OSCOM_APP_PAYPAL_' . strtoupper($file->getBasename('.php'));
                         } else {
                             $result[] = 'OSCOM_APP_PAYPAL_' . $this->code . '_' . strtoupper($file->getBasename('.php'));
                         }
                     } else {
-                        trigger_error('OSC\Apps\PayPal\PayPal\Module\Admin\Config\\ConfigAbstract::getParameters(): OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php') . ' is not a subclass of OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract and cannot be loaded.');
+                        trigger_error('OSC\Apps\PayPal\PayPal\Module\Admin\Config\\ConfigAbstract::getParameters(): OSC\Apps\PayPal\PayPal\Module\Admin\Config\\' . $this->code . '\\Params\\' . $file->getBasename('.php') . ' is not a subclass of OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract and cannot be loaded.');
                     }
                 }
             }
@@ -116,7 +114,7 @@ abstract class ConfigAbstract
             $cfg = new $class($this->code);
 
             if (!defined($key)) {
-              $this->app->saveParameter($key, $cfg->default, isset($cfg->title) ? $cfg->title : null, isset($cfg->description) ? $cfg->description : null, isset($cfg->set_func) ? $cfg->set_func : null);
+              $this->app->saveCfgParam($key, $cfg->default, isset($cfg->title) ? $cfg->title : null, isset($cfg->description) ? $cfg->description : null, isset($cfg->set_func) ? $cfg->set_func : null);
             }
 
             if ($cfg->app_configured !== false) {

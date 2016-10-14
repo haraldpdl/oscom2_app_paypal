@@ -8,9 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-use OSC\OM\HTML;
-
-class sandbox_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class sandbox_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $sort_order = 500;
 
@@ -18,26 +16,5 @@ class sandbox_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsA
     {
         $this->title = $this->app->getDef('cfg_login_sandbox_secret_title');
         $this->description = $this->app->getDef('cfg_login_sandbox_secret_desc');
-    }
-
-    public function getSetField()
-    {
-        $input = HTML::inputField('sandbox_secret', OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET, 'id="inputLogInSandboxSecret"');
-
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputLogInSandboxSecret">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
     }
 }

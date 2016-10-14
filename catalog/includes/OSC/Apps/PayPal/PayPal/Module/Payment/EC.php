@@ -16,7 +16,7 @@
   use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
   class EC implements \OSC\OM\Modules\PaymentInterface {
-    var $code, $title, $description, $enabled, $_app;
+    public $code, $title, $description, $enabled, $app;
 
     function __construct() {
       global $PHP_SELF, $order, $request_type;
@@ -25,16 +25,16 @@
         Registry::set('PayPal', new PayPalApp());
       }
 
-      $this->_app = Registry::get('PayPal');
-      $this->_app->loadLanguageFile('modules/EC/EC.php');
+      $this->app = Registry::get('PayPal');
+      $this->app->loadDefinitionFile('modules/EC/EC.php');
 
-      $this->signature = 'paypal|paypal_express|' . $this->_app->getVersion() . '|2.4';
-      $this->api_version = $this->_app->getApiVersion();
+      $this->signature = 'paypal|paypal_express|' . $this->app->getVersion() . '|2.4';
+      $this->api_version = $this->app->getApiVersion();
 
       $this->code = 'EC';
-      $this->title = $this->_app->getDef('module_ec_title');
-      $this->public_title = $this->_app->getDef('module_ec_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_ec_legacy_admin_app_button'), $this->_app->link('Configure&module=EC'), 'primary', null, true) . '</div>';
+      $this->title = $this->app->getDef('module_ec_title');
+      $this->public_title = $this->app->getDef('module_ec_public_title');
+      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_ec_legacy_admin_app_button'), null, $this->app->link('Configure&module=EC'), null, null, 'btn-primary') . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_EC_SORT_ORDER') ? OSCOM_APP_PAYPAL_EC_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_EC_STATUS') && in_array(OSCOM_APP_PAYPAL_EC_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_EC_ORDER_STATUS_ID : 0;
@@ -42,26 +42,26 @@
       if ( defined('OSCOM_APP_PAYPAL_EC_STATUS') ) {
         if ( OSCOM_APP_PAYPAL_EC_STATUS == '0' ) {
           $this->title .= ' [Sandbox]';
-          $this->public_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
+          $this->public_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
         }
       }
 
       if ( !function_exists('curl_init') ) {
-        $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_ec_error_curl') . '</div>';
+        $this->description .= '<div class="secWarning">' . $this->app->getDef('module_ec_error_curl') . '</div>';
 
         $this->enabled = false;
       }
 
       if ( $this->enabled === true ) {
         if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
-          if ( !$this->_app->hasCredentials('EC') ) {
-            $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_ec_error_credentials') . '</div>';
+          if ( !$this->app->hasCredentials('EC') ) {
+            $this->description .= '<div class="secWarning">' . $this->app->getDef('module_ec_error_credentials') . '</div>';
 
             $this->enabled = false;
           }
         } else { // Payflow
-          if ( !$this->_app->hasCredentials('EC', 'payflow') ) {
-            $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_ec_error_credentials_payflow') . '</div>';
+          if ( !$this->app->hasCredentials('EC', 'payflow') ) {
+            $this->description .= '<div class="secWarning">' . $this->app->getDef('module_ec_error_credentials_payflow') . '</div>';
 
             $this->enabled = false;
           }
@@ -76,7 +76,7 @@
 
       if ( basename($PHP_SELF) == 'shopping_cart.php' ) {
         if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
-          if ( isset($request_type) && ($request_type != 'SSL') && (ENABLE_SSL == true) ) {
+          if ( isset($request_type) && ($request_type != 'SSL') && (OSCOM::getConfig('ssl', 'Shop') == 'true') ) {
             OSCOM::redirect('shopping_cart.php', tep_get_all_get_params(), 'SSL');
           }
 
@@ -88,7 +88,7 @@
       if ( (basename($PHP_SELF) == 'checkout_payment.php') && isset($_SESSION['appPayPalEcRightTurn']) ) {
         unset($_SESSION['appPayPalEcRightTurn']);
 
-        if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code) ) {
+        if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code) ) {
           OSCOM::redirect('checkout_confirmation.php', '', 'SSL');
         }
       }
@@ -97,12 +97,10 @@
     function update_status() {
       global $order;
 
-      $OSCOM_Db = Registry::get('Db');
-
       if ( ($this->enabled == true) && ((int)OSCOM_APP_PAYPAL_EC_ZONE > 0) ) {
         $check_flag = false;
 
-        $Qcheck = $OSCOM_Db->get('zones_to_geo_zones', 'zone_id', ['geo_zone_id' => OSCOM_APP_PAYPAL_EC_ZONE, 'zone_country_id' => $order->delivery['country']['id']], 'zone_id');
+        $Qcheck = $this->app->db->get('zones_to_geo_zones', 'zone_id', ['geo_zone_id' => OSCOM_APP_PAYPAL_EC_ZONE, 'zone_country_id' => $order->delivery['country']['id']], 'zone_id');
 
         while ($Qcheck->fetch()) {
           if (($Qcheck->valueInt('zone_id') < 1) || ($Qcheck->valueInt('zone_id') == $order->delivery['zone_id'])) {
@@ -118,52 +116,137 @@
     }
 
     function checkout_initialization_method() {
-      if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_IMAGE == '1') ) {
-        if (OSCOM_APP_PAYPAL_EC_STATUS == '1') {
-          $image_button = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image';
-        } else {
-          $image_button = 'https://fpdbs.sandbox.paypal.com/dynamicimageweb?cmd=_dynamic-image';
-        }
+      global $oscTemplate;
 
-        $params = array('locale=' . $this->_app->getDef('module_ec_button_locale'));
+      $string = '';
 
-        if ( $this->_app->hasCredentials('EC') ) {
-          $response_array = $this->_app->getApiResult('EC', 'GetPalDetails');
+      if (OSCOM_APP_PAYPAL_GATEWAY == '1') {
+        if (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0') {
+          if (OSCOM_APP_PAYPAL_EC_CHECKOUT_IMAGE == '1') {
+            if (OSCOM_APP_PAYPAL_EC_STATUS == '1') {
+              $image_button = 'https://fpdbs.paypal.com/dynamicimageweb?cmd=_dynamic-image';
+            } else {
+              $image_button = 'https://fpdbs.sandbox.paypal.com/dynamicimageweb?cmd=_dynamic-image';
+            }
 
-          if ( isset($response_array['PAL']) ) {
-            $params[] = 'pal=' . $response_array['PAL'];
-            $params[] = 'ordertotal=' . $this->_app->formatCurrencyRaw($_SESSION['cart']->show_total());
+            $params = array('locale=' . $this->app->getDef('module_ec_button_locale'));
+
+            if ($this->app->hasCredentials('EC')) {
+              $response_array = $this->app->getApiResult('EC', 'GetPalDetails');
+
+              if (isset($response_array['PAL'])) {
+                $params[] = 'pal=' . $response_array['PAL'];
+                $params[] = 'ordertotal=' . $this->app->formatCurrencyRaw($_SESSION['cart']->show_total());
+              }
+            }
+
+            if (!empty($params)) {
+              $image_button .= '&' . implode('&', $params);
+            }
+          } else {
+            $image_button = $this->app->getDef('module_ec_button_url');
           }
-        }
 
-        if ( !empty($params) ) {
-          $image_button .= '&' . implode('&', $params);
-        }
-      } else {
-        $image_button = $this->_app->getDef('module_ec_button_url');
-      }
+          $button_title = HTML::outputProtected($this->app->getDef('module_ec_button_title'));
 
-      $button_title = HTML::outputProtected($this->_app->getDef('module_ec_button_title'));
+          if (OSCOM_APP_PAYPAL_EC_STATUS == '0') {
+            $button_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
+          }
 
-      if ( OSCOM_APP_PAYPAL_EC_STATUS == '0' ) {
-        $button_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
-      }
+          $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+        } else {
+          $oscTemplate->addBlock('<script src="https://www.paypalobjects.com/api/checkout.js" async></script>', 'footer_scripts');
 
-      $string = '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '" data-paypal-button="true"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+          $merchant_id = (OSCOM_APP_PAYPAL_EC_STATUS === '1') ? OSCOM_APP_PAYPAL_LIVE_MERCHANT_ID : OSCOM_APP_PAYPAL_SANDBOX_MERCHANT_ID;
+          if (empty($merchant_id)) $merchant_id = ' ';
 
-      if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
-        $string .= <<<EOD
+          $ppecset_url = OSCOM::link('index.php', 'order&callback&paypal&ec&format=json', 'SSL');
+
+          switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_COLOR) {
+            case '3':
+              $button_color = 'silver';
+              break;
+
+            case '2':
+              $button_color = 'blue';
+              break;
+
+            case '1':
+            default:
+              $button_color = 'gold';
+              break;
+          }
+
+          switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_SIZE) {
+            case '3':
+              $button_size = 'medium';
+              break;
+
+            case '1':
+              $button_size = 'tiny';
+              break;
+
+            case '2':
+            default:
+              $button_size = 'small';
+              break;
+          }
+
+          switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_SHAPE) {
+            case '2':
+              $button_shape = 'rect';
+              break;
+
+            case '1':
+            default:
+              $button_shape = 'pill';
+              break;
+          }
+
+          $string .= <<<EOD
+<span id="ppECButton"></span>
 <script>
-(function(d, s, id){
-  var js, ref = d.getElementsByTagName(s)[0];
-  if (!d.getElementById(id)){
-    js = d.createElement(s); js.id = id; js.async = true;
-    js.src = "//www.paypalobjects.com/js/external/paypal.v1.js";
-    ref.parentNode.insertBefore(js, ref);
-  }
-}(document, "script", "paypal-js"));
+window.paypalCheckoutReady = function () {
+  paypal.checkout.setup('${merchant_id}', {
+    environment: 'sandbox',
+    buttons: [
+      {
+        container: 'ppECButton',
+        color: '${button_color}',
+        size: '${button_size}',
+        shape: '${button_shape}',
+        click: function (event) {
+          event.preventDefault();
+
+          paypal.checkout.initXO();
+
+          var action = $.getJSON('${ppecset_url}');
+
+          action.done(function (data) {
+            paypal.checkout.startFlow(data.token);
+          });
+
+          action.fail(function () {
+            paypal.checkout.closeFlow();
+          });
+        }
+      }
+    ]
+  });
+};
 </script>
 EOD;
+        }
+      } else {
+        $image_button = $this->app->getDef('module_ec_button_url');
+
+        $button_title = HTML::outputProtected($this->app->getDef('module_ec_button_title'));
+
+        if (OSCOM_APP_PAYPAL_EC_STATUS == '0') {
+          $button_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
+        }
+
+        $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
       }
 
       return $string;
@@ -174,7 +257,7 @@ EOD;
     }
 
     function selection() {
-      return array('id' => $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code,
+      return array('id' => $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code,
                    'module' => $this->public_title);
     }
 
@@ -210,7 +293,7 @@ EOD;
       $confirmation = false;
 
       if (empty($_SESSION['comments'])) {
-        $confirmation = array('fields' => array(array('title' => $this->_app->getDef('module_ec_field_comments'),
+        $confirmation = array('fields' => array(array('title' => $this->app->getDef('module_ec_field_comments'),
                                                       'field' => HTML::textareaField('ppecomments', '60', '5'))));
       }
 
@@ -254,7 +337,7 @@ EOD;
 
       $params = array('TOKEN' => $_SESSION['appPayPalEcResult']['TOKEN'],
                       'PAYERID' => $_SESSION['appPayPalEcResult']['PAYERID'],
-                      'PAYMENTREQUEST_0_AMT' => $this->_app->formatCurrencyRaw($order->info['total']),
+                      'PAYMENTREQUEST_0_AMT' => $this->app->formatCurrencyRaw($order->info['total']),
                       'PAYMENTREQUEST_0_CURRENCYCODE' => $order->info['currency']);
 
       if (is_numeric($_SESSION['sendto']) && ($_SESSION['sendto'] > 0)) {
@@ -266,7 +349,7 @@ EOD;
         $params['PAYMENTREQUEST_0_SHIPTOZIP'] = $order->delivery['postcode'];
       }
 
-      $response_array = $this->_app->getApiResult('EC', 'DoExpressCheckoutPayment', $params);
+      $response_array = $this->app->getApiResult('EC', 'DoExpressCheckoutPayment', $params);
 
       if ( !in_array($response_array['ACK'], array('Success', 'SuccessWithWarning')) ) {
         if ( $response_array['L_ERRORCODE0'] == '10486' ) {
@@ -311,7 +394,7 @@ EOD;
       $params = array('EMAIL' => $order->customer['email_address'],
                       'TOKEN' => $_SESSION['appPayPalEcResult']['TOKEN'],
                       'PAYERID' => $_SESSION['appPayPalEcResult']['PAYERID'],
-                      'AMT' => $this->_app->formatCurrencyRaw($order->info['total']),
+                      'AMT' => $this->app->formatCurrencyRaw($order->info['total']),
                       'CURRENCY' => $order->info['currency']);
 
       if ( is_numeric($_SESSION['sendto']) && ($_SESSION['sendto'] > 0) ) {
@@ -323,7 +406,7 @@ EOD;
         $params['SHIPTOZIP'] = $order->delivery['postcode'];
       }
 
-      $response_array = $this->_app->getApiResult('EC', 'PayflowDoExpressCheckoutPayment', $params);
+      $response_array = $this->app->getApiResult('EC', 'PayflowDoExpressCheckoutPayment', $params);
 
       if ( $response_array['RESULT'] != '0' ) {
         OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($response_array['OSCOM_ERROR_MESSAGE']), 'SSL');
@@ -341,8 +424,6 @@ EOD;
     function after_process_paypal() {
       global $response_array, $insert_id;
 
-      $OSCOM_Db = Registry::get('Db');
-
       $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PAYMENTINFO_0_TRANSACTIONID']) . "\n" .
                    'Payer Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['PAYERSTATUS']) . "\n" .
                    'Address Status: ' . HTML::outputProtected($_SESSION['appPayPalEcResult']['ADDRESSSTATUS']) . "\n" .
@@ -356,7 +437,7 @@ EOD;
                               'customer_notified' => '0',
                               'comments' => $pp_result);
 
-      $OSCOM_Db->save('orders_status_history', $sql_data_array);
+      $this->app->db->save('orders_status_history', $sql_data_array);
 
       unset($_SESSION['appPayPalEcResult']);
       unset($_SESSION['appPayPalEcSecret']);
@@ -364,8 +445,6 @@ EOD;
 
     function after_process_payflow() {
       global $response_array, $insert_id;
-
-      $OSCOM_Db = Registry::get('Db');
 
       $pp_result = 'Transaction ID: ' . HTML::outputProtected($response_array['PNREF']) . "\n" .
                    'Gateway: Payflow' . "\n" .
@@ -382,13 +461,13 @@ EOD;
                               'customer_notified' => '0',
                               'comments' => $pp_result);
 
-      $OSCOM_Db->save('orders_status_history', $sql_data_array);
+      $this->app->db->save('orders_status_history', $sql_data_array);
 
       unset($_SESSION['appPayPalEcResult']);
       unset($_SESSION['appPayPalEcSecret']);
 
 // Manually call PayflowInquiry to retrieve more details about the transaction and to allow admin post-transaction actions
-      $response = $this->_app->getApiResult('APP', 'PayflowInquiry', array('ORIGID' => $response_array['PNREF']));
+      $response = $this->app->getApiResult('APP', 'PayflowInquiry', array('ORIGID' => $response_array['PNREF']));
 
       if ( isset($response['RESULT']) && ($response['RESULT'] == '0') ) {
         $result = 'Transaction ID: ' . HTML::outputProtected($response['ORIGPNREF']) . "\n" .
@@ -472,7 +551,7 @@ EOD;
                                 'customer_notified' => '0',
                                 'comments' => $result);
 
-        $OSCOM_Db->save('orders_status_history', $sql_data_array);
+        $this->app->db->save('orders_status_history', $sql_data_array);
       }
     }
 
@@ -485,11 +564,11 @@ EOD;
     }
 
     function install() {
-      $this->_app->redirect('Configure&Install&module=EC');
+      $this->app->redirect('Configure&Install&module=EC');
     }
 
     function remove() {
-      $this->_app->redirect('Configure&Uninstall&module=EC');
+      $this->app->redirect('Configure&Uninstall&module=EC');
     }
 
     function keys() {
@@ -497,10 +576,8 @@ EOD;
     }
 
     function getProductType($id, $attributes) {
-      $OSCOM_Db = Registry::get('Db');
-
       foreach ( $attributes as $a ) {
-        $Qcheck = $OSCOM_Db->prepare('select pad.products_attributes_id from :table_products_attributes pa, :table_products_attributes_download pad where pa.products_id = :products_id and pa.options_values_id = :options_values_id and pa.products_attributes_id = pad.products_attributes_id limit 1');
+        $Qcheck = $this->app->db->prepare('select pad.products_attributes_id from :table_products_attributes pa, :table_products_attributes_download pad where pa.products_id = :products_id and pa.options_values_id = :options_values_id and pa.products_attributes_id = pad.products_attributes_id limit 1');
         $Qcheck->bindInt(':products_id', $id);
         $Qcheck->bindInt(':options_values_id', $a['value_id']);
         $Qcheck->execute();

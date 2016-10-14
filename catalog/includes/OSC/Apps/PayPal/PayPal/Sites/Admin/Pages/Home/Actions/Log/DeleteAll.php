@@ -14,12 +14,12 @@ class DeleteAll extends \OSC\OM\PagesActionsAbstract
 {
     public function execute()
     {
-        $OSCOM_Db = Registry::get('Db');
+        $OSCOM_MessageStack = Registry::get('MessageStack');
         $OSCOM_PayPal = Registry::get('PayPal');
 
-        $OSCOM_Db->delete('oscom_app_paypal_log');
+        $OSCOM_PayPal->db->delete('oscom_app_paypal_log');
 
-        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_delete_success'), 'success');
+        $OSCOM_MessageStack->add($OSCOM_PayPal->getDef('alert_delete_success'), 'success', 'PayPal');
 
         $OSCOM_PayPal->redirect('Log');
     }

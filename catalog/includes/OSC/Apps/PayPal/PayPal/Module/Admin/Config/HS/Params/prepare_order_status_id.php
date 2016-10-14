@@ -9,34 +9,29 @@
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\HS\Params;
 
 use OSC\OM\HTML;
-use OSC\OM\Registry;
 
-class prepare_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class prepare_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '0';
     public $sort_order = 300;
 
-    protected $db;
-
     protected function init()
     {
-        $this->db = Registry::get('Db');
-
         $this->title = $this->app->getDef('cfg_hs_prepare_order_status_id_title');
         $this->description = $this->app->getDef('cfg_hs_prepare_order_status_id_desc');
 
-        if (!defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID')) {
-            $Qcheck = $this->db->get('orders_status', 'orders_status_id', ['orders_status_name' => 'Preparing [PayPal Pro HS]'], null, 1);
+        if (!defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') || (strlen(OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID) < 1)) {
+            $Qcheck = $this->app->db->get('orders_status', 'orders_status_id', ['orders_status_name' => 'Preparing [PayPal Pro HS]'], null, 1);
 
             if ($Qcheck->fetch() === false) {
-                $Qstatus = $this->db->get('orders_status', 'max(orders_status_id) as status_id');
+                $Qstatus = $this->app->db->get('orders_status', 'max(orders_status_id) as status_id');
 
                 $status_id = $Qstatus->valueInt('status_id') + 1;
 
                 $languages = tep_get_languages();
 
                 foreach ($languages as $lang) {
-                    $this->db->save('orders_status', [
+                    $this->app->db->save('orders_status', [
                         'orders_status_id' => $status_id,
                         'language_id' => $lang['id'],
                         'orders_status_name' => 'Preparing [PayPal Pro HS]',
@@ -54,7 +49,7 @@ class prepare_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Confi
         $this->default = $status_id;
     }
 
-    public function getSetField()
+    public function getInputField()
     {
         $statuses_array = [
             [
@@ -63,7 +58,12 @@ class prepare_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Confi
             ]
         ];
 
-        $Qstatuses = $this->db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id']], 'orders_status_name');
+        $Qstatuses = $this->app->db->get('orders_status', [
+            'orders_status_id',
+            'orders_status_name'
+        ], [
+            'language_id' => $_SESSION['languages_id']
+        ], 'orders_status_name');
 
         while ($Qstatuses->fetch()) {
             $statuses_array[] = [
@@ -72,22 +72,8 @@ class prepare_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Confi
             ];
         }
 
-        $input = HTML::selectField('prepare_order_status_id', $statuses_array, OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID, 'id="inputHsPrepareOrderStatusId"');
+        $input = HTML::selectField($this->key, $statuses_array, $this->getInputValue());
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputHsPrepareOrderStatusId">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

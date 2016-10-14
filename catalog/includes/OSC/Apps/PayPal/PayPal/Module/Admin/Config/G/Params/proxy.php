@@ -8,9 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G\Params;
 
-use OSC\OM\HTML;
-
-class proxy extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class proxy extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $sort_order = 400;
 
@@ -18,26 +16,5 @@ class proxy extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
     {
         $this->title = $this->app->getDef('cfg_proxy_title');
         $this->description = $this->app->getDef('cfg_proxy_desc');
-    }
-
-    public function getSetField()
-    {
-        $input = HTML::inputField('proxy', OSCOM_APP_PAYPAL_PROXY, 'id="inputProxy"');
-
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputProxy">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
     }
 }

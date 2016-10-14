@@ -2,8 +2,8 @@
 	"title":	"PayPal App",
 	"app":		"PayPal",
 	"vendor":	"PayPal",
-	"version":	5.0,
-	"req_core_version":	2.4,
+	"version":	"5.0.0",
+	"req_core_version":	"2.4",
 	"license":	"GPL",
 	"authors": [
 		{
@@ -34,7 +34,7 @@
 		"Hooks": {
 			"Admin/Orders": {
 				"Action":	"Module\\Hooks\\Admin\\Orders\\Action",
-				"PageTab":	"Module\\Hooks\\Admin\\Orders\\PageTab"
+				"Page":		"Module\\Hooks\\Admin\\Orders\\PageTab"
 			},
 			"Shop/Account": {
 				"Logout":	"Module\\Hooks\\Shop\\Account\\Logout"

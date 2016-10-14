@@ -16,15 +16,13 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 {
     public static function execute()
     {
-        global $cl_box_groups;
-
         if (!Registry::exists('PayPal')) {
             Registry::set('PayPal', new PayPalApp());
         }
 
         $OSCOM_PayPal = Registry::get('PayPal');
 
-        $OSCOM_PayPal->loadLanguageFile('admin/modules/boxes/paypal.php');
+        $OSCOM_PayPal->loadDefinitionFile('admin/modules/boxes/paypal.php');
 
         $paypal_menu = [
             [
@@ -72,7 +70,7 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
             }
         }
 
-        $cl_box_groups[] = array('heading' => $OSCOM_PayPal->getDef('module_admin_menu_title'),
-                                 'apps' => $paypal_menu);
+        return array('heading' => $OSCOM_PayPal->getDef('module_admin_menu_title'),
+                     'apps' => $paypal_menu);
     }
 }

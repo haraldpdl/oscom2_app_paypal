@@ -19,6 +19,6 @@ class Balance extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('balance.php');
         $this->page->data['action'] = 'Balance';
 
-        $OSCOM_PayPal->loadLanguageFile('admin/balance.php');
+        $OSCOM_PayPal->loadDefinitionFile('admin/balance.php');
     }
 }

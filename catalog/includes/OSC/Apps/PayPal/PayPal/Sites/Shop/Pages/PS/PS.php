@@ -17,14 +17,13 @@ use OSC\Apps\PayPal\PayPal\Module\Payment\PS as PaymentModulePS;
 class PS extends \OSC\OM\PagesAbstract
 {
     protected $file = null;
-    protected $db;
+    protected $use_site_template = false;
     protected $pm;
 
     protected function init()
     {
         global $currencies;
 
-        $this->db = Registry::get('Db');
         $this->pm = new PaymentModulePS();
 
         if (!defined('OSCOM_APP_PAYPAL_PS_STATUS') || !in_array(OSCOM_APP_PAYPAL_PS_STATUS, [
@@ -34,16 +33,16 @@ class PS extends \OSC\OM\PagesAbstract
             return false;
         }
 
-        include(OSCOM::BASE_DIR . 'languages/' . $_SESSION['language'] . '/checkout_process.php');
+        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/checkout_process.php');
 
         $result = false;
 
         $seller_accounts = [
-            $this->pm->_app->getCredentials('PS', 'email')
+            $this->pm->app->getCredentials('PS', 'email')
         ];
 
-        if (tep_not_null($this->pm->_app->getCredentials('PS', 'email_primary'))) {
-            $seller_accounts[] = $this->pm->_app->getCredentials('PS', 'email_primary');
+        if (tep_not_null($this->pm->app->getCredentials('PS', 'email_primary'))) {
+            $seller_accounts[] = $this->pm->app->getCredentials('PS', 'email_primary');
         }
 
         if (isset($_POST['receiver_email']) && in_array($_POST['receiver_email'], $seller_accounts)) {
@@ -57,7 +56,7 @@ class PS extends \OSC\OM\PagesAbstract
 
             $parameters = substr($parameters, 0, -1);
 
-            $result = $this->pm->_app->makeApiCall($this->pm->form_action_url, $parameters);
+            $result = $this->pm->app->makeApiCall($this->pm->form_action_url, $parameters);
         }
 
         $log_params = $_POST;
@@ -67,7 +66,7 @@ class PS extends \OSC\OM\PagesAbstract
             $log_params['GET ' . $key] = $value;
         }
 
-        $this->pm->_app->log('PS', '_notify-validate', ($result == 'VERIFIED') ? 1 : -1, $log_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox', true);
+        $this->pm->app->log('PS', '_notify-validate', ($result == 'VERIFIED') ? 1 : -1, $log_params, $result, (OSCOM_APP_PAYPAL_PS_STATUS == '1') ? 'live' : 'sandbox', true);
 
         if ($result == 'VERIFIED') {
             $this->pm->verifyTransaction($_POST, true);
@@ -75,7 +74,7 @@ class PS extends \OSC\OM\PagesAbstract
             $order_id = (int)$_POST['invoice'];
             $customer_id = (int)$_POST['custom'];
 
-            $Qorder = $this->db->get('orders', 'orders_status', [
+            $Qorder = $this->pm->app->db->get('orders', 'orders_status', [
                 'orders_id' => $order_id,
                 'customers_id' => $customer_id
             ]);
@@ -88,7 +87,7 @@ class PS extends \OSC\OM\PagesAbstract
                         $new_order_status = OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID;
                     }
 
-                    $this->db->save('orders', [
+                    $this->pm->app->db->save('orders', [
                         'orders_status' => $new_order_status,
                         'last_modified' => 'now()'
                     ], [
@@ -103,14 +102,14 @@ class PS extends \OSC\OM\PagesAbstract
                         'comments' => ''
                     ];
 
-                    $this->db->save('orders_status_history', $sql_data_array);
+                    $this->pm->app->db->save('orders_status_history', $sql_data_array);
 
-                    include(OSCOM::BASE_DIR . 'classes/order.php');
+                    include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/classes/order.php');
                     $order = new \order($order_id);
 
                     if (DOWNLOAD_ENABLED == 'true') {
                         for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
-                            $Qdownloads = $this->db->prepare('select opd.orders_products_filename from :table_orders o, :table_orders_products op, :table_orders_products_download opd where o.orders_id = :orders_id and o.customers_id = :customers_id and o.orders_id = op.orders_id and op.orders_products_id = opd.orders_products_id and opd.orders_products_filename != ""');
+                            $Qdownloads = $this->pm->app->db->prepare('select opd.orders_products_filename from :table_orders o, :table_orders_products op, :table_orders_products_download opd where o.orders_id = :orders_id and o.customers_id = :customers_id and o.orders_id = op.orders_id and op.orders_products_id = opd.orders_products_id and opd.orders_products_filename != ""');
                             $Qdownloads->bindInt(':orders_id', $order_id);
                             $Qdownloads->bindInt(':customers_id', $customer_id);
                             $Qdownloads->execute();
@@ -158,7 +157,7 @@ class PS extends \OSC\OM\PagesAbstract
                                     $stock_query_sql .= ' and pa.options_id = :options_id and pa.options_values_id = :options_values_id';
                                 }
 
-                                $Qstock = $this->db->prepare($stock_query_sql);
+                                $Qstock = $this->pm->app->db->prepare($stock_query_sql);
                                 $Qstock->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
 
                                 if (is_array($products_attributes)) {
@@ -168,7 +167,7 @@ class PS extends \OSC\OM\PagesAbstract
 
                                 $Qstock->execute();
                             } else {
-                                $Qstock = $this->db->get('products', 'products_quantity', [
+                                $Qstock = $this->pm->app->db->get('products', 'products_quantity', [
                                     'products_id' => tep_get_prid($order->products[$i]['id'])
                                 ]);
                             }
@@ -182,7 +181,7 @@ class PS extends \OSC\OM\PagesAbstract
                                 }
 
                                 if ($stock_left != $Qstock->valueInt('products_quantity')) {
-                                    $this->db->save('products', [
+                                    $this->pm->app->db->save('products', [
                                         'products_quantity' => $stock_left
                                     ], [
                                         'products_id' => tep_get_prid($order->products[$i]['id'])
@@ -190,7 +189,7 @@ class PS extends \OSC\OM\PagesAbstract
                                 }
 
                                 if (($stock_left < 1) && (STOCK_ALLOW_CHECKOUT == 'false')) {
-                                    $this->db->save('products', [
+                                    $this->pm->app->db->save('products', [
                                         'products_status' => '0'
                                     ], [
                                         'products_id' => tep_get_prid($order->products[$i]['id'])
@@ -200,7 +199,7 @@ class PS extends \OSC\OM\PagesAbstract
                         }
 
 // Update products_ordered (for bestsellers list)
-                        $Qupdate = $this->db->prepare('update :table_products set products_ordered = products_ordered + :products_ordered where products_id = :products_id');
+                        $Qupdate = $this->pm->app->db->prepare('update :table_products set products_ordered = products_ordered + :products_ordered where products_id = :products_id');
                         $Qupdate->bindInt(':products_ordered', $order->products[$i]['qty']);
                         $Qupdate->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
                         $Qupdate->execute();
@@ -262,17 +261,17 @@ class PS extends \OSC\OM\PagesAbstract
                         tep_mail('', SEND_EXTRA_ORDER_EMAILS_TO, EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
                     }
 
-                    $this->db->delete('customers_basket', [
+                    $this->pm->app->db->delete('customers_basket', [
                         'customers_id' => $customer_id
                     ]);
 
-                    $this->db->delete('customers_basket_attributes', [
+                    $this->pm->app->db->delete('customers_basket_attributes', [
                         'customers_id' => $customer_id
                     ]);
                 }
             }
         }
 
-        tep_session_destroy();
+        Registry::get('Session')->kill();
     }
 }

@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class theme extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class theme extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = 'Blue';
     public $sort_order = 600;
@@ -19,31 +21,15 @@ class theme extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
         $this->description = $this->app->getDef('cfg_login_theme_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="themeSelectionBlue" name="theme" value="Blue"' . (OSCOM_APP_PAYPAL_LOGIN_THEME == 'Blue' ? ' checked="checked"' : '') . '><label for="themeSelectionBlue">' . $this->app->getDef('cfg_login_theme_blue') . '</label>' .
-                 '<input type="radio" id="themeSelectionNeutral" name="theme" value="Neutral"' . (OSCOM_APP_PAYPAL_LOGIN_THEME == 'Neutral' ? ' checked="checked"' : '') . '><label for="themeSelectionNeutral">' . $this->app->getDef('cfg_login_theme_neutral') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == 'Blue' ? ' active' : '') . '">' . HTML::radioField($this->key, 'Blue', ($value == 'Blue')) . $this->app->getDef('cfg_login_theme_blue') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == 'Neutral' ? ' active' : '') . '">' . HTML::radioField($this->key, 'Neutral', ($value == 'Neutral')) . $this->app->getDef('cfg_login_theme_neutral') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="themeSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#themeSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

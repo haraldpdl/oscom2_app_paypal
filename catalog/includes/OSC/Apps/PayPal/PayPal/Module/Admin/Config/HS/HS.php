@@ -46,7 +46,7 @@ class HS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
         $installed[] = $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
-        $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+        $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
     }
 
     public function uninstall()
@@ -59,15 +59,15 @@ class HS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);
 
-            $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+            $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
         }
     }
 
     public function canMigrate()
     {
-        if (file_exists(OSCOM::BASE_DIR . 'modules/payment/' . $this->pm_code . '.php')) {
+        if (is_file(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $this->pm_code . '.php')) {
             if (!class_exists($this->pm_code)) {
-                include(OSCOM::BASE_DIR . 'modules/payment/' . $this->pm_code . '.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $this->pm_code . '.php');
             }
 
             $module = new $this->pm_code();
@@ -92,21 +92,21 @@ class HS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_ID')) {
                 if (tep_not_null(MODULE_PAYMENT_PAYPAL_PRO_HS_ID)) {
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL', MODULE_PAYMENT_PAYPAL_PRO_HS_ID);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL', MODULE_PAYMENT_PAYPAL_PRO_HS_ID);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_ID');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_ID');
             }
 
             if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID')) {
                 if (tep_not_null(MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID)) {
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY', MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY', MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_PRIMARY_ID');
             }
 
             if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_API_USERNAME') && defined('MODULE_PAYMENT_PAYPAL_PRO_HS_API_PASSWORD') && defined('MODULE_PAYMENT_PAYPAL_PRO_HS_API_SIGNATURE')) {
@@ -114,47 +114,47 @@ class HS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME'))) {
                         if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD'))) {
                             if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE'))) {
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME', MODULE_PAYMENT_PAYPAL_PRO_HS_API_USERNAME);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_HS_API_PASSWORD);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE', MODULE_PAYMENT_PAYPAL_PRO_HS_API_SIGNATURE);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME', MODULE_PAYMENT_PAYPAL_PRO_HS_API_USERNAME);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_HS_API_PASSWORD);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE', MODULE_PAYMENT_PAYPAL_PRO_HS_API_SIGNATURE);
                             }
                         }
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_API_USERNAME');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_API_PASSWORD');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_API_SIGNATURE');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_API_USERNAME');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_API_PASSWORD');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_API_SIGNATURE');
             }
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTION_METHOD')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTION_METHOD');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTION_METHOD');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_PREPARE_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_HS_PREPARE_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_PREPARE_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_HS_PREPARE_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_PREPARE_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_HS_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_HS_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_ZONE')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_ZONE', MODULE_PAYMENT_PAYPAL_PRO_HS_ZONE);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_ZONE');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_ZONE', MODULE_PAYMENT_PAYPAL_PRO_HS_ZONE);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_ZONE');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_SORT_ORDER')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_HS_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_SORT_ORDER');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_HS_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_SORT_ORDER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTIONS_ORDER_STATUS_ID')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTIONS_ORDER_STATUS_ID');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_TRANSACTIONS_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_STATUS')) {
@@ -168,32 +168,32 @@ class HS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_HS_STATUS', $status);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_STATUS');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_HS_STATUS', $status);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_STATUS');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_GATEWAY_SERVER')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_GATEWAY_SERVER');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_GATEWAY_SERVER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_VERIFY_SSL')) {
             if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_HS_VERIFY_SSL == 'True') ? '1' : '0');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_HS_VERIFY_SSL == 'True') ? '1' : '0');
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_VERIFY_SSL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_PROXY')) {
             if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_HS_PROXY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_HS_PROXY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_PROXY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_PROXY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_HS_DEBUG_EMAIL')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_HS_DEBUG_EMAIL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_HS_DEBUG_EMAIL');
         }
     }
 }

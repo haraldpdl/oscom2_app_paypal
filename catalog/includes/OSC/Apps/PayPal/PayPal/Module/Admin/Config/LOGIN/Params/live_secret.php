@@ -8,9 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-use OSC\OM\HTML;
-
-class live_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class live_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $sort_order = 300;
 
@@ -18,26 +16,5 @@ class live_secret extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbst
     {
         $this->title = $this->app->getDef('cfg_login_live_secret_title');
         $this->description = $this->app->getDef('cfg_login_live_secret_desc');
-    }
-
-    public function getSetField()
-    {
-        $input = HTML::inputField('live_secret', OSCOM_APP_PAYPAL_LOGIN_LIVE_SECRET, 'id="inputLogInLiveSecret"');
-
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputLogInLiveSecret">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
     }
 }

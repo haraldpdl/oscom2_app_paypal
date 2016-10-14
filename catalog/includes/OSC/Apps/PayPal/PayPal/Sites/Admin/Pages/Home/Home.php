@@ -16,14 +16,16 @@ use OSC\Apps\PayPal\PayPal\PayPal;
 
 class Home extends \OSC\OM\PagesAbstract
 {
-    protected $db;
-    public $data;
+    public $app;
 
     protected function init()
     {
-        $this->db = Registry::get('Db');
+        $OSCOM_PayPal = new PayPal();
+        Registry::set('PayPal', $OSCOM_PayPal);
 
-        $Qcheck = $this->db->query('show tables like ":table_oscom_app_paypal_log"');
+        $this->app = $OSCOM_PayPal;
+
+        $Qcheck = $this->app->db->query('show tables like ":table_oscom_app_paypal_log"');
 
         if ($Qcheck->fetch() === false) {
             $sql = <<<EOD
@@ -43,16 +45,13 @@ CREATE TABLE :table_oscom_app_paypal_log (
 ) CHARACTER SET utf8 COLLATE utf8_unicode_ci;
 EOD;
 
-            $this->db->exec($sql);
+            $this->app->db->exec($sql);
         }
 
-        $OSCOM_PayPal = new PayPal();
-        Registry::set('PayPal', $OSCOM_PayPal);
+        $this->app->loadDefinitionFile('admin.php');
+        $this->app->loadDefinitionFile('admin/start.php');
 
-        $OSCOM_PayPal->loadLanguageFile('admin.php');
-        $OSCOM_PayPal->loadLanguageFile('admin/start.php');
-
-        if ($OSCOM_PayPal->migrate()) {
+        if ($this->app->migrate()) {
             $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);
 
             foreach (Apps::getModules('adminDashboard', 'PayPal') as $k => $v) {
@@ -65,7 +64,7 @@ EOD;
             }
 
             if (isset($adm)) {
-                $this->db->save('configuration', [
+                $this->app->db->save('configuration', [
                     'configuration_value' => implode(';', $admin_dashboard_modules)
                 ], [
                     'configuration_key' => 'MODULE_ADMIN_DASHBOARD_INSTALLED'
@@ -74,11 +73,30 @@ EOD;
 
             OSCOM::redirect('index.php', tep_get_all_get_params());
         }
+
+        if (!$this->isActionRequest()) {
+            $paypal_menu_check = [
+                'OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL',
+                'OSCOM_APP_PAYPAL_LIVE_API_USERNAME',
+                'OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL',
+                'OSCOM_APP_PAYPAL_SANDBOX_API_USERNAME',
+                'OSCOM_APP_PAYPAL_PF_LIVE_VENDOR',
+                'OSCOM_APP_PAYPAL_PF_SANDBOX_VENDOR'
+            ];
+
+            foreach ($paypal_menu_check as $value) {
+                if (defined($value) && !empty(constant($value))) {
+                    $this->runAction('Configure');
+                    break;
+                }
+            }
+        }
     }
 
-    public function getFile()
+    public function getFile2()
     {
         if (isset($this->file)) {
+            var_dump(__DIR__ . '/templates/' . $this->file);
             return __DIR__ . '/templates/' . $this->file;
         }
     }

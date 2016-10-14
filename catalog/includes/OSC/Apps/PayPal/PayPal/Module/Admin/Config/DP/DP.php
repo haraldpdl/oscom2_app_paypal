@@ -47,7 +47,7 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
         $installed[] = $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
-        $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+        $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
     }
 
     public function uninstall()
@@ -60,7 +60,7 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);
 
-            $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+            $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
         }
     }
 
@@ -71,9 +71,9 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
 
     public function doMigrationCheck($class)
     {
-        if (file_exists(OSCOM::BASE_DIR . 'modules/payment/' . $class . '.php')) {
+        if (is_file(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $class . '.php')) {
             if (!class_exists($class)) {
-                include(OSCOM::BASE_DIR . 'modules/payment/' . $class . '.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $class . '.php');
             }
 
             $module = new $class();
@@ -102,17 +102,17 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME'))) {
                         if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD'))) {
                             if (!defined('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE'))) {
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME', MODULE_PAYMENT_PAYPAL_PRO_DP_API_USERNAME);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_DP_API_PASSWORD);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE', MODULE_PAYMENT_PAYPAL_PRO_DP_API_SIGNATURE);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_USERNAME', MODULE_PAYMENT_PAYPAL_PRO_DP_API_USERNAME);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_DP_API_PASSWORD);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_API_SIGNATURE', MODULE_PAYMENT_PAYPAL_PRO_DP_API_SIGNATURE);
                             }
                         }
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_API_USERNAME');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_API_PASSWORD');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_API_SIGNATURE');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_API_USERNAME');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_API_PASSWORD');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_API_SIGNATURE');
             }
         }
 
@@ -126,68 +126,68 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                     if (!defined('OSCOM_APP_PAYPAL_PF_' . $server . '_VENDOR') || !tep_not_null(constant('OSCOM_APP_PAYPAL_PF_' . $server . '_VENDOR'))) {
                         if (!defined('OSCOM_APP_PAYPAL_PF_' . $server . '_PASSWORD') || !tep_not_null(constant('OSCOM_APP_PAYPAL_PF_' . $server . '_PASSWORD'))) {
                             if (!defined('OSCOM_APP_PAYPAL_PF_' . $server . '_PARTNER') || !tep_not_null(constant('OSCOM_APP_PAYPAL_PF_' . $server . '_PARTNER'))) {
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_PF_' . $server . '_VENDOR', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VENDOR);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_PF_' . $server . '_USER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_USERNAME);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_PF_' . $server . '_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PASSWORD);
-                                $this->app->saveParameter('OSCOM_APP_PAYPAL_PF_' . $server . '_PARTNER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PARTNER);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PF_' . $server . '_VENDOR', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VENDOR);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PF_' . $server . '_USER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_USERNAME);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PF_' . $server . '_PASSWORD', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PASSWORD);
+                                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PF_' . $server . '_PARTNER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PARTNER);
                             }
                         }
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VENDOR');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_USERNAME');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PASSWORD');
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PARTNER');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VENDOR');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_USERNAME');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PASSWORD');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PARTNER');
             }
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_METHOD')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_METHOD');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_METHOD');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_METHOD')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_METHOD');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_METHOD');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_DP_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_DP_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_ZONE')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_ZONE', MODULE_PAYMENT_PAYPAL_PRO_DP_ZONE);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_ZONE');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_ZONE', MODULE_PAYMENT_PAYPAL_PRO_DP_ZONE);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_ZONE');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ZONE')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_ZONE', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ZONE);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ZONE');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_ZONE', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ZONE);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_ZONE');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_SORT_ORDER')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_DP_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_SORT_ORDER');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_DP_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_SORT_ORDER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_SORT_ORDER')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_SORT_ORDER');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_SORT_ORDER', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_SORT_ORDER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTIONS_ORDER_STATUS_ID')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTIONS_ORDER_STATUS_ID');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTIONS_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTIONS_ORDER_STATUS_ID')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTIONS_ORDER_STATUS_ID');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTIONS_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_STATUS')) {
@@ -201,8 +201,8 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_STATUS', $status);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_STATUS');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_STATUS', $status);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_STATUS');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_STATUS')) {
@@ -216,16 +216,16 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_STATUS', $status);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_STATUS');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_STATUS', $status);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_STATUS');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_SERVER')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_SERVER');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_TRANSACTION_SERVER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_SERVER')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_SERVER');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_TRANSACTION_SERVER');
         }
 
         $cards = [
@@ -254,51 +254,51 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_DP_CARDS', implode(';', $cards_installed));
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_DP_CARDS', implode(';', $cards_installed));
         }
 
         foreach ($cards as $c) {
-            $this->app->deleteParameter($c);
+            $this->app->deleteCfgParam($c);
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_VERIFY_SSL')) {
             if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_DP_VERIFY_SSL == 'True') ? '1' : '0');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_DP_VERIFY_SSL == 'True') ? '1' : '0');
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_VERIFY_SSL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VERIFY_SSL')) {
             if ( !defined('OSCOM_APP_PAYPAL_VERIFY_SSL') ) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VERIFY_SSL == 'True') ? '1' : '0');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VERIFY_SSL == 'True') ? '1' : '0');
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VERIFY_SSL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_PROXY')) {
             if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_DP_PROXY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_DP_PROXY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_PROXY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_PROXY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PROXY')) {
             if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PROXY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PROXY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PROXY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_PROXY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_DP_DEBUG_EMAIL')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_DP_DEBUG_EMAIL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_DP_DEBUG_EMAIL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_DEBUG_EMAIL')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_DEBUG_EMAIL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_DP_DEBUG_EMAIL');
         }
 
         if ($is_payflow === true) {
@@ -308,7 +308,7 @@ class DP extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             if ($installed_pos !== false) {
                 unset($installed[$installed_pos]);
 
-                $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+                $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
             }
         }
     }

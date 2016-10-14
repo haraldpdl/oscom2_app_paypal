@@ -15,7 +15,7 @@
   use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 
   class HS implements \OSC\OM\Modules\PaymentInterface {
-    var $code, $title, $description, $enabled, $_app;
+    public $code, $title, $description, $enabled, $app;
 
     function __construct() {
       global $order;
@@ -24,16 +24,16 @@
         Registry::set('PayPal', new PayPalApp());
       }
 
-      $this->_app = Registry::get('PayPal');
-      $this->_app->loadLanguageFile('modules/HS/HS.php');
+      $this->app = Registry::get('PayPal');
+      $this->app->loadDefinitionFile('modules/HS/HS.php');
 
-      $this->signature = 'paypal|paypal_pro_hs|' . $this->_app->getVersion() . '|2.4';
-      $this->api_version = $this->_app->getApiVersion();
+      $this->signature = 'paypal|paypal_pro_hs|' . $this->app->getVersion() . '|2.4';
+      $this->api_version = $this->app->getApiVersion();
 
       $this->code = 'HS';
-      $this->title = $this->_app->getDef('module_hs_title');
-      $this->public_title = $this->_app->getDef('module_hs_public_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_hs_legacy_admin_app_button'), $this->_app->link('Configure&module=HS'), 'primary', null, true) . '</div>';
+      $this->title = $this->app->getDef('module_hs_title');
+      $this->public_title = $this->app->getDef('module_hs_public_title');
+      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_hs_legacy_admin_app_button'), null, $this->app->link('Configure&module=HS'), null, null, 'btn-primary') . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_HS_SORT_ORDER') ? OSCOM_APP_PAYPAL_HS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_HS_STATUS') && in_array(OSCOM_APP_PAYPAL_HS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID : 0;
@@ -41,7 +41,7 @@
       if ( defined('OSCOM_APP_PAYPAL_HS_STATUS') ) {
         if ( OSCOM_APP_PAYPAL_HS_STATUS == '0' ) {
           $this->title .= ' [Sandbox]';
-          $this->public_title .= ' (' . $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code . '; Sandbox)';
+          $this->public_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
         }
 
         if ( OSCOM_APP_PAYPAL_HS_STATUS == '1' ) {
@@ -52,18 +52,18 @@
       }
 
       if ( !function_exists('curl_init') ) {
-        $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_hs_error_curl') . '</div>';
+        $this->description .= '<div class="secWarning">' . $this->app->getDef('module_hs_error_curl') . '</div>';
 
         $this->enabled = false;
       }
 
       if ( $this->enabled === true ) {
-        if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && !$this->_app->hasCredentials('HS') ) { // PayPal
-          $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_hs_error_credentials') . '</div>';
+        if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && !$this->app->hasCredentials('HS') ) { // PayPal
+          $this->description .= '<div class="secWarning">' . $this->app->getDef('module_hs_error_credentials') . '</div>';
 
           $this->enabled = false;
         } elseif ( OSCOM_APP_PAYPAL_GATEWAY == '0' ) { // Payflow
-          $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_hs_error_payflow') . '</div>';
+          $this->description .= '<div class="secWarning">' . $this->app->getDef('module_hs_error_payflow') . '</div>';
 
           $this->enabled = false;
         }
@@ -79,12 +79,10 @@
     function update_status() {
       global $order;
 
-      $OSCOM_Db = Registry::get('Db');
-
       if ( ($this->enabled == true) && ((int)OSCOM_APP_PAYPAL_HS_ZONE > 0) ) {
         $check_flag = false;
 
-        $Qcheck = $OSCOM_Db->get('zones_to_geo_zones', 'zone_id', ['geo_zone_id' => OSCOM_APP_PAYPAL_HS_ZONE, 'zone_country_id' => $order->billing['country']['id']], 'zone_id');
+        $Qcheck = $this->app->db->get('zones_to_geo_zones', 'zone_id', ['geo_zone_id' => OSCOM_APP_PAYPAL_HS_ZONE, 'zone_country_id' => $order->billing['country']['id']], 'zone_id');
 
         while ($Qcheck->fetch()) {
           if (($Qcheck->valueInt('zone_id') < 1) || ($Qcheck->valueInt('zone_id') == $order->billing['zone_id'])) {
@@ -104,25 +102,23 @@
     }
 
     function selection() {
-      $OSCOM_Db = Registry::get('Db');
-
       if (isset($_SESSION['cart_PayPal_Pro_HS_ID'])) {
         $order_id = substr($_SESSION['cart_PayPal_Pro_HS_ID'], strpos($_SESSION['cart_PayPal_Pro_HS_ID'], '-')+1);
 
-        $Qcheck = $OSCOM_Db->get('orders_status_history', 'orders_id', ['orders_id' => $order_id], null, 1);
+        $Qcheck = $this->app->db->get('orders_status_history', 'orders_id', ['orders_id' => $order_id], null, 1);
 
         if ($Qcheck->fetch() === false) {
-          $OSCOM_Db->delete('orders', ['orders_id' => $order_id]);
-          $OSCOM_Db->delete('orders_total', ['orders_id' => $order_id]);
-          $OSCOM_Db->delete('orders_products', ['orders_id' => $order_id]);
-          $OSCOM_Db->delete('orders_products_attributes', ['orders_id' => $order_id]);
-          $OSCOM_Db->delete('orders_products_download', ['orders_id' => $order_id]);
+          $this->app->db->delete('orders', ['orders_id' => $order_id]);
+          $this->app->db->delete('orders_total', ['orders_id' => $order_id]);
+          $this->app->db->delete('orders_products', ['orders_id' => $order_id]);
+          $this->app->db->delete('orders_products_attributes', ['orders_id' => $order_id]);
+          $this->app->db->delete('orders_products_download', ['orders_id' => $order_id]);
 
           unset($_SESSION['cart_PayPal_Pro_HS_ID']);
         }
       }
 
-      return array('id' => $this->_app->vendor . '\\' . $this->_app->code . '\\' . $this->code,
+      return array('id' => $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code,
                    'module' => $this->public_title);
     }
 
@@ -135,8 +131,6 @@
     function confirmation() {
       global $order, $order_total_modules;
 
-      $OSCOM_Db = Registry::get('Db');
-
       $_SESSION['pphs_result'] = array();
 
       if (isset($_SESSION['cartID'])) {
@@ -145,17 +139,17 @@
         if (isset($_SESSION['cart_PayPal_Pro_HS_ID'])) {
           $order_id = substr($_SESSION['cart_PayPal_Pro_HS_ID'], strpos($_SESSION['cart_PayPal_Pro_HS_ID'], '-')+1);
 
-          $Qorder = $OSCOM_Db->get('orders', 'currency', ['orders_id' => $order_id]);
+          $Qorder = $this->app->db->get('orders', 'currency', ['orders_id' => $order_id]);
 
           if ( ($Qorder->value('currency') != $order->info['currency']) || ($_SESSION['cartID'] != substr($_SESSION['cart_PayPal_Pro_HS_ID'], 0, strlen($_SESSION['cartID']))) ) {
-            $Qcheck = $OSCOM_Db->get('orders_status_history', 'orders_id', ['orders_id' => $order_id], null, 1);
+            $Qcheck = $this->app->db->get('orders_status_history', 'orders_id', ['orders_id' => $order_id], null, 1);
 
             if ($Qcheck->fetch() === false) {
-              $OSCOM_Db->delete('orders', ['orders_id' => $order_id]);
-              $OSCOM_Db->delete('orders_total', ['orders_id' => $order_id]);
-              $OSCOM_Db->delete('orders_products', ['orders_id' => $order_id]);
-              $OSCOM_Db->delete('orders_products_attributes', ['orders_id' => $order_id]);
-              $OSCOM_Db->delete('orders_products_download', ['orders_id' => $order_id]);
+              $this->app->db->delete('orders', ['orders_id' => $order_id]);
+              $this->app->db->delete('orders_total', ['orders_id' => $order_id]);
+              $this->app->db->delete('orders_products', ['orders_id' => $order_id]);
+              $this->app->db->delete('orders_products_attributes', ['orders_id' => $order_id]);
+              $this->app->db->delete('orders_products_download', ['orders_id' => $order_id]);
             }
 
             $insert_order = true;
@@ -223,9 +217,9 @@
                                   'currency' => $order->info['currency'],
                                   'currency_value' => $order->info['currency_value']);
 
-          $OSCOM_Db->save('orders', $sql_data_array);
+          $this->app->db->save('orders', $sql_data_array);
 
-          $insert_id = $OSCOM_Db->lastInsertId();
+          $insert_id = $this->app->db->lastInsertId();
 
           for ($i=0, $n=sizeof($order_totals); $i<$n; $i++) {
             $sql_data_array = array('orders_id' => $insert_id,
@@ -235,7 +229,7 @@
                                     'class' => $order_totals[$i]['code'],
                                     'sort_order' => $order_totals[$i]['sort_order']);
 
-            $OSCOM_Db->save('orders_total', $sql_data_array);
+            $this->app->db->save('orders_total', $sql_data_array);
           }
 
           for ($i=0, $n=sizeof($order->products); $i<$n; $i++) {
@@ -246,12 +240,11 @@
                                     'products_price' => $order->products[$i]['price'],
                                     'final_price' => $order->products[$i]['final_price'],
                                     'products_tax' => $order->products[$i]['tax'],
-                                    'products_quantity' => $order->products[$i]['qty'],
-                                    'products_full_id' => $order->products[$i]['id']);
+                                    'products_quantity' => $order->products[$i]['qty']);
 
-            $OSCOM_Db->save('orders_products', $sql_data_array);
+            $this->app->db->save('orders_products', $sql_data_array);
 
-            $order_products_id = $OSCOM_Db->lastInsertId();
+            $order_products_id = $this->app->db->lastInsertId();
 
             $attributes_exist = '0';
             if (isset($order->products[$i]['attributes'])) {
@@ -280,7 +273,7 @@
                                        and popt.language_id = poval.language_id';
                 }
 
-                $Qattributes = $OSCOM_Db->prepare($attributes_query);
+                $Qattributes = $this->app->db->prepare($attributes_query);
                 $Qattributes->bindInt(':products_id', $order->products[$i]['id']);
                 $Qattributes->bindInt(':options_id', $order->products[$i]['attributes'][$j]['option_id']);
                 $Qattributes->bindInt(':options_values_id', $order->products[$i]['attributes'][$j]['value_id']);
@@ -294,7 +287,7 @@
                                         'options_values_price' => $Qattributes->value('options_values_price'),
                                         'price_prefix' => $Qattributes->value('price_prefix'));
 
-                $OSCOM_Db->save('orders_products_attributes', $sql_data_array);
+                $this->app->db->save('orders_products_attributes', $sql_data_array);
 
                 if ((DOWNLOAD_ENABLED == 'true') && $Qattributes->hasValue('products_attributes_filename') && !empty($Qattributes->value('products_attributes_filename'))) {
                   $sql_data_array = array('orders_id' => $insert_id,
@@ -303,7 +296,7 @@
                                           'download_maxdays' => $Qattributes->value('products_attributes_maxdays'),
                                           'download_count' => $Qattributes->value('products_attributes_maxcount'));
 
-                  $OSCOM_Db->save('orders_products_download', $sql_data_array);
+                  $this->app->db->save('orders_products_download', $sql_data_array);
                 }
               }
             }
@@ -322,9 +315,9 @@
                         'paymentaction' => OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD == '1' ? 'sale' : 'authorization',
                         'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
                         'notify_url' => OSCOM::link('index.php', 'order&ipn&paypal&hs', 'SSL', false, false),
-                        'shipping' => $this->_app->formatCurrencyRaw($order->info['shipping_cost']),
-                        'tax' => $this->_app->formatCurrencyRaw($order->info['tax']),
-                        'subtotal' => $this->_app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
+                        'shipping' => $this->app->formatCurrencyRaw($order->info['shipping_cost']),
+                        'tax' => $this->app->formatCurrencyRaw($order->info['tax']),
+                        'subtotal' => $this->app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
                         'billing_first_name' => $order->billing['firstname'],
                         'billing_last_name' => $order->billing['lastname'],
                         'billing_address1' => $order->billing['street_address'],
@@ -350,13 +343,15 @@
           $params['country'] = $order->delivery['country']['iso_code_2'];
         }
 
-        $return_link_title = $this->_app->getDef('module_hs_button_return_to_store', array('storename' => STORE_NAME));
+        $return_link_title = $this->app->getDef('module_hs_button_return_to_store', [
+          ':storename' => STORE_NAME
+        ]);
 
         if ( strlen($return_link_title) <= 60 ) {
           $params['cbt'] = $return_link_title;
         }
 
-        $_SESSION['pphs_result'] = $this->_app->getApiResult('APP', 'BMCreateButton', $params, (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
+        $_SESSION['pphs_result'] = $this->app->getApiResult('APP', 'BMCreateButton', $params, (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
       }
 
       $_SESSION['pphs_key'] = tep_create_random_value(16);
@@ -364,15 +359,8 @@
       $iframe_url = OSCOM::link('index.php', 'order&paypal&checkout&hs&key=' . $_SESSION['pphs_key'], 'SSL');
       $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs', 'SSL');
 
-// include jquery if it doesn't exist in the template
       $output = <<<EOD
 <iframe src="{$iframe_url}" width="570px" height="540px" frameBorder="0" scrolling="no"></iframe>
-<script>
-if ( typeof jQuery == 'undefined' ) {
-  document.write('<scr' + 'ipt src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></scr' + 'ipt>');
-}
-</script>
-
 <script>
 $(function() {
   $('form[name="checkout_confirmation"] input[type="submit"], form[name="checkout_confirmation"] input[type="image"], form[name="checkout_confirmation"] button[type="submit"]').hide();
@@ -393,14 +381,12 @@ EOD;
     function before_process() {
       global $order, $order_totals, $currencies;
 
-      $OSCOM_Db = Registry::get('Db');
-
       $result = false;
 
       if ( isset($_GET['tx']) && !empty($_GET['tx']) ) { // direct payment (eg, credit card)
-        $result = $this->_app->getApiResult('APP', 'GetTransactionDetails', array('TRANSACTIONID' => $_GET['tx']), (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
+        $result = $this->app->getApiResult('APP', 'GetTransactionDetails', array('TRANSACTIONID' => $_GET['tx']), (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
       } elseif ( isset($_POST['txn_id']) && !empty($_POST['txn_id']) ) { // paypal payment
-        $result = $this->_app->getApiResult('APP', 'GetTransactionDetails', array('TRANSACTIONID' => $_POST['txn_id']), (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
+        $result = $this->app->getApiResult('APP', 'GetTransactionDetails', array('TRANSACTIONID' => $_POST['txn_id']), (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox');
       }
 
       if ( !in_array($result['ACK'], array('Success', 'SuccessWithWarning')) ) {
@@ -409,10 +395,10 @@ EOD;
 
       $order_id = substr($_SESSION['cart_PayPal_Pro_HS_ID'], strpos($_SESSION['cart_PayPal_Pro_HS_ID'], '-')+1);
 
-      $seller_accounts = array($this->_app->getCredentials('HS', 'email'));
+      $seller_accounts = array($this->app->getCredentials('HS', 'email'));
 
-      if ( tep_not_null($this->_app->getCredentials('HS', 'email_primary')) ) {
-        $seller_accounts[] = $this->_app->getCredentials('HS', 'email_primary');
+      if ( tep_not_null($this->app->getCredentials('HS', 'email_primary')) ) {
+        $seller_accounts[] = $this->app->getCredentials('HS', 'email_primary');
       }
 
       if ( !isset($result['RECEIVERBUSINESS']) || !in_array($result['RECEIVERBUSINESS'], $seller_accounts) || ($result['INVNUM'] != $order_id) || ($result['CUSTOM'] != $_SESSION['customer_id']) ) {
@@ -421,7 +407,7 @@ EOD;
 
       $_SESSION['pphs_result'] = $result;
 
-      $Qorder = $OSCOM_Db->get('orders', 'orders_status', ['orders_id' => $order_id, 'customers_id' => $_SESSION['customer_id']]);
+      $Qorder = $this->app->db->get('orders', 'orders_status', ['orders_id' => $order_id, 'customers_id' => $_SESSION['customer_id']]);
 
       if (($Qorder->fetch() === false) || ($order_id != $_SESSION['pphs_result']['INVNUM']) || ($_SESSION['customer_id'] != $_SESSION['pphs_result']['CUSTOM'])) {
         OSCOM::redirect('shopping_cart.php');
@@ -439,7 +425,7 @@ EOD;
         $new_order_status = OSCOM_APP_PAYPAL_HS_ORDER_STATUS_ID;
       }
 
-      $OSCOM_Db->save('orders', ['orders_status' => $new_order_status, 'last_modified' => 'now()'], ['orders_id' => $order_id]);
+      $this->app->db->save('orders', ['orders_status' => $new_order_status, 'last_modified' => 'now()'], ['orders_id' => $order_id]);
 
       $sql_data_array = array('orders_id' => $order_id,
                               'orders_status_id' => (int)$new_order_status,
@@ -447,7 +433,7 @@ EOD;
                               'customer_notified' => (SEND_EMAILS == 'true') ? '1' : '0',
                               'comments' => $order->info['comments']);
 
-      $OSCOM_Db->save('orders_status_history', $sql_data_array);
+      $this->app->db->save('orders_status_history', $sql_data_array);
 
 // initialized for the email confirmation
       $products_ordered = '';
@@ -470,7 +456,7 @@ EOD;
               $stock_query_sql .= ' and pa.options_id = :options_id and pa.options_values_id = :options_values_id';
             }
 
-            $Qstock = $OSCOM_Db->prepare($stock_query_sql);
+            $Qstock = $this->app->db->prepare($stock_query_sql);
             $Qstock->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
 
             if (is_array($products_attributes)) {
@@ -480,7 +466,7 @@ EOD;
 
             $Qstock->execute();
           } else {
-            $Qstock = $OSCOM_Db->prepare('select products_quantity from :table_products where products_id = :products_id');
+            $Qstock = $this->app->db->prepare('select products_quantity from :table_products where products_id = :products_id');
             $Qstock->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
             $Qstock->execute();
           }
@@ -494,17 +480,17 @@ EOD;
             }
 
             if ($stock_left != $Qstock->valueInt('products_quantity')) {
-              $OSCOM_Db->save('products', ['products_quantity' => $stock_left], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
+              $this->app->db->save('products', ['products_quantity' => $stock_left], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
             }
 
             if ( ($stock_left < 1) && (STOCK_ALLOW_CHECKOUT == 'false') ) {
-             $OSCOM_Db->save('products', ['products_status' => '0'], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
+             $this->app->db->save('products', ['products_status' => '0'], ['products_id' => tep_get_prid($order->products[$i]['id'])]);
             }
           }
         }
 
 // Update products_ordered (for bestsellers list)
-        $Qupdate = $OSCOM_Db->prepare('update :table_products set products_ordered = products_ordered + :products_ordered where products_id = :products_id');
+        $Qupdate = $this->app->db->prepare('update :table_products set products_ordered = products_ordered + :products_ordered where products_id = :products_id');
         $Qupdate->bindInt(':products_ordered', $order->products[$i]['qty']);
         $Qupdate->bindInt(':products_id', tep_get_prid($order->products[$i]['id']));
         $Qupdate->execute();
@@ -538,7 +524,7 @@ EOD;
                                    and popt.language_id = poval.language_id';
             }
 
-            $Qattributes = $OSCOM_Db->prepare($attributes_query);
+            $Qattributes = $this->app->db->prepare($attributes_query);
             $Qattributes->bindInt(':products_id', $order->products[$i]['id']);
             $Qattributes->bindInt(':options_id', $order->products[$i]['attributes'][$j]['option_id']);
             $Qattributes->bindInt(':options_values_id', $order->products[$i]['attributes'][$j]['value_id']);
@@ -613,8 +599,8 @@ EOD;
     }
 
     function get_error() {
-      $error = array('title' => $this->_app->getDef('module_hs_error_general_title'),
-                     'error' => $this->_app->getDef('module_hs_error_general'));
+      $error = array('title' => $this->app->getDef('module_hs_error_general_title'),
+                     'error' => $this->app->getDef('module_hs_error_general'));
 
       if ( isset($_SESSION['pphs_error_msg']) ) {
         $error['error'] = $_SESSION['pphs_error_msg'];
@@ -630,11 +616,11 @@ EOD;
     }
 
     function install() {
-      $this->_app->redirect('Configure&Install&module=HS');
+      $this->app->redirect('Configure&Install&module=HS');
     }
 
     function remove() {
-      $this->_app->redirect('Configure&Uninstall&module=HS');
+      $this->app->redirect('Configure&Uninstall&module=HS');
     }
 
     function keys() {
@@ -643,8 +629,6 @@ EOD;
 
     function verifyTransaction($is_ipn = false) {
       global $currencies;
-
-      $OSCOM_Db = Registry::get('Db');
 
       $tx_order_id = $_SESSION['pphs_result']['INVNUM'];
       $tx_customer_id = $_SESSION['pphs_result']['CUSTOM'];
@@ -658,7 +642,7 @@ EOD;
       $tx_pending_reason = (isset($_SESSION['pphs_result']['PENDINGREASON'])) ? $_SESSION['pphs_result']['PENDINGREASON'] : null;
 
       if ( is_numeric($tx_order_id) && ($tx_order_id > 0) && is_numeric($tx_customer_id) && ($tx_customer_id > 0) ) {
-        $Qorder = $OSCOM_Db->get('orders', ['orders_id', 'orders_status', 'currency', 'currency_value'], ['orders_id' => $tx_order_id, 'customers_id' => $tx_customer_id]);
+        $Qorder = $this->app->db->get('orders', ['orders_id', 'orders_status', 'currency', 'currency_value'], ['orders_id' => $tx_order_id, 'customers_id' => $tx_customer_id]);
 
         if ($Qorder->fetch() !== false) {
           $new_order_status = DEFAULT_ORDERS_STATUS_ID;
@@ -667,7 +651,7 @@ EOD;
             $new_order_status = $Qorder->valueInt('orders_status');
           }
 
-          $Qtotal = $OSCOM_Db->get('orders_total', 'value', ['orders_id' => $Qorder->valueInt('orders_id'), 'class' => 'ot_total'], null, 1);
+          $Qtotal = $this->app->db->get('orders_total', 'value', ['orders_id' => $Qorder->valueInt('orders_id'), 'class' => 'ot_total'], null, 1);
 
           $comment_status = 'Transaction ID: ' . HTML::outputProtected($tx_transaction_id) . "\n" .
                             'Payer Status: ' . HTML::outputProtected($tx_payer_status) . "\n" .
@@ -676,13 +660,13 @@ EOD;
                             'Payment Type: ' . HTML::outputProtected($tx_payment_type) . "\n" .
                             'Pending Reason: ' . HTML::outputProtected($tx_pending_reason);
 
-          if ( $tx_amount != $this->_app->formatCurrencyRaw($Qtotal->value('value'), $Qorder->value('currency'), $Qorder->value('currency_value')) ) {
-            $comment_status .= "\n" . 'OSCOM Error Total Mismatch: PayPal transaction value (' . HTML::outputProtected($tx_amount) . ') does not match order value (' . $this->_app->formatCurrencyRaw($Qtotal->value('value'), $Qorder->value('currency'), $Qorder->value('currency_value')) . ')';
+          if ( $tx_amount != $this->app->formatCurrencyRaw($Qtotal->value('value'), $Qorder->value('currency'), $Qorder->value('currency_value')) ) {
+            $comment_status .= "\n" . 'OSCOM Error Total Mismatch: PayPal transaction value (' . HTML::outputProtected($tx_amount) . ') does not match order value (' . $this->app->formatCurrencyRaw($Qtotal->value('value'), $Qorder->value('currency'), $Qorder->value('currency_value')) . ')';
           } elseif ( $tx_payment_status == 'Completed' ) {
             $new_order_status = (OSCOM_APP_PAYPAL_HS_ORDER_STATUS_ID > 0 ? OSCOM_APP_PAYPAL_HS_ORDER_STATUS_ID : $new_order_status);
           }
 
-          $OSCOM_Db->save('orders', ['orders_status' => $new_order_status, 'last_modified' => 'now()'], ['orders_id' => $Qorder->valueInt('orders_id')]);
+          $this->app->db->save('orders', ['orders_status' => $new_order_status, 'last_modified' => 'now()'], ['orders_id' => $Qorder->valueInt('orders_id')]);
 
           if ( $is_ipn === true ) {
             $comment_status .= "\n" . 'Source: IPN';
@@ -694,7 +678,7 @@ EOD;
                                   'customer_notified' => '0',
                                   'comments' => $comment_status);
 
-          $OSCOM_Db->save('orders_status_history', $sql_data_array);
+          $this->app->db->save('orders_status_history', $sql_data_array);
         }
       }
     }

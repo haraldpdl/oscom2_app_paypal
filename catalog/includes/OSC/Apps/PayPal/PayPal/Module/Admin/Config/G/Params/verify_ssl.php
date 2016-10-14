@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G\Params;
 
-class verify_ssl extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class verify_ssl extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '1';
     public $sort_order = 300;
@@ -19,31 +21,15 @@ class verify_ssl extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstr
         $this->description = $this->app->getDef('cfg_verify_ssl_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="verifySslSelectionTrue" name="verify_ssl" value="1"' . (OSCOM_APP_PAYPAL_VERIFY_SSL == '1' ? ' checked="checked"' : '') . '><label for="verifySslSelectionTrue">' . $this->app->getDef('cfg_verify_ssl_true') . '</label>' .
-                 '<input type="radio" id="verifySslSelectionFalse" name="verify_ssl" value="0"' . (OSCOM_APP_PAYPAL_VERIFY_SSL == '0' ? ' checked="checked"' : '') . '><label for="verifySslSelectionFalse">' . $this->app->getDef('cfg_verify_ssl_false') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == '1' ? ' active' : '') . '">' . HTML::radioField($this->key, '1', ($value == '1')) . $this->app->getDef('cfg_verify_ssl_true') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '0' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '0')) . $this->app->getDef('cfg_verify_ssl_false') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="verifySslSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#verifySslSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

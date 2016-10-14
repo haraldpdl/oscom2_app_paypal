@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G\Params;
 
-class log_transactions extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class log_transactions extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '1';
     public $sort_order = 500;
@@ -19,32 +21,16 @@ class log_transactions extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\Param
         $this->description = $this->app->getDef('cfg_log_transactions_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="logTransactionsSelectionAll" name="log_transactions" value="1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionAll">' . $this->app->getDef('cfg_log_transactions_all') . '</label>' .
-                 '<input type="radio" id="logTransactionsSelectionErrors" name="log_transactions" value="0"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '0' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionErrors">' . $this->app->getDef('cfg_log_transactions_errors') . '</label>' .
-                 '<input type="radio" id="logTransactionsSelectionDisabled" name="log_transactions" value="-1"' . (OSCOM_APP_PAYPAL_LOG_TRANSACTIONS == '-1' ? ' checked="checked"' : '') . '><label for="logTransactionsSelectionDisabled">' . $this->app->getDef('cfg_log_transactions_disabled') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == '1' ? ' active' : '') . '">' . HTML::radioField($this->key, '1', ($value == '1')) . $this->app->getDef('cfg_log_transactions_all') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '0' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '0')) . $this->app->getDef('cfg_log_transactions_errors') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '-1' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '-1')) . $this->app->getDef('cfg_log_transactions_disabled') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="logSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#logSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

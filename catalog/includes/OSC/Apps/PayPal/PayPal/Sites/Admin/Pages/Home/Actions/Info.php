@@ -19,6 +19,6 @@ class Info extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('info.php');
         $this->page->data['action'] = 'Info';
 
-        $OSCOM_PayPal->loadLanguageFile('admin/info.php');
+        $OSCOM_PayPal->loadDefinitionFile('admin/info.php');
     }
 }

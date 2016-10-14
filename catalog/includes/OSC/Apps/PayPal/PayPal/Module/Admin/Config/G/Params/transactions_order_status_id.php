@@ -9,28 +9,29 @@
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\G\Params;
 
 use OSC\OM\HTML;
-use OSC\OM\Registry;
 
-class transactions_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class transactions_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '0';
     public $sort_order = 200;
 
-    protected $db;
-
     protected function init()
     {
-        $this->db = Registry::get('Db');
-
         $this->title = $this->app->getDef('cfg_transactions_order_status_id_title');
         $this->description = $this->app->getDef('cfg_transactions_order_status_id_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
         $statuses_array = [];
 
-        $Qstatuses = $this->db->get('orders_status', ['orders_status_id', 'orders_status_name'], ['language_id' => $_SESSION['languages_id'], 'public_flag' => '0'], 'orders_status_name');
+        $Qstatuses = $this->app->db->get('orders_status', [
+            'orders_status_id',
+            'orders_status_name'
+        ], [
+            'language_id' => $_SESSION['languages_id'],
+            'public_flag' => '0'
+        ], 'orders_status_name');
 
         while ($Qstatuses->fetch()) {
             $statuses_array[] = [
@@ -39,22 +40,8 @@ class transactions_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\
             ];
         }
 
-        $input = HTML::selectField('transactions_order_status_id', $statuses_array, OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID, 'id="inputTransactionsOrderStatusId"');
+        $input = HTML::selectField($this->key, $statuses_array, $this->getInputValue());
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputTransactionsOrderStatusId">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

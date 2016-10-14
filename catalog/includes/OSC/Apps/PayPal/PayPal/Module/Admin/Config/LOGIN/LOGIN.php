@@ -44,7 +44,7 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         $installed = explode(';', MODULE_CONTENT_INSTALLED);
         $installed[] = 'login/' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
-        $this->app->saveParameter('MODULE_CONTENT_INSTALLED', implode(';', $installed));
+        $this->app->saveCfgParam('MODULE_CONTENT_INSTALLED', implode(';', $installed));
     }
 
     public function uninstall()
@@ -57,7 +57,7 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);
 
-            $this->app->saveParameter('MODULE_CONTENT_INSTALLED', implode(';', $installed));
+            $this->app->saveCfgParam('MODULE_CONTENT_INSTALLED', implode(';', $installed));
         }
     }
 
@@ -65,9 +65,9 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
     {
         $class = basename($this->_cm_code);
 
-        if (file_exists(OSCOM::BASE_DIR . 'modules/content/' . $this->_cm_code . '.php')) {
+        if (is_file(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/content/' . $this->_cm_code . '.php')) {
             if (!class_exists($class)) {
-                include(OSCOM::BASE_DIR . 'modules/content/' . $this->_cm_code . '.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/content/' . $this->_cm_code . '.php');
             }
 
             $module = new $class();
@@ -92,42 +92,42 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             if (defined('MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID')) {
                 if (tep_not_null(MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID)) {
                     if (!defined('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_CLIENT_ID') || !tep_not_null(constant('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_CLIENT_ID'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_CLIENT_ID', MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_CLIENT_ID', MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID');
+                $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_CLIENT_ID');
             }
 
             if (defined('MODULE_CONTENT_PAYPAL_LOGIN_SECRET')) {
                 if (tep_not_null(MODULE_CONTENT_PAYPAL_LOGIN_SECRET)) {
                     if (!defined('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_SECRET') || !tep_not_null(constant('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_SECRET'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_SECRET', MODULE_CONTENT_PAYPAL_LOGIN_SECRET);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_' . $server . '_SECRET', MODULE_CONTENT_PAYPAL_LOGIN_SECRET);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_SECRET');
+                $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_SECRET');
             }
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_THEME')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_THEME', MODULE_CONTENT_PAYPAL_LOGIN_THEME);
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_THEME');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_THEME', MODULE_CONTENT_PAYPAL_LOGIN_THEME);
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_THEME');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_ATTRIBUTES')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_ATTRIBUTES', MODULE_CONTENT_PAYPAL_LOGIN_ATTRIBUTES);
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_ATTRIBUTES');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_ATTRIBUTES', MODULE_CONTENT_PAYPAL_LOGIN_ATTRIBUTES);
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_ATTRIBUTES');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_CONTENT_WIDTH')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_CONTENT_WIDTH', MODULE_CONTENT_PAYPAL_LOGIN_CONTENT_WIDTH, 'Content Width', 'Should the content be shown in a full or half width container?', 'tep_cfg_select_option(array(\'Full\', \'Half\'), ');
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_CONTENT_WIDTH');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_CONTENT_WIDTH', MODULE_CONTENT_PAYPAL_LOGIN_CONTENT_WIDTH, 'Content Width', 'Should the content be shown in a full or half width container?', 'tep_cfg_select_option(array(\'Full\', \'Half\'), ');
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_CONTENT_WIDTH');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_SORT_ORDER')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER', MODULE_CONTENT_PAYPAL_LOGIN_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_SORT_ORDER');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER', MODULE_CONTENT_PAYPAL_LOGIN_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_SORT_ORDER');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_STATUS')) {
@@ -141,28 +141,28 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_LOGIN_STATUS', $status);
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_STATUS');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_LOGIN_STATUS', $status);
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_STATUS');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_SERVER_TYPE')) {
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_SERVER_TYPE');
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_SERVER_TYPE');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL')) {
             if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL == 'True') ? '1' : '0');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL == 'True') ? '1' : '0');
             }
 
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL');
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_PROXY')) {
             if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PROXY', MODULE_CONTENT_PAYPAL_LOGIN_PROXY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_CONTENT_PAYPAL_LOGIN_PROXY);
             }
 
-            $this->app->deleteParameter('MODULE_CONTENT_PAYPAL_LOGIN_PROXY');
+            $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_PROXY');
         }
     }
 }

@@ -8,6 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
+use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
 class GetBalance extends \OSC\OM\PagesActionsAbstract
@@ -16,7 +17,7 @@ class GetBalance extends \OSC\OM\PagesActionsAbstract
     {
         $OSCOM_PayPal = Registry::get('PayPal');
 
-        include(DIR_FS_ADMIN . 'includes/classes/currencies.php');
+        include(OSCOM::getConfig('dir_root') . 'includes/classes/currencies.php');
         $currencies = new \currencies();
 
         $result = [

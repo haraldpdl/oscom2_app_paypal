@@ -13,7 +13,7 @@ privacy_body = <h3>API Credentials <small>(available for :api_req_countries coun
   <li>Account ID</li>
 </ul>
 
-<p>No other account information is accessed (eg, PayPal account username or password, account balance, transaction history, etc.).</p>
+<p>No other personal account information is accessed (eg, PayPal account username or password, account balance, or transaction history).</p>
 
 <p>The API Username, API Password, API Signature, and Account ID information are used to automatically configure the PayPal modules bundled in the PayPal App, including:</p>
 
@@ -53,17 +53,17 @@ privacy_body = <h3>API Credentials <small>(available for :api_req_countries coun
   <li>The PayPal App configures itself with the API credentials.</li>
 </ol>
 
-<div class="pp-panel pp-panel-warning">
+<div class="alert alert-warning">
   <p>The API Credentials retrieved from the store owners PayPal account are only used to configure the PayPal App. osCommerce temporarily stores the API Credentials as described in this privacy policy, and discards the API Credentials as soon as the process is over. A back-end script is also run to discard any stored information for processes that have not finalized.</p>
 </div>
 
-<div class="pp-panel pp-panel-info">
+<div class="alert alert-info">
   <p>osCommerce has worked closely with PayPal to ensure the PayPal App follows strict privacy and security policies.</p>
 </div>
 
 <h3>PayPal Modules</h3>
 
-<p>PayPal modules send store owner, online store, and customer related information to PayPal to process API transactions. These include the following modules:</p>
+<p>PayPal modules send store owner, online store, and customer related information to PayPal to process order transactions. These include the following modules:</p>
 
 <ul>
   <li>PayPal Payments Standard</li>
@@ -85,12 +85,6 @@ privacy_body = <h3>API Credentials <small>(available for :api_req_countries coun
   <li>E-Commerce solution identification.</li>
 </ul>
 
-<div class="pp-panel pp-panel-info">
+<div class="alert alert-info">
   <p>The parameters of each transaction sent to and recieved from PayPal can be inspected on the PayPal App Log page.</p>
 </div>
-
-<h3>App Updates</h3>
-
-<p>The PayPal App for osCommerce Online Merchant automatically checks the osCommerce website for updates that are available to the App. This check is performed once every 24 hours and if an update is available, a notification is shown to allow the App to download and apply the update.</p>
-
-<p>A manual check for available updates is also performed on the PayPal App Info page.</p>

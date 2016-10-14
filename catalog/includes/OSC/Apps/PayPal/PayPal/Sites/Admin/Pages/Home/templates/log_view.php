@@ -14,14 +14,14 @@ $OSCOM_Page = Registry::get('Site')->getPage();
 require(__DIR__ . '/template_top.php');
 ?>
 
-<div style="text-align: right; padding-bottom: 15px;">
-  <?php echo $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_back'), $OSCOM_PayPal->link('Log&page=' . $_GET['page']), 'info'); ?>
+<div class="text-right">
+  <?= HTML::button($OSCOM_PayPal->getDef('button_back'), null, $OSCOM_PayPal->link('Log&page=' . $_GET['page']), null, null, 'btn-info'); ?>
 </div>
 
-<table class="pp-table pp-table-hover" width="100%">
+<table class="table table-hover">
   <thead>
-    <tr>
-      <th colspan="2"><?php echo $OSCOM_PayPal->getDef('table_heading_entries_request'); ?></th>
+    <tr class="info">
+      <th colspan="2"><?= $OSCOM_PayPal->getDef('table_heading_entries_request'); ?></th>
     </tr>
   </thead>
   <tbody>
@@ -31,8 +31,8 @@ foreach ($OSCOM_Page->data['log_request'] as $key => $value) {
 ?>
 
     <tr>
-      <td width="25%"><?php echo HTML::outputProtected($key); ?></td>
-      <td><?php echo HTML::outputProtected($value); ?></td>
+      <td width="25%"><?= HTML::outputProtected($key); ?></td>
+      <td><?= HTML::outputProtected($value); ?></td>
     </tr>
 
 <?php
@@ -42,10 +42,10 @@ foreach ($OSCOM_Page->data['log_request'] as $key => $value) {
   </tbody>
 </table>
 
-<table class="pp-table pp-table-hover" width="100%">
+<table class="table table-hover">
   <thead>
-    <tr>
-      <th colspan="2"><?php echo $OSCOM_PayPal->getDef('table_heading_entries_response'); ?></th>
+    <tr class="info">
+      <th colspan="2"><?= $OSCOM_PayPal->getDef('table_heading_entries_response'); ?></th>
     </tr>
   </thead>
   <tbody>
@@ -55,8 +55,8 @@ foreach ($OSCOM_Page->data['log_response'] as $key => $value) {
 ?>
 
     <tr>
-      <td width="25%"><?php echo HTML::outputProtected($key); ?></td>
-      <td><?php echo HTML::outputProtected($value); ?></td>
+      <td width="25%"><?= HTML::outputProtected($key); ?></td>
+      <td><?= HTML::outputProtected($value); ?></td>
     </tr>
 
 <?php

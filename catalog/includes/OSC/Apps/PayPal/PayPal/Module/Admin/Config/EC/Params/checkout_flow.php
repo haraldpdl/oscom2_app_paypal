@@ -8,11 +8,11 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\EC\Params;
 
-use OSC\OM\OSCOM;
+use OSC\OM\HTML;
 
-class checkout_flow extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class checkout_flow extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
-    public $default = '0';
+    public $default = '1';
     public $sort_order = 200;
 
     protected function init()
@@ -21,35 +21,15 @@ class checkout_flow extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAb
         $this->description = $this->app->getDef('cfg_ec_checkout_flow_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        if (!file_exists(OSCOM::BASE_DIR . 'OSC/Apps/PayPal/PayPal/with_beta.txt')) {
-            return false;
-        }
+        $value = $this->getInputValue();
 
-        $input = '<input type="radio" id="checkoutFlowSelectionDefault" name="checkout_flow" value="0"' . (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0' ? ' checked="checked"' : '') . '><label for="checkoutFlowSelectionDefault">' . $this->app->getDef('cfg_ec_checkout_flow_default') . '</label>' .
-                 '<input type="radio" id="checkoutFlowSelectionInContext" name="checkout_flow" value="1"' . (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1' ? ' checked="checked"' : '') . '><label for="checkoutFlowSelectionInContext">' . $this->app->getDef('cfg_ec_checkout_flow_in_context') . '</label>';
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == '1' ? ' active' : '') . '">' . HTML::radioField($this->key, '1', ($value == '1')) . $this->app->getDef('cfg_ec_checkout_flow_in_context') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '0' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '0')) . $this->app->getDef('cfg_ec_checkout_flow_default') . '</label>' .
+                 '</div>';
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div id="checkoutFlowSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#checkoutFlowSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

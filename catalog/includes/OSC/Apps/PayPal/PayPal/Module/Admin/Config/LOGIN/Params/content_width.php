@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class content_width extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class content_width extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = 'Full';
     public $app_configured = false;
@@ -20,31 +22,15 @@ class content_width extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAb
         $this->description = $this->app->getDef('cfg_login_content_width_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="contentWidthSelectionHalf" name="content_width" value="Half"' . (OSCOM_APP_PAYPAL_LOGIN_CONTENT_WIDTH == 'Half' ? ' checked="checked"' : '') . '><label for="contentWidthSelectionHalf">' . $this->app->getDef('cfg_login_content_width_half') . '</label>' .
-                 '<input type="radio" id="contentWidthSelectionFull" name="content_width" value="Full"' . (OSCOM_APP_PAYPAL_LOGIN_CONTENT_WIDTH == 'Full' ? ' checked="checked"' : '') . '><label for="contentWidthSelectionFull">' . $this->app->getDef('cfg_login_content_width_full') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == 'Half' ? ' active' : '') . '">' . HTML::radioField($this->key, 'Half', ($value == 'Half')) . $this->app->getDef('cfg_login_content_width_half') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == 'Full' ? ' active' : '') . '">' . HTML::radioField($this->key, 'Full', ($value == 'Full')) . $this->app->getDef('cfg_login_content_width_full') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="contentWidthSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#contentWidthSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

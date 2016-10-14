@@ -42,7 +42,7 @@ class PS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         $installed = explode(';', MODULE_PAYMENT_INSTALLED);
         $installed[] = $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code;
 
-        $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+        $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
     }
 
     public function uninstall()
@@ -55,7 +55,7 @@ class PS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         if ($installed_pos !== false) {
             unset($installed[$installed_pos]);
 
-            $this->app->saveParameter('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
+            $this->app->saveCfgParam('MODULE_PAYMENT_INSTALLED', implode(';', $installed));
         }
     }
 
@@ -63,9 +63,9 @@ class PS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
     {
         $class = $this->pm_code;
 
-        if (file_exists(OSCOM::BASE_DIR . 'modules/payment/' . $class . '.php')) {
+        if (is_file(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $class . '.php')) {
             if (!class_exists($class)) {
-                include(OSCOM::BASE_DIR . 'modules/payment/' . $class . '.php');
+                include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/modules/payment/' . $class . '.php');
             }
 
             $module = new $class();
@@ -90,56 +90,56 @@ class PS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_ID')) {
                 if (tep_not_null(MODULE_PAYMENT_PAYPAL_STANDARD_ID)) {
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL', MODULE_PAYMENT_PAYPAL_STANDARD_ID);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL', MODULE_PAYMENT_PAYPAL_STANDARD_ID);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_ID');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_ID');
             }
 
             if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID')) {
                 if (tep_not_null(MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID)) {
                     if (!defined('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY') || !tep_not_null(constant('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY'))) {
-                        $this->app->saveParameter('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY', MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID);
+                        $this->app->saveCfgParam('OSCOM_APP_PAYPAL_' . $server . '_SELLER_EMAIL_PRIMARY', MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID);
                     }
                 }
 
-                $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID');
+                $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_PRIMARY_ID');
             }
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_PAGE_STYLE')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_PAGE_STYLE', MODULE_PAYMENT_PAYPAL_STANDARD_PAGE_STYLE);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_PAGE_STYLE');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_PAGE_STYLE', MODULE_PAYMENT_PAYPAL_STANDARD_PAGE_STYLE);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_PAGE_STYLE');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTION_METHOD')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTION_METHOD');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_TRANSACTION_METHOD', (MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTION_METHOD == 'Sale') ? '1' : '0');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTION_METHOD');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_PREPARE_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_STANDARD_PREPARE_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_PREPARE_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_PREPARE_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_STANDARD_PREPARE_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_PREPARE_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_ORDER_STATUS_ID')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_STANDARD_ORDER_STATUS_ID);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_ORDER_STATUS_ID');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_ORDER_STATUS_ID', MODULE_PAYMENT_PAYPAL_STANDARD_ORDER_STATUS_ID);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_ZONE')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_ZONE', MODULE_PAYMENT_PAYPAL_STANDARD_ZONE);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_ZONE');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_ZONE', MODULE_PAYMENT_PAYPAL_STANDARD_ZONE);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_ZONE');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_SORT_ORDER')) {
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_SORT_ORDER', MODULE_PAYMENT_PAYPAL_STANDARD_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_SORT_ORDER');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_SORT_ORDER', MODULE_PAYMENT_PAYPAL_STANDARD_SORT_ORDER, 'Sort Order', 'Sort order of display (lowest to highest).');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_SORT_ORDER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTIONS_ORDER_STATUS_ID')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTIONS_ORDER_STATUS_ID');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_TRANSACTIONS_ORDER_STATUS_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_STATUS')) {
@@ -153,88 +153,88 @@ class PS extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
                 }
             }
 
-            $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_STATUS', $status);
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_STATUS');
+            $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_STATUS', $status);
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_STATUS');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_GATEWAY_SERVER')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_GATEWAY_SERVER');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_GATEWAY_SERVER');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_VERIFY_SSL')) {
             if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_STANDARD_VERIFY_SSL == 'True') ? '1' : '0');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_STANDARD_VERIFY_SSL == 'True') ? '1' : '0');
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_VERIFY_SSL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_PROXY')) {
             if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_STANDARD_PROXY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_STANDARD_PROXY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_PROXY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_PROXY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_DEBUG_EMAIL')) {
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_DEBUG_EMAIL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_DEBUG_EMAIL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_STATUS')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_STATUS')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_STATUS', (MODULE_PAYMENT_PAYPAL_STANDARD_EWP_STATUS == 'True') ? '1' : '-1');
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_STATUS', (MODULE_PAYMENT_PAYPAL_STANDARD_EWP_STATUS == 'True') ? '1' : '-1');
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_STATUS');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_STATUS');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PRIVATE_KEY')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_PRIVATE_KEY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_PRIVATE_KEY', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PRIVATE_KEY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_PRIVATE_KEY', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PRIVATE_KEY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PRIVATE_KEY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PRIVATE_KEY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PUBLIC_KEY')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PUBLIC_KEY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PUBLIC_KEY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PUBLIC_KEY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PUBLIC_KEY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_CERT_ID')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT_ID')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT_ID', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_CERT_ID);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_PUBLIC_CERT_ID', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_CERT_ID);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_CERT_ID');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_CERT_ID');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PAYPAL_KEY')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_PAYPAL_CERT')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_PAYPAL_CERT', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PAYPAL_KEY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_PAYPAL_CERT', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PAYPAL_KEY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PAYPAL_KEY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_PAYPAL_KEY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_WORKING_DIRECTORY')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_WORKING_DIRECTORY')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_WORKING_DIRECTORY', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_WORKING_DIRECTORY);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_WORKING_DIRECTORY', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_WORKING_DIRECTORY);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_WORKING_DIRECTORY');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_WORKING_DIRECTORY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_OPENSSL')) {
             if (!defined('OSCOM_APP_PAYPAL_PS_EWP_OPENSSL')) {
-                $this->app->saveParameter('OSCOM_APP_PAYPAL_PS_EWP_OPENSSL', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_OPENSSL);
+                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PS_EWP_OPENSSL', MODULE_PAYMENT_PAYPAL_STANDARD_EWP_OPENSSL);
             }
 
-            $this->app->deleteParameter('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_OPENSSL');
+            $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_STANDARD_EWP_OPENSSL');
         }
     }
 }

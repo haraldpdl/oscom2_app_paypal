@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\EC\Params;
 
-class account_optional extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class account_optional extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '0';
     public $sort_order = 300;
@@ -19,31 +21,15 @@ class account_optional extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\Param
         $this->description = $this->app->getDef('cfg_ec_account_optional_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $input = '<input type="radio" id="accountOptionalSelectionTrue" name="account_optional" value="1"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '1' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionTrue">' . $this->app->getDef('cfg_ec_account_optional_true') . '</label>' .
-                 '<input type="radio" id="accountOptionalSelectionFalse" name="account_optional" value="0"' . (OSCOM_APP_PAYPAL_EC_ACCOUNT_OPTIONAL == '0' ? ' checked="checked"' : '') . '><label for="accountOptionalSelectionFalse">' . $this->app->getDef('cfg_ec_account_optional_false') . '</label>';
+        $value = $this->getInputValue();
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
+        $input = '<div class="btn-group" data-toggle="buttons">' .
+                 '  <label class="btn btn-info' . ($value == '1' ? ' active' : '') . '">' . HTML::radioField($this->key, '1', ($value == '1')) . $this->app->getDef('cfg_ec_account_optional_true') . '</label>' .
+                 '  <label class="btn btn-info' . ($value == '0' ? ' active' : '') . '">' . HTML::radioField($this->key, '0', ($value == '0')) . $this->app->getDef('cfg_ec_account_optional_false') . '</label>' .
+                 '</div>';
 
-    {$this->description}
-  </p>
-
-  <div id="accountOptionalSelection">
-    {$input}
-  </div>
-</div>
-
-<script>
-$(function() {
-  $('#accountOptionalSelection').buttonset();
-});
-</script>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

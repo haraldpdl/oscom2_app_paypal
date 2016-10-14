@@ -8,6 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Dashboard;
 
+use OSC\OM\HTML;
 use OSC\OM\Registry;
 
 use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
@@ -24,13 +25,13 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
 
         $this->app = Registry::get('PayPal');
 
-        $this->app->loadLanguageFile('admin/balance.php');
-        $this->app->loadLanguageFile('admin/modules/dashboard/d_paypal_app.php');
+        $this->app->loadDefinitionFile('admin/balance.php');
+        $this->app->loadDefinitionFile('admin/modules/dashboard/d_paypal_app.php');
 
         $this->title = $this->app->getDef('module_admin_dashboard_title');
         $this->description = $this->app->getDef('module_admin_dashboard_description');
 
-        if ( defined('MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER') ) {
+        if (defined('MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER')) {
             $this->sort_order = MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER;
             $this->enabled = true;
         }
@@ -38,69 +39,22 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
 
     public function getOutput()
     {
-        $version = $this->app->getVersion();
-        $version_check_result = defined('OSCOM_APP_PAYPAL_VERSION_CHECK') ? '"' . OSCOM_APP_PAYPAL_VERSION_CHECK . '"' : 'undefined';
-        $can_apply_online_updates = class_exists('ZipArchive') && function_exists('openssl_verify') ? 'true' : 'false';
         $has_live_account = ($this->app->hasApiCredentials('live') === true) ? 'true' : 'false';
         $has_sandbox_account = ($this->app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
-        $version_check_url = addslashes($this->app->link('RPC&CheckVersion'));
-        $new_update_notice = $this->app->getDef('update_available_body', array('button_view_update' => $this->app->drawButton($this->app->getDef('button_view_update'), $this->app->link('Update'), 'success', null, true)));
-        $heading_live_account = $this->app->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))));
-        $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))));
+        $heading_live_account = $this->app->getDef('heading_live_account', [
+          ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))
+        ]);
+        $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', [
+          ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))
+        ]);
         $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
-        $app_get_started = $this->app->drawButton($this->app->getDef('button_app_get_started'), $this->app->link(), 'warning', null, true);
+        $app_get_started = HTML::button($this->app->getDef('button_app_get_started'), null, $this->app->link(), null, null, 'btn-primary');
         $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
         $get_balance_url = addslashes($this->app->link('RPC&GetBalance&type=PPTYPE'));
 
         $output = <<<EOD
-<style>
-.pp-container {
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.pp-panel {
-  padding: 1px 10px;
-  margin-bottom: 15px;
-}
-
-.pp-panel.pp-panel-success {
-  background-color: #e8ffe1;
-  border-left: 2px solid #a0e097;
-  color: #349a20;
-}
-
-.pp-panel-header-success {
-  background-color: #a0e097;
-  background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
-  font-size: 12px;
-  color: #fff;
-  margin: 0;
-  padding: 3px 15px;
-}
-
-.pp-panel.pp-panel-warning {
-  background-color: #fff4dd;
-  border-left: 2px solid #e2ab62;
-  color: #cd7c20;
-}
-
-.pp-panel-header-warning {
-  background-color: #e2ab62;
-  background-image: linear-gradient(transparent, rgba(0, 0, 0, 0.05) 40%, rgba(0, 0, 0, 0.1));
-  font-size: 12px;
-  color: #fff;
-  margin: 0;
-  padding: 3px 15px;
-}
-
-small .pp-button {
-  font-size: 11px !important;
-}
-</style>
 <script>
 var OSCOM = {
-  dateNow: new Date(),
   htmlSpecialChars: function(string) {
     if ( string == null ) {
       string = '';
@@ -108,98 +62,44 @@ var OSCOM = {
 
     return $('<span />').text(string).html();
   },
-  nl2br: function(string) {
-    return string.replace(/\\n/g, '<br />');
-  },
   APP: {
     PAYPAL: {
-      version: '{$version}',
-      versionCheckResult: {$version_check_result},
-      doOnlineVersionCheck: false,
-      canApplyOnlineUpdates: {$can_apply_online_updates},
       accountTypes: {
         live: {$has_live_account},
         sandbox: {$has_sandbox_account}
-      },
-      versionCheck: function() {
-        $.get('{$version_check_url}', function (data) {
-          var versions = [];
-
-          if ( OSCOM.APP.PAYPAL.canApplyOnlineUpdates == true ) {
-            try {
-              data = $.parseJSON(data);
-            } catch (ex) {
-            }
-
-            if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) && (typeof data['releases'] != 'undefined') && (data['releases'].length > 0) ) {
-              for ( var i = 0; i < data['releases'].length; i++ ) {
-                versions.push(data['releases'][i]['version']);
-              }
-            }
-          } else {
-            if ( (typeof data == 'string') && (data.indexOf('rpcStatus') > -1) ) {
-              var result = data.split("\\n", 2);
-
-              if ( result.length == 2 ) {
-                var rpcStatus = result[0].split('=', 2);
-
-                if ( rpcStatus[1] == 1 ) {
-                  var release = result[1].split('=', 2);
-
-                  versions.push(release[1]);
-                }
-              }
-            }
-          }
-
-          if ( versions.length > 0 ) {
-            OSCOM.APP.PAYPAL.versionCheckResult = [ OSCOM.dateNow.getDate(), Math.max.apply(Math, versions) ];
-
-            OSCOM.APP.PAYPAL.versionCheckNotify();
-          }
-        });
-      },
-      versionCheckNotify: function() {
-        if ( (typeof this.versionCheckResult[0] != 'undefined') && (typeof this.versionCheckResult[1] != 'undefined') ) {
-          if ( this.versionCheckResult[1] > this.version ) {
-            $('#ppAppUpdateNotice').show();
-          }
-        }
       }
     }
   }
 };
-
-if ( typeof OSCOM.APP.PAYPAL.versionCheckResult != 'undefined' ) {
-  OSCOM.APP.PAYPAL.versionCheckResult = OSCOM.APP.PAYPAL.versionCheckResult.split('-', 2);
-}
 </script>
 
-<div class="pp-container">
-  <div id="ppAppUpdateNotice" style="display: none;">
-    <div class="pp-panel pp-panel-success">
-      {$new_update_notice}
-    </div>
+<div id="ppAccountBalanceLive" class="panel panel-success">
+  <div class="panel-heading">
+    <h3 class="panel-title">{$heading_live_account}</h3>
   </div>
 
-  <div id="ppAccountBalanceLive">
-    <h3 class="pp-panel-header-success">{$heading_live_account}</h3>
-    <div id="ppBalanceLiveInfo" class="pp-panel pp-panel-success">
-      <p>{$receiving_balance_progress}</p>
-    </div>
+  <div id="ppBalanceLiveInfo" class="panel-body">
+    <p>{$receiving_balance_progress}</p>
+  </div>
+</div>
+
+<div id="ppAccountBalanceSandbox" class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">{$heading_sandbox_account}</h3>
   </div>
 
-  <div id="ppAccountBalanceSandbox">
-    <h3 class="pp-panel-header-warning">{$heading_sandbox_account}</h3>
-    <div id="ppBalanceSandboxInfo" class="pp-panel pp-panel-warning">
-      <p>{$receiving_balance_progress}</p>
-    </div>
+  <div id="ppBalanceSandboxInfo" class="panel-body">
+    <p>{$receiving_balance_progress}</p>
+  </div>
+</div>
+
+<div id="ppAccountBalanceNone" class="panel panel-primary" style="display: none;">
+  <div class="panel-heading">
+    <h3 class="panel-title">PayPal</h3>
   </div>
 
-  <div id="ppAccountBalanceNone" style="display: none;">
-    <div class="pp-panel pp-panel-warning">
-      <p>{$app_get_started}</p>
-    </div>
+  <div class="panel-body">
+    <p>{$app_get_started}</p>
   </div>
 </div>
 
@@ -262,22 +162,6 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
 };
 
 $(function() {
-  if ( typeof OSCOM.APP.PAYPAL.versionCheckResult == 'undefined' ) {
-    OSCOM.APP.PAYPAL.doOnlineVersionCheck = true;
-  } else {
-    if ( typeof OSCOM.APP.PAYPAL.versionCheckResult[0] != 'undefined' ) {
-      if ( OSCOM.dateNow.getDate() != OSCOM.APP.PAYPAL.versionCheckResult[0] ) {
-        OSCOM.APP.PAYPAL.doOnlineVersionCheck = true;
-      }
-    }
-  }
-
-  if ( OSCOM.APP.PAYPAL.doOnlineVersionCheck == true ) {
-    OSCOM.APP.PAYPAL.versionCheck();
-  } else {
-    OSCOM.APP.PAYPAL.versionCheckNotify();
-  }
-
   (function() {
     var pass = false;
 
@@ -312,7 +196,7 @@ EOD;
 
     public function install()
     {
-        $this->db->save('configuration', [
+        $this->app->db->save('configuration', [
             'configuration_title' => 'Sort Order',
             'configuration_key' => 'MODULE_ADMIN_DASHBOARD_PAYPAL_APP_SORT_ORDER',
             'configuration_value' => '0',

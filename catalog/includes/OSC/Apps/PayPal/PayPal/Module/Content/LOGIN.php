@@ -16,23 +16,23 @@
   use OSC\Apps\PayPal\PayPal\Module\Payment\EC as PaymentModuleEC;
 
   class LOGIN implements \OSC\OM\Modules\ContentInterface {
-    var $code, $group, $title, $description, $sort_order, $enabled, $_app;
+    public $code, $group, $title, $description, $sort_order, $enabled, $app;
 
     function __construct() {
       if (!Registry::exists('PayPal')) {
         Registry::set('PayPal', new PayPalApp());
       }
 
-      $this->_app = Registry::get('PayPal');
-      $this->_app->loadLanguageFile('modules/LOGIN/LOGIN.php');
+      $this->app = Registry::get('PayPal');
+      $this->app->loadDefinitionFile('modules/LOGIN/LOGIN.php');
 
-      $this->signature = 'paypal|paypal_login|' . $this->_app->getVersion() . '|2.4';
+      $this->signature = 'paypal|paypal_login|' . $this->app->getVersion() . '|2.4';
 
       $this->code = 'LOGIN';
       $this->group = 'login';
 
-      $this->title = $this->_app->getDef('module_login_title');
-      $this->description = '<div align="center">' . $this->_app->drawButton($this->_app->getDef('module_login_legacy_admin_app_button'), $this->_app->link('Configure&module=LOGIN'), 'primary', null, true) . '</div>';
+      $this->title = $this->app->getDef('module_login_title');
+      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_login_legacy_admin_app_button'), null, $this->app->link('Configure&module=LOGIN'), null, null, 'btn-primary') . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER') ? OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER : 0;
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {
@@ -43,14 +43,14 @@
         }
 
         if ( !function_exists('curl_init') ) {
-          $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_login_error_curl') . '</div>';
+          $this->description .= '<div class="secWarning">' . $this->app->getDef('module_login_error_curl') . '</div>';
 
           $this->enabled = false;
         }
 
         if ( $this->enabled === true ) {
           if ( ((OSCOM_APP_PAYPAL_LOGIN_STATUS == '1') && (!tep_not_null(OSCOM_APP_PAYPAL_LOGIN_LIVE_CLIENT_ID) || !tep_not_null(OSCOM_APP_PAYPAL_LOGIN_LIVE_SECRET))) || ((OSCOM_APP_PAYPAL_LOGIN_STATUS == '0') && (!tep_not_null(OSCOM_APP_PAYPAL_LOGIN_SANDBOX_CLIENT_ID) || !tep_not_null(OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET))) ) {
-            $this->description .= '<div class="secWarning">' . $this->_app->getDef('module_login_error_credentials') . '</div>';
+            $this->description .= '<div class="secWarning">' . $this->app->getDef('module_login_error_credentials') . '</div>';
 
             $this->enabled = false;
           }
@@ -98,8 +98,6 @@
     }
 
     function preLogin() {
-      $OSCOM_Db = Registry::get('Db');
-
       $return_url = OSCOM::link('index.php', 'Account&LogIn', 'SSL');
 
       if ( isset($_GET['code']) ) {
@@ -108,18 +106,18 @@
         $params = array('code' => $_GET['code'],
                         'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login', 'SSL')));
 
-        $response_token = $this->_app->getApiResult('LOGIN', 'GrantToken', $params);
+        $response_token = $this->app->getApiResult('LOGIN', 'GrantToken', $params);
 
         if ( !isset($response_token['access_token']) && isset($response_token['refresh_token']) ) {
           $params = array('refresh_token' => $response_token['refresh_token']);
 
-          $response_token = $this->_app->getApiResult('LOGIN', 'RefreshToken', $params);
+          $response_token = $this->app->getApiResult('LOGIN', 'RefreshToken', $params);
         }
 
         if ( isset($response_token['access_token']) ) {
           $params = array('access_token' => $response_token['access_token']);
 
-          $response = $this->_app->getApiResult('LOGIN', 'UserInfo', $params);
+          $response = $this->app->getApiResult('LOGIN', 'UserInfo', $params);
 
           if ( isset($response['email']) ) {
             $_SESSION['paypal_login_access_token'] = $response_token['access_token'];
@@ -127,7 +125,7 @@
 // check if e-mail address exists in database and login or create customer account
             $email_address = HTML::sanitize($response['email']);
 
-            $Qcheck = $OSCOM_Db->get('customers', 'customers_id', ['customers_email_address' => $email_address], null, 1);
+            $Qcheck = $this->app->db->get('customers', 'customers_id', ['customers_email_address' => $email_address], null, 1);
 
             if ($Qcheck->fetch() !== false) {
               $_SESSION['paypal_login_customer_id'] = $Qcheck->valueInt('customers_id');
@@ -149,11 +147,11 @@
                 $sql_data_array['customers_telephone'] = $customers_telephone;
               }
 
-              $OSCOM_Db->save('customers', $sql_data_array);
+              $this->app->db->save('customers', $sql_data_array);
 
-              $_SESSION['paypal_login_customer_id'] = $OSCOM_Db->lastInsertId();
+              $_SESSION['paypal_login_customer_id'] = $this->app->db->lastInsertId();
 
-              $OSCOM_Db->save('customers_info', [
+              $this->app->db->save('customers_info', [
                 'customers_info_id' => $_SESSION['paypal_login_customer_id'],
                 'customers_info_number_of_logons' => '0',
                 'customers_info_date_account_created' => 'now()'
@@ -172,7 +170,7 @@
             $ship_country_id = 0;
             $ship_address_format_id = 1;
 
-            $Qcountry = $OSCOM_Db->get('countries', ['countries_id', 'address_format_id'], ['countries_iso_code_2' => $ship_country], null, 1);
+            $Qcountry = $this->app->db->get('countries', ['countries_id', 'address_format_id'], ['countries_iso_code_2' => $ship_country], null, 1);
 
             if ($Qcountry->fetch() !== false) {
               $ship_country_id = $Qcountry->valueInt('countries_id');
@@ -180,7 +178,7 @@
             }
 
             if ($ship_country_id > 0) {
-              $Qzone = $OSCOM_Db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
+              $Qzone = $this->app->db->prepare('select zone_id from :table_zones where zone_country_id = :zone_country_id and (zone_name = :zone_name or zone_code = :zone_code) limit 1');
               $Qzone->bindInt(':zone_country_id', $ship_country_id);
               $Qzone->bindValue(':zone_name', $ship_zone);
               $Qzone->bindValue(':zone_code', $ship_zone);
@@ -191,7 +189,7 @@
               }
             }
 
-            $Qcheck = $OSCOM_Db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
+            $Qcheck = $this->app->db->prepare('select address_book_id from :table_address_book where customers_id = :customers_id and entry_firstname = :entry_firstname and entry_lastname = :entry_lastname and entry_street_address = :entry_street_address and entry_postcode = :entry_postcode and entry_city = :entry_city and (entry_state = :entry_state or entry_zone_id = :entry_zone_id) and entry_country_id = :entry_country_id limit 1');
             $Qcheck->bindInt(':customers_id', $_SESSION['paypal_login_customer_id']);
             $Qcheck->bindValue(':entry_firstname', $ship_firstname);
             $Qcheck->bindValue(':entry_lastname', $ship_lastname);
@@ -224,14 +222,14 @@
                 }
               }
 
-              $OSCOM_Db->save('address_book', $sql_data_array);
+              $this->app->db->save('address_book', $sql_data_array);
 
-              $address_id = $OSCOM_Db->lastInsertId();
+              $address_id = $this->app->db->lastInsertId();
 
               $_SESSION['sendto'] = $address_id;
 
               if (!isset($_SESSION['customer_default_address_id'])) {
-                $OSCOM_Db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $_SESSION['paypal_login_customer_id']]);
+                $this->app->db->save('customers', ['customers_default_address_id' => $address_id], ['customers_id' => $_SESSION['paypal_login_customer_id']]);
 
                 $_SESSION['customer_default_address_id'] = $address_id;
               }
@@ -283,11 +281,11 @@
     }
 
     function install() {
-      $this->_app->redirect('Configure&Install&module=LOGIN');
+      $this->app->redirect('Configure&Install&module=LOGIN');
     }
 
     function remove() {
-      $this->_app->redirect('Configure&Uninstall&module=LOGIN');
+      $this->app->redirect('Configure&Uninstall&module=LOGIN');
     }
 
     function keys() {

@@ -16,8 +16,8 @@ use OSC\Apps\PayPal\PayPal\Module\Payment\HS as PaymentModuleHS;
 class HS extends \OSC\OM\PagesAbstract
 {
     protected $file = null;
+    protected $use_site_template = false;
     protected $pm;
-    public $data;
 
     protected function init()
     {
@@ -48,7 +48,7 @@ class HS extends \OSC\OM\PagesAbstract
         $result = false;
 
         if (isset($_POST['txn_id']) && !empty($_POST['txn_id'])) {
-            $result = $this->pm->_app->getApiResult('APP', 'GetTransactionDetails', [
+            $result = $this->pm->app->getApiResult('APP', 'GetTransactionDetails', [
                 'TRANSACTIONID' => $_POST['txn_id']
             ], (OSCOM_APP_PAYPAL_HS_STATUS == '1') ? 'live' : 'sandbox', true);
         }
@@ -59,7 +59,7 @@ class HS extends \OSC\OM\PagesAbstract
             $this->pm->verifyTransaction(true);
         }
 
-        tep_session_destroy();
+        Registry::get('Session')->kill();
     }
 
     protected function doCheckout()
@@ -94,12 +94,5 @@ class HS extends \OSC\OM\PagesAbstract
         }
 
         $this->file = 'checkout.php';
-    }
-
-    public function getFile()
-    {
-        if (isset($this->file)) {
-            return __DIR__ . '/templates/' . $this->file;
-        }
     }
 }

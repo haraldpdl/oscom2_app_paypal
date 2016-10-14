@@ -1,44 +1,47 @@
 <?php
-/**
-  * osCommerce Online Merchant
-  *
-  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
-  * @license GPL; http://www.oscommerce.com/gpllicense.txt
-  */
+use OSC\OM\HTML;
 
 require(__DIR__ . '/template_top.php');
 ?>
 
-<div id="ppStartDashboard" style="width: 100%;">
-  <div style="float: left; width: 50%;">
-    <div style="padding: 2px;">
-      <h3 class="pp-panel-header-info"><?php echo $OSCOM_PayPal->getDef('online_documentation_title'); ?></h3>
-      <div class="pp-panel pp-panel-info">
-        <?php echo $OSCOM_PayPal->getDef('online_documentation_body', array('button_online_documentation' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_online_documentation'), 'http://library.oscommerce.com/Package&paypal&oscom23', 'info', 'target="_blank"'))); ?>
+<div class="row">
+  <div class="col-sm-6">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <?= $OSCOM_PayPal->getDef('online_documentation_title'); ?>
+      </div>
+
+      <div class="panel-body">
+        <?=
+            $OSCOM_PayPal->getDef('online_documentation_body', [
+                ':button_online_documentation' => HTML::button($OSCOM_PayPal->getDef('button_online_documentation'), null, 'https://library.oscommerce.com/Package&paypal&oscom24', null, ['newwindow' => true], 'btn-info')
+            ]);
+        ?>
       </div>
     </div>
   </div>
 
-  <div style="float: left; width: 50%;">
-    <div style="padding: 2px;">
-      <h3 class="pp-panel-header-warning"><?php echo $OSCOM_PayPal->getDef('online_forum_title'); ?></h3>
-      <div class="pp-panel pp-panel-warning">
-        <?php echo $OSCOM_PayPal->getDef('online_forum_body', array('button_online_forum' => $OSCOM_PayPal->drawButton($OSCOM_PayPal->getDef('button_online_forum'), 'http://forums.oscommerce.com/forum/54-paypal/', 'warning', 'target="_blank"'))); ?>
+  <div class="col-sm-6">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <?= $OSCOM_PayPal->getDef('online_forum_title'); ?>
+      </div>
+
+      <div class="panel-body">
+        <?=
+            $OSCOM_PayPal->getDef('online_forum_body', [
+                ':button_online_forum' => HTML::button($OSCOM_PayPal->getDef('button_online_forum'), null, 'http://forums.oscommerce.com/forum/54-paypal/', null, ['newwindow' => true], 'btn-warning')
+            ]);
+        ?>
       </div>
     </div>
   </div>
 </div>
 
+<div id="ppNewsContent"></div>
+
 <script>
 $(function() {
-  $('#ppStartDashboard > div:nth-child(2)').each(function() {
-    if ( $(this).prev().height() < $(this).height() ) {
-      $(this).prev().height($(this).height());
-    } else {
-      $(this).height($(this).prev().height());
-    }
-  });
-
   OSCOM.APP.PAYPAL.versionCheck();
 
   $.getJSON('<?php echo addslashes($OSCOM_PayPal->link('RPC&GetNews')); ?>', function (data) {
@@ -51,7 +54,7 @@ $(function() {
 
       ppNewsContent = ppNewsContent + '</div>';
 
-      $('#ppStartDashboard').after(ppNewsContent);
+      $('#ppNewsContent').html(ppNewsContent);
     }
   });
 });

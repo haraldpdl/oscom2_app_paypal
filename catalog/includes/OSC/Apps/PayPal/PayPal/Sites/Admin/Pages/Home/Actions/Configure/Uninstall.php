@@ -14,6 +14,7 @@ class Uninstall extends \OSC\OM\PagesActionsAbstract
 {
     public function execute()
     {
+        $OSCOM_MessageStack = Registry::get('MessageStack');
         $OSCOM_PayPal = Registry::get('PayPal');
 
         $current_module = $this->page->data['current_module'];
@@ -21,7 +22,7 @@ class Uninstall extends \OSC\OM\PagesActionsAbstract
         $m = Registry::get('PayPalAdminConfig' . $current_module);
         $m->uninstall();
 
-        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_module_uninstall_success'), 'success');
+        $OSCOM_MessageStack->add($OSCOM_PayPal->getDef('alert_module_uninstall_success'), 'success', 'PayPal');
 
         $OSCOM_PayPal->redirect('Configure&module=' . $current_module);
     }

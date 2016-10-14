@@ -17,7 +17,7 @@ use OSC\Apps\PayPal\PayPal\PayPal as PayPalApp;
 class Action implements \OSC\OM\Modules\HooksInterface
 {
     protected $app;
-    protected $db;
+    protected $ms;
 
     public function __construct()
     {
@@ -26,15 +26,16 @@ class Action implements \OSC\OM\Modules\HooksInterface
         }
 
         $this->app = Registry::get('PayPal');
-        $this->db = Registry::get('Db');
 
-        $this->app->loadLanguageFile('hooks/admin/orders/action.php');
+        $this->ms = Registry::get('MessageStack');
+
+        $this->app->loadDefinitionFile('hooks/admin/orders/action.php');
     }
 
     public function execute()
     {
         if (isset($_GET['tabaction'])) {
-            $Qstatus = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "%Transaction ID:%" order by date_added limit 1');
+            $Qstatus = $this->app->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "%Transaction ID:%" order by date_added limit 1');
             $Qstatus->bindInt(':orders_id', $_GET['oID']);
             $Qstatus->bindInt(':orders_status_id', OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID);
             $Qstatus->execute();
@@ -51,7 +52,7 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 }
 
                 if (isset($pp['Transaction ID'])) {
-                    $Qorder = $this->db->prepare('select o.orders_id, o.payment_method, o.currency, o.currency_value, ot.value as total from :table_orders o, :table_orders_total ot where o.orders_id = :orders_id and o.orders_id = ot.orders_id and ot.class = "ot_total"');
+                    $Qorder = $this->app->db->prepare('select o.orders_id, o.payment_method, o.currency, o.currency_value, ot.value as total from :table_orders o, :table_orders_total ot where o.orders_id = :orders_id and o.orders_id = ot.orders_id and ot.class = "ot_total"');
                     $Qorder->bindInt(':orders_id', $_GET['oID']);
                     $Qorder->execute();
 
@@ -81,8 +82,6 @@ class Action implements \OSC\OM\Modules\HooksInterface
 
     protected function getTransactionDetails($comments, $order)
     {
-        global $messageStack;
-
         $result = null;
 
         if (!isset($comments['Gateway'])) {
@@ -190,18 +189,16 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 'comments' => $result
             ];
 
-            $this->db->save('orders_status_history', $sql_data_array);
+            $this->app->db->save('orders_status_history', $sql_data_array);
 
-            $messageStack->add_session($this->app->getDef('ms_success_getTransactionDetails'), 'success');
+            $this->ms->add($this->app->getDef('ms_success_getTransactionDetails'), 'success');
         } else {
-            $messageStack->add_session($this->app->getDef('ms_error_getTransactionDetails'), 'error');
+            $this->ms->add($this->app->getDef('ms_error_getTransactionDetails'), 'error');
         }
     }
 
     protected function doCapture($comments, $order)
     {
-        global $messageStack;
-
         $pass = false;
 
         $capture_total = $capture_value = $this->app->formatCurrencyRaw($order['total'], $order['currency'], $order['currency_value']);
@@ -260,18 +257,16 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 'comments' => $result
             ];
 
-            $this->db->save('orders_status_history', $sql_data_array);
+            $this->app->db->save('orders_status_history', $sql_data_array);
 
-            $messageStack->add_session($this->app->getDef('ms_success_doCapture'), 'success');
+            $this->ms->add($this->app->getDef('ms_success_doCapture'), 'success');
         } else {
-            $messageStack->add_session($this->app->getDef('ms_error_doCapture'), 'error');
+            $this->ms->add($this->app->getDef('ms_error_doCapture'), 'error');
         }
     }
 
     protected function doVoid($comments, $order)
     {
-        global $messageStack;
-
         $pass = false;
 
         if (!isset($comments['Gateway'])) {
@@ -295,7 +290,7 @@ class Action implements \OSC\OM\Modules\HooksInterface
         if ($pass === true) {
             $capture_total = $this->app->formatCurrencyRaw($order['total'], $order['currency'], $order['currency_value']);
 
-            $Qc = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: Capture (%"');
+            $Qc = $this->app->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: Capture (%"');
             $Qc->bindInt(':orders_id', $order['orders_id']);
             $Qc->bindInt(':orders_status_id', OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID);
             $Qc->execute();
@@ -316,22 +311,20 @@ class Action implements \OSC\OM\Modules\HooksInterface
                 'comments' => $result
             ];
 
-            $this->db->save('orders_status_history', $sql_data_array);
+            $this->app->db->save('orders_status_history', $sql_data_array);
 
-            $messageStack->add_session($this->app->getDef('ms_success_doVoid'), 'success');
+            $this->ms->add($this->app->getDef('ms_success_doVoid'), 'success');
         } else {
-            $messageStack->add_session($this->app->getDef('ms_error_doVoid'), 'error');
+            $this->ms->add($this->app->getDef('ms_error_doVoid'), 'error');
         }
     }
 
     protected function refundTransaction($comments, $order)
     {
-        global $messageStack;
-
         if (isset($_POST['ppRefund'])) {
             $tids = [];
 
-            $Qc = $this->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: %" order by date_added desc');
+            $Qc = $this->app->db->prepare('select comments from :table_orders_status_history where orders_id = :orders_id and orders_status_id = :orders_status_id and comments like "PayPal App: %" order by date_added desc');
             $Qc->bindInt(':orders_id', $order['orders_id']);
             $Qc->bindInt(':orders_status_id', OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID);
             $Qc->execute();
@@ -398,14 +391,14 @@ class Action implements \OSC\OM\Modules\HooksInterface
                         'comments' => $result
                     ];
 
-                    $this->db->save('orders_status_history', $sql_data_array);
+                    $this->app->db->save('orders_status_history', $sql_data_array);
 
-                    $messageStack->add_session($this->app->getDef('ms_success_refundTransaction', [
-                        'refund_amount' => $tids[$id]['Amount']
+                    $this->ms->add($this->app->getDef('ms_success_refundTransaction', [
+                        ':refund_amount' => $tids[$id]['Amount']
                     ]), 'success');
                 } else {
-                    $messageStack->add_session($this->app->getDef('ms_error_refundTransaction', [
-                        'refund_amount' => $tids[$id]['Amount']
+                    $this->ms->add($this->app->getDef('ms_error_refundTransaction', [
+                        ':refund_amount' => $tids[$id]['Amount']
                     ]), 'error');
                 }
             }

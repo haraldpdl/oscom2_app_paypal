@@ -14,7 +14,3 @@ button_save = Save
 button_uninstall = Uninstall
 button_dialog_uninstall = Uninstall &hellip;
 button_view = View
-button_view_update = View Update
-
-update_available_body = <p>An update is available for this App!</p>
-<p><small>:button_view_update</small></p>

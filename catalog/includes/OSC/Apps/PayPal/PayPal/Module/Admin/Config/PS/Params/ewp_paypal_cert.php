@@ -8,9 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\PS\Params;
 
-use OSC\OM\HTML;
-
-class ewp_paypal_cert extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class ewp_paypal_cert extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $sort_order = 1100;
 
@@ -18,26 +16,5 @@ class ewp_paypal_cert extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\Params
     {
         $this->title = $this->app->getDef('cfg_ps_ewp_paypal_cert_title');
         $this->description = $this->app->getDef('cfg_ps_ewp_paypal_cert_desc');
-    }
-
-    public function getSetField()
-    {
-        $input = HTML::inputField('ewp_paypal_cert', OSCOM_APP_PAYPAL_PS_EWP_PAYPAL_CERT, 'id="inputPsEwpPayPalCert"');
-
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputPsEwpPayPalCert">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
     }
 }

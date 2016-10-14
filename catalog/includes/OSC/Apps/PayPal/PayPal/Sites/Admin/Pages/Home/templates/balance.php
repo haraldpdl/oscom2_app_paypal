@@ -1,32 +1,29 @@
 <?php
-/**
-  * osCommerce Online Merchant
-  *
-  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
-  * @license GPL; http://www.oscommerce.com/gpllicense.txt
-  */
-
 require(__DIR__ . '/template_top.php');
 ?>
 
-<div id="ppAccountBalanceLive">
-  <h3 class="pp-panel-header-success"><?php echo $OSCOM_PayPal->getDef('heading_live_account', array('account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('live', 'username')))); ?></h3>
-  <div id="ppBalanceLiveInfo" class="pp-panel pp-panel-success">
-    <p><?php echo $OSCOM_PayPal->getDef('retrieving_balance_progress'); ?></p>
+<div id="ppAccountBalanceLive" class="panel panel-success">
+  <div class="panel-heading">
+    <?= $OSCOM_PayPal->getDef('heading_live_account', [':account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('live', 'username'))]); ?>
+  </div>
+
+  <div class="panel-body">
+    <p><?= $OSCOM_PayPal->getDef('retrieving_balance_progress'); ?></p>
   </div>
 </div>
 
-<div id="ppAccountBalanceSandbox">
-  <h3 class="pp-panel-header-warning"><?php echo $OSCOM_PayPal->getDef('heading_sandbox_account', array('account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('sandbox', 'username')))); ?></h3>
-  <div id="ppBalanceSandboxInfo" class="pp-panel pp-panel-warning">
-    <p><?php echo $OSCOM_PayPal->getDef('retrieving_balance_progress'); ?></p>
+<div id="ppAccountBalanceSandbox" class="panel panel-warning">
+  <div class="panel-heading">
+    <?= $OSCOM_PayPal->getDef('heading_sandbox_account', [':account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('sandbox', 'username'))]); ?>
+  </div>
+
+  <div class="panel-body">
+    <p><?= $OSCOM_PayPal->getDef('retrieving_balance_progress'); ?></p>
   </div>
 </div>
 
-<div id="ppAccountBalanceNone" style="display: none;">
-  <div class="pp-panel pp-panel-error">
-    <p><?php echo $OSCOM_PayPal->getDef('error_no_accounts_configured'); ?></p>
-  </div>
+<div id="ppAccountBalanceNone" class="alert alert-danger" style="display: none;">
+  <p><?= $OSCOM_PayPal->getDef('error_no_accounts_configured'); ?></p>
 </div>
 
 <script>
@@ -35,12 +32,12 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
     'error_balance_retrieval': '<?php echo addslashes($OSCOM_PayPal->getDef('error_balance_retrieval')); ?>'
   };
 
-  var divId = 'ppBalance' + type.charAt(0).toUpperCase() + type.slice(1) + 'Info';
+  var divId = 'ppAccountBalance' + type.charAt(0).toUpperCase() + type.slice(1);
 
-  $.get('<?php echo addslashes($OSCOM_PayPal->link('RPC&GetBalance&type=PPTYPE')); ?>'.replace('PPTYPE', type), function (data) {
+  $.get('<?= addslashes($OSCOM_PayPal->link('RPC&GetBalance&type=PPTYPE')); ?>'.replace('PPTYPE', type), function (data) {
     var balance = {};
 
-    $('#' + divId).empty();
+    $('#' + divId + ' .panel-body').empty();
 
     try {
       data = $.parseJSON(data);
@@ -76,14 +73,14 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
     for ( var key in balance ) {
       pass = true;
 
-      $('#' + divId).append('<p><strong>' + OSCOM.htmlSpecialChars(key) + ':</strong> ' + OSCOM.htmlSpecialChars(balance[key]) + '</p>');
+      $('#' + divId + ' .panel-body').append('<p><strong>' + OSCOM.htmlSpecialChars(key) + ':</strong> ' + OSCOM.htmlSpecialChars(balance[key]) + '</p>');
     }
 
     if ( pass == false ) {
-      $('#' + divId).append('<p>' + def['error_balance_retrieval'] + '</p>');
+      $('#' + divId + ' .panel-body').append('<p>' + def['error_balance_retrieval'] + '</p>');
     }
   }).fail(function() {
-    $('#' + divId).empty().append('<p>' + def['error_balance_retrieval'] + '</p>');
+    $('#' + divId + ' .panel-body').empty().append('<p>' + def['error_balance_retrieval'] + '</p>');
   });
 };
 

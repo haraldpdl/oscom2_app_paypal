@@ -9,24 +9,19 @@
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\EC\Params;
 
 use OSC\OM\HTML;
-use OSC\OM\Registry;
 
-class zone extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+class zone extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $default = '0';
     public $sort_order = 900;
 
-    protected $db;
-
     protected function init()
     {
-        $this->db = Registry::get('Db');
-
         $this->title = $this->app->getDef('cfg_ec_zone_title');
         $this->description = $this->app->getDef('cfg_ec_zone_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
         $zone_class_array = [
             [
@@ -35,7 +30,10 @@ class zone extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
             ]
         ];
 
-        $Qclasses = $this->db->get('geo_zones', ['geo_zone_id', 'geo_zone_name'], null, 'geo_zone_name');
+        $Qclasses = $this->app->db->get('geo_zones', [
+            'geo_zone_id',
+            'geo_zone_name'
+        ], null, 'geo_zone_name');
 
         while ($Qclasses->fetch()) {
             $zone_class_array[] = [
@@ -44,22 +42,8 @@ class zone extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
             ];
         }
 
-        $input = HTML::selectField('zone', $zone_class_array, OSCOM_APP_PAYPAL_EC_ZONE, 'id="inputEcZone"');
+        $input = HTML::selectField($this->key, $zone_class_array, $this->getInputValue());
 
-        $result = <<<EOT
-<div>
-  <p>
-    <label for="inputEcZone">{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div>
-    {$input}
-  </div>
-</div>
-EOT;
-
-        return $result;
+        return $input;
     }
 }

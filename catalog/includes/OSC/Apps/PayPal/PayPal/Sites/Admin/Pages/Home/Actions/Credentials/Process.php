@@ -15,6 +15,7 @@ class Process extends \OSC\OM\PagesActionsAbstract
 {
     public function execute()
     {
+        $OSCOM_MessageStack = Registry::get('MessageStack');
         $OSCOM_PayPal = Registry::get('PayPal');
 
         $current_module = $this->page->data['current_module'];
@@ -25,11 +26,13 @@ class Process extends \OSC\OM\PagesActionsAbstract
             $data = [
                 'OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL' => isset($_POST['live_email']) ? HTML::sanitize($_POST['live_email']) : '',
                 'OSCOM_APP_PAYPAL_LIVE_SELLER_EMAIL_PRIMARY' => isset($_POST['live_email_primary']) ? HTML::sanitize($_POST['live_email_primary']) : '',
+                'OSCOM_APP_PAYPAL_LIVE_MERCHANT_ID' => isset($_POST['live_merchant_id']) ? HTML::sanitize($_POST['live_merchant_id']) : '',
                 'OSCOM_APP_PAYPAL_LIVE_API_USERNAME' => isset($_POST['live_username']) ? HTML::sanitize($_POST['live_username']) : '',
                 'OSCOM_APP_PAYPAL_LIVE_API_PASSWORD' => isset($_POST['live_password']) ? HTML::sanitize($_POST['live_password']) : '',
                 'OSCOM_APP_PAYPAL_LIVE_API_SIGNATURE' => isset($_POST['live_signature']) ? HTML::sanitize($_POST['live_signature']) : '',
                 'OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL' => isset($_POST['sandbox_email']) ? HTML::sanitize($_POST['sandbox_email']) : '',
                 'OSCOM_APP_PAYPAL_SANDBOX_SELLER_EMAIL_PRIMARY' => isset($_POST['sandbox_email_primary']) ? HTML::sanitize($_POST['sandbox_email_primary']) : '',
+                'OSCOM_APP_PAYPAL_SANDBOX_MERCHANT_ID' => isset($_POST['sandbox_merchant_id']) ? HTML::sanitize($_POST['sandbox_merchant_id']) : '',
                 'OSCOM_APP_PAYPAL_SANDBOX_API_USERNAME' => isset($_POST['sandbox_username']) ? HTML::sanitize($_POST['sandbox_username']) : '',
                 'OSCOM_APP_PAYPAL_SANDBOX_API_PASSWORD' => isset($_POST['sandbox_password']) ? HTML::sanitize($_POST['sandbox_password']) : '',
                 'OSCOM_APP_PAYPAL_SANDBOX_API_SIGNATURE' => isset($_POST['sandbox_signature']) ? HTML::sanitize($_POST['sandbox_signature']) : ''
@@ -48,10 +51,10 @@ class Process extends \OSC\OM\PagesActionsAbstract
         }
 
         foreach ($data as $key => $value) {
-            $OSCOM_PayPal->saveParameter($key, $value);
+            $OSCOM_PayPal->saveCfgParam($key, $value);
         }
 
-        $OSCOM_PayPal->addAlert($OSCOM_PayPal->getDef('alert_credentials_saved_success'), 'success');
+        $OSCOM_MessageStack->add($OSCOM_PayPal->getDef('alert_credentials_saved_success'), 'success', 'PayPal');
 
         $OSCOM_PayPal->redirect('Credentials&module=' . $current_module);
     }

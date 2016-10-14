@@ -8,7 +8,9 @@
 
 namespace OSC\Apps\PayPal\PayPal\Module\Admin\Config\LOGIN\Params;
 
-class attributes extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstract
+use OSC\OM\HTML;
+
+class attributes extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigParamAbstract
 {
     public $sort_order = 700;
 
@@ -59,9 +61,9 @@ class attributes extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstr
         $this->description = $this->app->getDef('cfg_login_attributes_desc');
     }
 
-    public function getSetField()
+    public function getInputField()
     {
-        $values_array = explode(';', OSCOM_APP_PAYPAL_LOGIN_ATTRIBUTES);
+        $values_array = explode(';', $this->getInputValue());
 
         $input = '';
 
@@ -70,61 +72,53 @@ class attributes extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ParamsAbstr
 
             foreach ($attributes as $attribute => $scope) {
                 if (in_array($attribute, $this->required)) {
-                    $input .= '<input type="radio" id="ppLogInAttributesSelection' . ucfirst($attribute) . '" name="ppLogInAttributesTmp' . ucfirst($attribute) . '" value="' . $attribute . '" checked="checked" />';
+                    $input .= '<div class="radio">' .
+                              '  <label>' . HTML::radioField('ppLogInAttributesTmp' . ucfirst($attribute), $attribute, true) . $this->app->getDef('cfg_login_attributes_attribute_' . $attribute) . '</label>' .
+                              '</div>';
                 } else {
-                    $input .= '<input type="checkbox" id="ppLogInAttributesSelection' . ucfirst($attribute) . '" name="ppLogInAttributes[]" value="' . $attribute . '"' . (in_array($attribute, $values_array) ? ' checked="checked"' : '') . ' />';
+                    $input .= '<div class="checkbox">' .
+                              '  <label>' . HTML::checkboxField('ppLogInAttributes[]', $attribute, in_array($attribute, $values_array)) . $this->app->getDef('cfg_login_attributes_attribute_' . $attribute) . '</label>' .
+                              '</div>';
                 }
-
-                $input .= '&nbsp;<label for="ppLogInAttributesSelection' . ucfirst($attribute) . '">' . $this->app->getDef('cfg_login_attributes_attribute_' . $attribute) . '</label><br />';
             }
         }
 
-        if (!empty($input)) {
-            $input = '<br />' . substr($input, 0, -6);
-        }
+        $input .= HTML::hiddenField($this->key);
 
-        $input .= '<input type="hidden" name="attributes" value="" />';
+        $fieldName = $this->key;
 
         $result = <<<EOT
-<div>
-  <p>
-    <label>{$this->title}</label>
-
-    {$this->description}
-  </p>
-
-  <div id="attributesSelection">
-    {$input}
-  </div>
+<div id="attributesSelection">
+  {$input}
 </div>
 
 <script>
 function ppLogInAttributesUpdateCfgValue() {
   var pp_login_attributes_selected = '';
 
-  if ( $('input[name^="ppLogInAttributesTmp"]').length > 0 ) {
+  if ($('input[name^="ppLogInAttributesTmp"]').length > 0) {
     $('input[name^="ppLogInAttributesTmp"]').each(function() {
       pp_login_attributes_selected += $(this).attr('value') + ';';
     });
   }
 
-  if ( $('input[name="ppLogInAttributes[]"]').length > 0 ) {
+  if ($('input[name="ppLogInAttributes[]"]').length > 0) {
     $('input[name="ppLogInAttributes[]"]:checked').each(function() {
       pp_login_attributes_selected += $(this).attr('value') + ';';
     });
   }
 
-  if ( pp_login_attributes_selected.length > 0 ) {
+  if (pp_login_attributes_selected.length > 0) {
     pp_login_attributes_selected = pp_login_attributes_selected.substring(0, pp_login_attributes_selected.length - 1);
   }
 
-  $('input[name="attributes"]').val(pp_login_attributes_selected);
+  $('input[name="${fieldName}"]').val(pp_login_attributes_selected);
 }
 
 $(function() {
   ppLogInAttributesUpdateCfgValue();
 
-  if ( $('input[name="ppLogInAttributes[]"]').length > 0 ) {
+  if ($('input[name="ppLogInAttributes[]"]').length > 0) {
     $('input[name="ppLogInAttributes[]"]').change(function() {
       ppLogInAttributesUpdateCfgValue();
     });
