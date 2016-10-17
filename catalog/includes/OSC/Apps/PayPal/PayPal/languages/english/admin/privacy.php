@@ -86,5 +86,5 @@ privacy_body = <h3>API Credentials <small>(available for :api_req_countries coun
 </ul>
 
 <div class="alert alert-info">
-  <p>The parameters of each transaction sent to and recieved from PayPal can be inspected on the PayPal App Log page.</p>
+  <p>The parameters of each transaction sent to and received from PayPal can be inspected on the PayPal App Log page.</p>
 </div>
