@@ -82,10 +82,10 @@ if ($OSCOM_PayPal_Config->is_installed === true) {
 <p>
 
 <?php
-    echo HTML::button($OSCOM_PayPal->getDef('button_save'), null, null, null, null, 'btn-success');
+    echo HTML::button($OSCOM_PayPal->getDef('button_save'), null, null, null, 'btn-success');
 
     if ($OSCOM_PayPal->getConfigModuleInfo($current_module, 'is_uninstallable') === true) {
-        echo '<span class="pull-right">' . HTML::button($OSCOM_PayPal->getDef('button_dialog_uninstall'), null, '#', null, ['params' => 'data-toggle="modal" data-target="#ppUninstallModal"'], 'btn-warning') . '</span>';
+        echo '<span class="pull-right">' . HTML::button($OSCOM_PayPal->getDef('button_dialog_uninstall'), null, '#', ['params' => 'data-toggle="modal" data-target="#ppUninstallModal"'], 'btn-warning') . '</span>';
     }
 ?>
 
@@ -108,8 +108,8 @@ if ($OSCOM_PayPal_Config->is_installed === true) {
         <?= $OSCOM_PayPal->getDef('dialog_uninstall_body'); ?>
       </div>
       <div class="modal-footer">
-        <?= HTML::button($OSCOM_PayPal->getDef('button_uninstall'), null, $OSCOM_PayPal->link('Configure&Uninstall&module=' . $current_module), null, null, 'btn-danger'); ?>
-        <?= HTML::button($OSCOM_PayPal->getDef('button_cancel'), null, '#', null, ['params' => 'data-dismiss="modal"'], 'btn-link'); ?>
+        <?= HTML::button($OSCOM_PayPal->getDef('button_uninstall'), null, $OSCOM_PayPal->link('Configure&Uninstall&module=' . $current_module), null, 'btn-danger'); ?>
+        <?= HTML::button($OSCOM_PayPal->getDef('button_cancel'), null, '#', ['params' => 'data-dismiss="modal"'], 'btn-link'); ?>
       </div>
     </div>
   </div>
@@ -131,7 +131,7 @@ if ($OSCOM_PayPal_Config->is_installed === true) {
 </div>
 
 <p>
-  <?= HTML::button($OSCOM_PayPal->getDef('button_install_title', [':title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title')]), null, $OSCOM_PayPal->link('Configure&Install&module=' . $current_module), null, null, 'btn-warning'); ?>
+  <?= HTML::button($OSCOM_PayPal->getDef('button_install_title', [':title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title')]), null, $OSCOM_PayPal->link('Configure&Install&module=' . $current_module), null, 'btn-warning'); ?>
 </p>
 
 <?php

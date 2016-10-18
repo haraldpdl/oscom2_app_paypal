@@ -33,7 +33,7 @@
       $this->code = 'HS';
       $this->title = $this->app->getDef('module_hs_title');
       $this->public_title = $this->app->getDef('module_hs_public_title');
-      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_hs_legacy_admin_app_button'), null, $this->app->link('Configure&module=HS'), null, null, 'btn-primary') . '</div>';
+      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_hs_legacy_admin_app_button'), null, $this->app->link('Configure&module=HS'), null, 'btn-primary') . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_HS_SORT_ORDER') ? OSCOM_APP_PAYPAL_HS_SORT_ORDER : 0;
       $this->enabled = defined('OSCOM_APP_PAYPAL_HS_STATUS') && in_array(OSCOM_APP_PAYPAL_HS_STATUS, array('1', '0')) ? true : false;
       $this->order_status = defined('OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID') && ((int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID > 0) ? (int)OSCOM_APP_PAYPAL_HS_PREPARE_ORDER_STATUS_ID : 0;

@@ -62,7 +62,7 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
 
                 $pp_server = (strpos(strtolower($Qorder->value('payment_method')), 'sandbox') !== false) ? 'sandbox' : 'live';
 
-                $info_button = HTML::button($this->app->getDef('button_details'), 'fa fa-info-circle', OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), 'primary', null, 'btn-primary');
+                $info_button = HTML::button($this->app->getDef('button_details'), 'fa fa-info-circle', OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), 'btn-primary');
                 $capture_button = $this->getCaptureButton($status, $Qorder->toArray());
                 $void_button = $this->getVoidButton($status, $Qorder->toArray());
                 $refund_button = $this->getRefundButton($status, $Qorder->toArray());
@@ -112,7 +112,7 @@ EOD;
                 }
 
                 if ($capture_total > 0) {
-                    $output .= HTML::button($this->app->getDef('button_dialog_capture'), 'fa fa-check-circle', '#', null, ['params' => 'data-button="paypalButtonDoCapture"'], 'btn-success');
+                    $output .= HTML::button($this->app->getDef('button_dialog_capture'), 'fa fa-check-circle', '#', ['params' => 'data-button="paypalButtonDoCapture"'], 'btn-success');
 
                     $dialog_title = HTML::outputProtected($this->app->getDef('dialog_capture_title'));
                     $dialog_body = $this->app->getDef('dialog_capture_body');
@@ -229,7 +229,7 @@ EOD;
             }
 
             if ($capture_total > 0) {
-                $output .= HTML::button($this->app->getDef('button_dialog_void'), 'fa fa-times-circle', '#', null, ['params' => 'data-button="paypalButtonDoVoid"'], 'btn-warning');
+                $output .= HTML::button($this->app->getDef('button_dialog_void'), 'fa fa-times-circle', '#', ['params' => 'data-button="paypalButtonDoVoid"'], 'btn-warning');
 
                 $dialog_title = HTML::outputProtected($this->app->getDef('dialog_void_title'));
                 $dialog_body = $this->app->getDef('dialog_void_body');
@@ -316,7 +316,7 @@ EOD;
         }
 
         if ($can_refund === true) {
-            $output .= HTML::button($this->app->getDef('button_dialog_refund'), 'fa fa-minus-circle', '#', null, ['params' => 'data-button="paypalButtonRefundTransaction"'], 'btn-danger');
+            $output .= HTML::button($this->app->getDef('button_dialog_refund'), 'fa fa-minus-circle', '#', ['params' => 'data-button="paypalButtonRefundTransaction"'], 'btn-danger');
 
             $dialog_title = HTML::outputProtected($this->app->getDef('dialog_refund_title'));
             $dialog_body = $this->app->getDef('dialog_refund_body');

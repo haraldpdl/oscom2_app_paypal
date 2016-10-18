@@ -16,7 +16,7 @@ $Qlog->execute();
 ?>
 
 <div class="text-right">
-  <?= HTML::button($OSCOM_PayPal->getDef('button_dialog_delete'), null, '#', null, ['params' => 'data-button="delLogs"'], 'btn-warning'); ?>
+  <?= HTML::button($OSCOM_PayPal->getDef('button_dialog_delete'), null, '#', ['params' => 'data-button="delLogs"'], 'btn-warning'); ?>
 </div>
 
 <table id="ppTableLog" class="oscom-table table table-hover">
@@ -88,8 +88,8 @@ if ($Qlog->getPageSetTotalRows() > 0) {
       </div>
 
       <div class="modal-footer">
-        <?= HTML::button($OSCOM_PayPal->getDef('button_delete'), null, $OSCOM_PayPal->link('Log&DeleteAll'), null, null, 'btn-danger'); ?>
-        <?= HTML::button($OSCOM_PayPal->getDef('button_cancel'), null, '#', null, ['params' => 'data-dismiss="modal"'], 'btn-link'); ?>
+        <?= HTML::button($OSCOM_PayPal->getDef('button_delete'), null, $OSCOM_PayPal->link('Log&DeleteAll'), null, 'btn-danger'); ?>
+        <?= HTML::button($OSCOM_PayPal->getDef('button_cancel'), null, '#', ['params' => 'data-dismiss="modal"'], 'btn-link'); ?>
       </div>
     </div>
   </div>

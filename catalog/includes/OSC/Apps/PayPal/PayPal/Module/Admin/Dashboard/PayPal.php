@@ -48,7 +48,7 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
           ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))
         ]);
         $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
-        $app_get_started = HTML::button($this->app->getDef('button_app_get_started'), null, $this->app->link(), null, null, 'btn-primary');
+        $app_get_started = HTML::button($this->app->getDef('button_app_get_started'), null, $this->app->link(), null, 'btn-primary');
         $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
         $get_balance_url = addslashes($this->app->link('RPC&GetBalance&type=PPTYPE'));
 

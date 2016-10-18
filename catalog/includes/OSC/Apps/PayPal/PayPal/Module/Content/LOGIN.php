@@ -32,7 +32,7 @@
       $this->group = 'login';
 
       $this->title = $this->app->getDef('module_login_title');
-      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_login_legacy_admin_app_button'), null, $this->app->link('Configure&module=LOGIN'), null, null, 'btn-primary') . '</div>';
+      $this->description = '<div align="center">' . HTML::button($this->app->getDef('module_login_legacy_admin_app_button'), null, $this->app->link('Configure&module=LOGIN'), null, 'btn-primary') . '</div>';
       $this->sort_order = defined('OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER') ? OSCOM_APP_PAYPAL_LOGIN_SORT_ORDER : 0;
 
       if ( defined('OSCOM_APP_PAYPAL_LOGIN_STATUS') ) {

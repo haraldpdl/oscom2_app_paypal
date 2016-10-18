@@ -22,8 +22,8 @@ if (($current_module == 'PP') && $OSCOM_PayPal->isReqApiCountrySupported(STORE_C
 ?>
 
   <div class="col-sm-6 text-right">
-    <?= HTML::button($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=live'), null, null, 'btn-warning'); ?>
-    <?= HTML::button($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=sandbox'), null, null, 'btn-warning'); ?>
+    <?= HTML::button($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=live'), null, 'btn-warning'); ?>
+    <?= HTML::button($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=sandbox'), null, 'btn-warning'); ?>
   </div>
 
 <?php
@@ -42,7 +42,7 @@ $('#appPayPalToolbar li[data-module="<?= $current_module; ?>"]').addClass('activ
 require(__DIR__ . '/credentials_' . strtolower($current_module) . '.php');
 ?>
 
-<p><?= HTML::button($OSCOM_PayPal->getDef('button_save'), null, null, null, null, 'btn-success'); ?></p>
+<p><?= HTML::button($OSCOM_PayPal->getDef('button_save'), null, null, null, 'btn-success'); ?></p>
 
 </form>
 

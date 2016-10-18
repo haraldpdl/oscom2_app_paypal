@@ -16,8 +16,8 @@ if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
       <div class="panel-body">
         <?=
             $OSCOM_PayPal->getDef('onboarding_intro_body', [
-                ':button_retrieve_live_credentials' => HTML::button($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=live'), null, null, 'btn-primary'),
-                ':button_retrieve_sandbox_credentials' => HTML::button($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=sandbox'), null, null, 'btn-primary')
+                ':button_retrieve_live_credentials' => HTML::button($OSCOM_PayPal->getDef('button_retrieve_live_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=live'), null, 'btn-primary'),
+                ':button_retrieve_sandbox_credentials' => HTML::button($OSCOM_PayPal->getDef('button_retrieve_sandbox_credentials'), null, $OSCOM_PayPal->link('Start&Process&type=sandbox'), null, 'btn-primary')
             ]);
         ?>
       </div>
@@ -34,7 +34,7 @@ if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
       <div class="panel-body">
         <?=
             $OSCOM_PayPal->getDef('manage_credentials_body', [
-                ':button_manage_credentials' => HTML::button($OSCOM_PayPal->getDef('button_manage_credentials'), null, $OSCOM_PayPal->link('Credentials'), null, null, 'btn-info')
+                ':button_manage_credentials' => HTML::button($OSCOM_PayPal->getDef('button_manage_credentials'), null, $OSCOM_PayPal->link('Credentials'), null, 'btn-info')
             ]);
         ?>
       </div>

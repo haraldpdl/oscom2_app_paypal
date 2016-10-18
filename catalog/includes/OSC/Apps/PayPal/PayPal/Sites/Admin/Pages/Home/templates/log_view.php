@@ -15,7 +15,7 @@ require(__DIR__ . '/template_top.php');
 ?>
 
 <div class="text-right">
-  <?= HTML::button($OSCOM_PayPal->getDef('button_back'), null, $OSCOM_PayPal->link('Log&page=' . $_GET['page']), null, null, 'btn-info'); ?>
+  <?= HTML::button($OSCOM_PayPal->getDef('button_back'), null, $OSCOM_PayPal->link('Log&page=' . $_GET['page']), null, 'btn-info'); ?>
 </div>
 
 <table class="table table-hover">
