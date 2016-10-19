@@ -981,6 +981,15 @@ EOD;
         $response_array = $paypal_express->_app->getApiResult('EC', 'SetExpressCheckout', $params);
 
         if ( in_array($response_array['ACK'], array('Success', 'SuccessWithWarning')) ) {
+          if ( isset($HTTP_GET_VARS['format']) && ($HTTP_GET_VARS['format'] == 'json') ) {
+            $result = array(
+              'token' => $response_array['TOKEN']
+            );
+
+            echo json_encode($result);
+            exit;
+          }
+
           tep_redirect($paypal_url . 'token=' . $response_array['TOKEN']);
         } else {
           tep_redirect(tep_href_link(FILENAME_SHOPPING_CART, 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL'));
