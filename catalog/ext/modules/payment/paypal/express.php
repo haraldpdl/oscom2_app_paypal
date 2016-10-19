@@ -816,7 +816,7 @@ EOD;
                                             'name' => $quote['module'],
                                             'label' => $rate['title'],
                                             'cost' => $rate['cost'],
-                                            'tax' => $quote['tax']);
+                                            'tax' => (isset($quote['tax']) ? $quote['tax'] : null));
                   }
                 }
               }
