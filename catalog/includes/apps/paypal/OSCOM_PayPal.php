@@ -14,7 +14,7 @@
     var $_code = 'paypal';
     var $_title = 'PayPal App';
     var $_version;
-    var $_api_version = '112';
+    var $_api_version = '204';
     var $_definitions = array();
 
     function isReqApiCountrySupported($country_id) {
