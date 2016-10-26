@@ -24,9 +24,9 @@ class Process extends \OSC\OM\PagesActionsAbstract
             'sandbox'
         ])) {
             $params = [
-                'return_url' => $OSCOM_PayPal->link('Start&Retrieve', 'SSL'),
+                'return_url' => $OSCOM_PayPal->link('Start&Retrieve'),
                 'type' => $_GET['type'],
-                'site_url' => OSCOM::link('Shop/index.php', null, 'SSL', false),
+                'site_url' => OSCOM::link('Shop/index.php', null, false),
                 'site_currency' => DEFAULT_CURRENCY
             ];
 

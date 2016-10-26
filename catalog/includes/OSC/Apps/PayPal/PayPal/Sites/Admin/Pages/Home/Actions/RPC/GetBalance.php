@@ -8,6 +8,7 @@
 
 namespace OSC\Apps\PayPal\PayPal\Sites\Admin\Pages\Home\Actions\RPC;
 
+use OSC\OM\Cache;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
@@ -28,7 +29,17 @@ class GetBalance extends \OSC\OM\PagesActionsAbstract
             'live',
             'sandbox'
         ])) {
-            $response = $OSCOM_PayPal->getApiResult('APP', 'GetBalance', null, $_GET['type']);
+            $PayPalCache = new Cache('app_paypal-balance');
+
+            if ($PayPalCache->exists(15)) {
+                $response = $PayPalCache->get();
+            } else {
+                $response = $OSCOM_PayPal->getApiResult('APP', 'GetBalance', null, $_GET['type']);
+
+                if (is_array($response) && isset($response['ACK']) && ($response['ACK'] == 'Success')) {
+                    $PayPalCache->save($response);
+                }
+            }
 
             if (is_array($response) && isset($response['ACK']) && ($response['ACK'] == 'Success')) {
                 $result['rpcStatus'] = 1;

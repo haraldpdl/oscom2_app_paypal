@@ -22,7 +22,7 @@ class PayPal implements \OSC\OM\Modules\AdminMenuInterface
 
         $OSCOM_PayPal = Registry::get('PayPal');
 
-        $OSCOM_PayPal->loadDefinitionFile('admin/modules/boxes/paypal.php');
+        $OSCOM_PayPal->loadDefinitions('admin/modules/boxes/paypal');
 
         $paypal_menu = [
             [

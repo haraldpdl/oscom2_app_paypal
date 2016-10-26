@@ -19,7 +19,7 @@ class Configure extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('configure.php');
         $this->page->data['action'] = 'Configure';
 
-        $OSCOM_PayPal->loadDefinitionFile('admin/configure.php');
+        $OSCOM_PayPal->loadDefinitions('admin/configure');
 
         $modules = $OSCOM_PayPal->getConfigModules();
 

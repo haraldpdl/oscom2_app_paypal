@@ -25,8 +25,8 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
 
         $this->app = Registry::get('PayPal');
 
-        $this->app->loadDefinitionFile('admin/balance.php');
-        $this->app->loadDefinitionFile('admin/modules/dashboard/d_paypal_app.php');
+        $this->app->loadDefinitions('admin/balance');
+        $this->app->loadDefinitions('admin/modules/dashboard/d_paypal_app');
 
         $this->title = $this->app->getDef('module_admin_dashboard_title');
         $this->description = $this->app->getDef('module_admin_dashboard_description');
@@ -47,6 +47,7 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
         $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', [
           ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))
         ]);
+        $cached_notice = $this->app->getDef('cached_notice');
         $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');
         $app_get_started = HTML::button($this->app->getDef('button_app_get_started'), null, $this->app->link(), null, 'btn-primary');
         $error_balance_retrieval = addslashes($this->app->getDef('error_balance_retrieval'));
@@ -75,7 +76,7 @@ var OSCOM = {
 
 <div id="ppAccountBalanceLive" class="panel panel-success">
   <div class="panel-heading">
-    <h3 class="panel-title">{$heading_live_account}</h3>
+    <h3 class="panel-title">{$heading_live_account} <span class="small pull-right">{$cached_notice}</span></h3>
   </div>
 
   <div id="ppBalanceLiveInfo" class="panel-body">
@@ -85,7 +86,7 @@ var OSCOM = {
 
 <div id="ppAccountBalanceSandbox" class="panel panel-warning">
   <div class="panel-heading">
-    <h3 class="panel-title">{$heading_sandbox_account}</h3>
+    <h3 class="panel-title">{$heading_sandbox_account} <span class="small pull-right">{$cached_notice}</span></h3>
   </div>
 
   <div id="ppBalanceSandboxInfo" class="panel-body">

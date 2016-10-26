@@ -30,7 +30,7 @@ abstract class ConfigParamAbstract extends \OSC\Sites\Admin\ConfigParamAbstract
 
         $this->code = (new \ReflectionClass($this))->getShortName();
 
-        $this->app->loadDefinitionFile('modules/' . $config_module . '/Params/' . $this->code . '.php');
+        $this->app->loadDefinitions('modules/' . $config_module . '/Params/' . $this->code);
 
         parent::__construct();
     }

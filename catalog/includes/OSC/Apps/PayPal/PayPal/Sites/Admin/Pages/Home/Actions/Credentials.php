@@ -19,7 +19,7 @@ class Credentials extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('credentials.php');
         $this->page->data['action'] = 'Credentials';
 
-        $OSCOM_PayPal->loadDefinitionFile('admin/credentials.php');
+        $OSCOM_PayPal->loadDefinitions('admin/credentials');
 
         $modules = [
             'PP',

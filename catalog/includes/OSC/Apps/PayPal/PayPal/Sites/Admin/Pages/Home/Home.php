@@ -48,8 +48,8 @@ EOD;
             $this->app->db->exec($sql);
         }
 
-        $this->app->loadDefinitionFile('admin.php');
-        $this->app->loadDefinitionFile('admin/start.php');
+        $this->app->loadDefinitions('admin');
+        $this->app->loadDefinitions('admin/start');
 
         if ($this->app->migrate()) {
             $admin_dashboard_modules = explode(';', MODULE_ADMIN_DASHBOARD_INSTALLED);

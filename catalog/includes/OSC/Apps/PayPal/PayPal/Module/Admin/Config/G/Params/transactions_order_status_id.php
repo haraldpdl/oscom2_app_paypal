@@ -29,7 +29,7 @@ class transactions_order_status_id extends \OSC\Apps\PayPal\PayPal\Module\Admin\
             'orders_status_id',
             'orders_status_name'
         ], [
-            'language_id' => $_SESSION['languages_id'],
+            'language_id' => $this->app->lang->getId(),
             'public_flag' => '0'
         ], 'orders_status_name');
 

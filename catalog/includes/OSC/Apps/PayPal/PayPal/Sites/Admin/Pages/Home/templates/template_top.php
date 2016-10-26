@@ -33,7 +33,7 @@ var OSCOM = {
 
 <div class="row" style="padding-bottom: 30px;">
   <div class="col-sm-6">
-    <a href="<?= $OSCOM_PayPal->link(); ?>"><img src="<?= OSCOM::link('Shop/public/Apps/PayPal/PayPal/images/paypal.png', '', 'SSL', false); ?>" /></a>
+    <a href="<?= $OSCOM_PayPal->link(); ?>"><img src="<?= OSCOM::link('Shop/public/Apps/PayPal/PayPal/images/paypal.png', '', false); ?>" /></a>
   </div>
 
   <div class="col-sm-6 text-right text-muted">

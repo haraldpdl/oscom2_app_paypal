@@ -4,4 +4,6 @@ module_admin_dashboard_description = PayPal App Dashboard module to display the 
 heading_live_account = PayPal Live: :account
 heading_sandbox_account = PayPal Sandbox: :account
 
+cached_notice = (cached 15 mins.)
+
 button_app_get_started = Get Started with the PayPal App

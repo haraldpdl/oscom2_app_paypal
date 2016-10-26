@@ -33,7 +33,7 @@ abstract class ConfigAbstract
 
         $this->code = (new \ReflectionClass($this))->getShortName();
 
-        $this->app->loadDefinitionFile('modules/' . $this->code . '/' . $this->code . '.php');
+        $this->app->loadDefinitions('modules/' . $this->code . '/' . $this->code);
 
         $this->init();
     }

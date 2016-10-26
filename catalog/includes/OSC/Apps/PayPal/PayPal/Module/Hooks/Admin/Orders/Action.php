@@ -29,7 +29,7 @@ class Action implements \OSC\OM\Modules\HooksInterface
 
         $this->ms = Registry::get('MessageStack');
 
-        $this->app->loadDefinitionFile('hooks/admin/orders/action.php');
+        $this->app->loadDefinitions('hooks/admin/orders/action');
     }
 
     public function execute()

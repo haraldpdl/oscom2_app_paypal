@@ -19,10 +19,13 @@ class PS extends \OSC\OM\PagesAbstract
     protected $file = null;
     protected $use_site_template = false;
     protected $pm;
+    protected $lang;
 
     protected function init()
     {
         global $currencies;
+
+        $this->lang = Registry::get('Language');
 
         $this->pm = new PaymentModulePS();
 
@@ -33,7 +36,7 @@ class PS extends \OSC\OM\PagesAbstract
             return false;
         }
 
-        include(OSCOM::getConfig('dir_root', 'Shop') . 'includes/languages/' . $_SESSION['language'] . '/checkout_process.php');
+        $this->lang->loadDefinitions('Shop/checkout_process');
 
         $result = false;
 
@@ -220,7 +223,7 @@ class PS extends \OSC\OM\PagesAbstract
                     $email_order = STORE_NAME . "\n" .
                                    EMAIL_SEPARATOR . "\n" .
                                    EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                                   EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
+                                   EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, false) . "\n" .
                                    EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
 
                     if ($order->info['comments']) {

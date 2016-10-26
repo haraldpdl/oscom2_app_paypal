@@ -24,7 +24,7 @@
       }
 
       $this->app = Registry::get('PayPal');
-      $this->app->loadDefinitionFile('modules/LOGIN/LOGIN.php');
+      $this->app->loadDefinitions('modules/LOGIN/LOGIN');
 
       $this->signature = 'paypal|paypal_login|' . $this->app->getVersion() . '|2.4';
 
@@ -98,13 +98,13 @@
     }
 
     function preLogin() {
-      $return_url = OSCOM::link('index.php', 'Account&LogIn', 'SSL');
+      $return_url = OSCOM::link('index.php', 'Account&LogIn');
 
       if ( isset($_GET['code']) ) {
         $_SESSION['paypal_login_customer_id'] = false;
 
         $params = array('code' => $_GET['code'],
-                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login', 'SSL')));
+                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login')));
 
         $response_token = $this->app->getApiResult('LOGIN', 'GrantToken', $params);
 
@@ -237,7 +237,7 @@
 
             $_SESSION['billto'] = $_SESSION['sendto'];
 
-            $return_url = OSCOM::link('index.php', 'Account&LogIn&action=paypal_login_process', 'SSL');
+            $return_url = OSCOM::link('index.php', 'Account&LogIn&action=paypal_login_process');
           }
         }
       }

@@ -19,6 +19,6 @@ class Log extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('log.php');
         $this->page->data['action'] = 'Log';
 
-        $OSCOM_PayPal->loadDefinitionFile('admin/log.php');
+        $OSCOM_PayPal->loadDefinitions('admin/log');
     }
 }

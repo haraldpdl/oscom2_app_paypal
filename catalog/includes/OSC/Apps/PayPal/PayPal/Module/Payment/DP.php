@@ -25,7 +25,7 @@
       }
 
       $this->app = Registry::get('PayPal');
-      $this->app->loadDefinitionFile('modules/DP/DP.php');
+      $this->app->loadDefinitions('modules/DP/DP');
 
       $this->signature = 'paypal|paypal_pro_dp|' . $this->app->getVersion() . '|2.4';
       $this->api_version = $this->app->getApiVersion();
@@ -308,10 +308,10 @@ EOD;
         $response_array = $this->app->getApiResult('DP', 'DoDirectPayment', $params);
 
         if ( !in_array($response_array['ACK'], array('Success', 'SuccessWithWarning')) ) {
-          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']));
         }
       } else {
-        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->app->getDef('module_dp_error_all_fields_required'), 'SSL');
+        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->app->getDef('module_dp_error_all_fields_required'));
       }
     }
 
@@ -380,7 +380,7 @@ EOD;
         $params['_headers'] = array('X-VPS-REQUEST-ID: ' . md5($_SESSION['cartID'] . session_id() . $this->app->formatCurrencyRaw($order->info['total'])),
                                     'X-VPS-CLIENT-TIMEOUT: 45',
                                     'X-VPS-VIT-INTEGRATION-PRODUCT: OSCOM',
-                                    'X-VPS-VIT-INTEGRATION-VERSION: 2.3');
+                                    'X-VPS-VIT-INTEGRATION-VERSION: 2.4');
 
         $response_array = $this->app->getApiResult('DP', 'PayflowPayment', $params);
 
@@ -409,10 +409,10 @@ EOD;
               break;
           }
 
-          OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $error_message, 'SSL');
+          OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $error_message);
         }
       } else {
-        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->app->getDef('module_dp_error_all_fields_required'), 'SSL');
+        OSCOM::redirect('checkout_confirmation.php', 'error_message=' . $this->app->getDef('module_dp_error_all_fields_required'));
       }
     }
 

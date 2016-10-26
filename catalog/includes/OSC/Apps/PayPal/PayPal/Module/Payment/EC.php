@@ -19,14 +19,14 @@
     public $code, $title, $description, $enabled, $app;
 
     function __construct() {
-      global $PHP_SELF, $order, $request_type;
+      global $PHP_SELF, $order;
 
       if (!Registry::exists('PayPal')) {
         Registry::set('PayPal', new PayPalApp());
       }
 
       $this->app = Registry::get('PayPal');
-      $this->app->loadDefinitionFile('modules/EC/EC.php');
+      $this->app->loadDefinitions('modules/EC/EC');
 
       $this->signature = 'paypal|paypal_express|' . $this->app->getVersion() . '|2.4';
       $this->api_version = $this->app->getApiVersion();
@@ -76,10 +76,6 @@
 
       if ( basename($PHP_SELF) == 'shopping_cart.php' ) {
         if ( (OSCOM_APP_PAYPAL_GATEWAY == '1') && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '1') ) {
-          if ( isset($request_type) && ($request_type != 'SSL') && (OSCOM::getConfig('ssl', 'Shop') == 'true') ) {
-            OSCOM::redirect('shopping_cart.php', tep_get_all_get_params(), 'SSL');
-          }
-
           header('X-UA-Compatible: IE=edge', true);
         }
       }
@@ -89,7 +85,7 @@
         unset($_SESSION['appPayPalEcRightTurn']);
 
         if ( isset($_SESSION['payment']) && ($_SESSION['payment'] == $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code) ) {
-          OSCOM::redirect('checkout_confirmation.php', '', 'SSL');
+          OSCOM::redirect('checkout_confirmation.php');
         }
       }
     }
@@ -153,14 +149,14 @@
             $button_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
           }
 
-          $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+          $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
         } else {
           $oscTemplate->addBlock('<script src="https://www.paypalobjects.com/api/checkout.js" async></script>', 'footer_scripts');
 
           $merchant_id = (OSCOM_APP_PAYPAL_EC_STATUS === '1') ? OSCOM_APP_PAYPAL_LIVE_MERCHANT_ID : OSCOM_APP_PAYPAL_SANDBOX_MERCHANT_ID;
           if (empty($merchant_id)) $merchant_id = ' ';
 
-          $ppecset_url = OSCOM::link('index.php', 'order&callback&paypal&ec&format=json', 'SSL');
+          $ppecset_url = OSCOM::link('index.php', 'order&callback&paypal&ec&format=json');
 
           switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_COLOR) {
             case '3':
@@ -246,7 +242,7 @@ EOD;
           $button_title .= ' (' . $this->app->vendor . '\\' . $this->app->code . '\\' . $this->code . '; Sandbox)';
         }
 
-        $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec', 'SSL') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
+        $string .= '<a href="' . OSCOM::link('index.php', 'order&callback&paypal&ec') . '"><img src="' . $image_button . '" border="0" alt="" title="' . $button_title . '" /></a>';
       }
 
       return $string;
@@ -265,20 +261,20 @@ EOD;
       global $messageStack, $order;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec');
       }
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
         if ( !in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
-          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']), 'SSL');
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']));
         } elseif ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['PAYMENTREQUEST_0_CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
-          OSCOM::redirect('shopping_cart.php', '', 'SSL');
+          OSCOM::redirect('shopping_cart.php');
         }
       } else { // Payflow
         if ($_SESSION['appPayPalEcResult']['RESULT'] != '0') {
-          OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']), 'SSL');
+          OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']));
         } elseif ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
-          OSCOM::redirect('shopping_cart.php', '', 'SSL');
+          OSCOM::redirect('shopping_cart.php');
         }
       }
 
@@ -316,15 +312,15 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec');
       }
 
       if ( in_array($_SESSION['appPayPalEcResult']['ACK'], array('Success', 'SuccessWithWarning')) ) {
         if ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['PAYMENTREQUEST_0_CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
-          OSCOM::redirect('shopping_cart.php', '', 'SSL');
+          OSCOM::redirect('shopping_cart.php');
         }
       } else {
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($_SESSION['appPayPalEcResult']['L_LONGMESSAGE0']));
       }
 
       if (empty($_SESSION['comments'])) {
@@ -364,7 +360,7 @@ EOD;
           HTTP::redirect($paypal_url);
         }
 
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . stripslashes($response_array['L_LONGMESSAGE0']));
       }
     }
 
@@ -372,15 +368,15 @@ EOD;
       global $order, $response_array;
 
       if ( !isset($_SESSION['appPayPalEcResult']) ) {
-        OSCOM::redirect('index.php', 'order&callback&paypal&ec', 'SSL');
+        OSCOM::redirect('index.php', 'order&callback&paypal&ec');
       }
 
       if ( $_SESSION['appPayPalEcResult']['RESULT'] == '0' ) {
         if ( !isset($_SESSION['appPayPalEcSecret']) || ($_SESSION['appPayPalEcResult']['CUSTOM'] != $_SESSION['appPayPalEcSecret']) ) {
-          OSCOM::redirect('shopping_cart.php', '', 'SSL');
+          OSCOM::redirect('shopping_cart.php');
         }
       } else {
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($_SESSION['appPayPalEcResult']['OSCOM_ERROR_MESSAGE']));
       }
 
       if ( empty($_SESSION['comments']) ) {
@@ -409,7 +405,7 @@ EOD;
       $response_array = $this->app->getApiResult('EC', 'PayflowDoExpressCheckoutPayment', $params);
 
       if ( $response_array['RESULT'] != '0' ) {
-        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($response_array['OSCOM_ERROR_MESSAGE']), 'SSL');
+        OSCOM::redirect('shopping_cart.php', 'error_message=' . urlencode($response_array['OSCOM_ERROR_MESSAGE']));
       }
     }
 

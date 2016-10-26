@@ -25,7 +25,7 @@
       }
 
       $this->app = Registry::get('PayPal');
-      $this->app->loadDefinitionFile('modules/HS/HS.php');
+      $this->app->loadDefinitions('modules/HS/HS');
 
       $this->signature = 'paypal|paypal_pro_hs|' . $this->app->getVersion() . '|2.4';
       $this->api_version = $this->app->getApiVersion();
@@ -277,7 +277,7 @@
                 $Qattributes->bindInt(':products_id', $order->products[$i]['id']);
                 $Qattributes->bindInt(':options_id', $order->products[$i]['attributes'][$j]['option_id']);
                 $Qattributes->bindInt(':options_values_id', $order->products[$i]['attributes'][$j]['value_id']);
-                $Qattributes->bindInt(':language_id', $_SESSION['languages_id']);
+                $Qattributes->bindInt(':language_id', $this->app->lang->getId());
                 $Qattributes->execute();
 
                 $sql_data_array = array('orders_id' => $insert_id,
@@ -308,13 +308,13 @@
         $order_id = substr($_SESSION['cart_PayPal_Pro_HS_ID'], strpos($_SESSION['cart_PayPal_Pro_HS_ID'], '-')+1);
 
         $params = array('buyer_email' => $order->customer['email_address'],
-                        'cancel_return' => OSCOM::link('checkout_payment.php', '', 'SSL'),
+                        'cancel_return' => OSCOM::link('checkout_payment.php'),
                         'currency_code' => $_SESSION['currency'],
                         'invoice' => $order_id,
                         'custom' => $_SESSION['customer_id'],
                         'paymentaction' => OSCOM_APP_PAYPAL_HS_TRANSACTION_METHOD == '1' ? 'sale' : 'authorization',
-                        'return' => OSCOM::link('checkout_process.php', '', 'SSL'),
-                        'notify_url' => OSCOM::link('index.php', 'order&ipn&paypal&hs', 'SSL', false, false),
+                        'return' => OSCOM::link('checkout_process.php'),
+                        'notify_url' => OSCOM::link('index.php', 'order&ipn&paypal&hs', false, false),
                         'shipping' => $this->app->formatCurrencyRaw($order->info['shipping_cost']),
                         'tax' => $this->app->formatCurrencyRaw($order->info['tax']),
                         'subtotal' => $this->app->formatCurrencyRaw($order->info['total'] - $order->info['shipping_cost'] - $order->info['tax']),
@@ -356,8 +356,8 @@
 
       $_SESSION['pphs_key'] = tep_create_random_value(16);
 
-      $iframe_url = OSCOM::link('index.php', 'order&paypal&checkout&hs&key=' . $_SESSION['pphs_key'], 'SSL');
-      $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs', 'SSL');
+      $iframe_url = OSCOM::link('index.php', 'order&paypal&checkout&hs&key=' . $_SESSION['pphs_key']);
+      $form_url = OSCOM::link('checkout_payment.php', 'payment_error=paypal_pro_hs');
 
       $output = <<<EOD
 <iframe src="{$iframe_url}" width="570px" height="540px" frameBorder="0" scrolling="no"></iframe>
@@ -528,7 +528,7 @@ EOD;
             $Qattributes->bindInt(':products_id', $order->products[$i]['id']);
             $Qattributes->bindInt(':options_id', $order->products[$i]['attributes'][$j]['option_id']);
             $Qattributes->bindInt(':options_values_id', $order->products[$i]['attributes'][$j]['value_id']);
-            $Qattributes->bindInt(':language_id', $_SESSION['languages_id']);
+            $Qattributes->bindInt(':language_id', $this->app->lang->getId());
             $Qattributes->execute();
 
             $products_ordered_attributes .= "\n\t" . $Qattributes->value('products_options_name') . ' ' . $Qattributes->value('products_options_values_name');
@@ -543,7 +543,7 @@ EOD;
       $email_order = STORE_NAME . "\n" .
                      EMAIL_SEPARATOR . "\n" .
                      EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                     EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, 'SSL', false) . "\n" .
+                     EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, false) . "\n" .
                      EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
       if ($order->info['comments']) {
         $email_order .= HTML::outputProtected($order->info['comments']) . "\n\n";
@@ -595,7 +595,7 @@ EOD;
       unset($_SESSION['pphs_result']);
       unset($_SESSION['pphs_key']);
 
-      OSCOM::redirect('checkout_success.php', '', 'SSL');
+      OSCOM::redirect('checkout_success.php');
     }
 
     function get_error() {

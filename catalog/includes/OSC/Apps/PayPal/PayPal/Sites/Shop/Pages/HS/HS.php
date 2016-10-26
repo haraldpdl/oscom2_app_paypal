@@ -90,7 +90,7 @@ class HS extends \OSC\OM\PagesAbstract
                 $this->data['form_url'] = 'https://securepayments.sandbox.paypal.com/webapps/HostedSoleSolutionApp/webflow/sparta/hostedSoleSolutionProcess';
             }
         } else {
-            $this->data['form_url'] = OSCOM::link('checkout_payment.php', 'payment_error=PayPal\HS', 'SSL');
+            $this->data['form_url'] = OSCOM::link('checkout_payment.php', 'payment_error=PayPal\HS');
         }
 
         $this->file = 'checkout.php';

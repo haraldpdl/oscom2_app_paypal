@@ -19,6 +19,6 @@ class Privacy extends \OSC\OM\PagesActionsAbstract
         $this->page->setFile('privacy.php');
         $this->page->data['action'] = 'Privacy';
 
-        $OSCOM_PayPal->loadDefinitionFile('admin/privacy.php');
+        $OSCOM_PayPal->loadDefinitions('admin/privacy');
     }
 }

@@ -35,7 +35,7 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
             return false;
         }
 
-        $this->app->loadDefinitionFile('hooks/admin/orders/tab.php');
+        $this->app->loadDefinitions('hooks/admin/orders/tab');
 
         $output = '';
 
@@ -62,11 +62,11 @@ class PageTab implements \OSC\OM\Modules\HooksInterface
 
                 $pp_server = (strpos(strtolower($Qorder->value('payment_method')), 'sandbox') !== false) ? 'sandbox' : 'live';
 
-                $info_button = HTML::button($this->app->getDef('button_details'), 'fa fa-info-circle', OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), 'btn-primary');
+                $info_button = HTML::button($this->app->getDef('button_details'), 'fa fa-info-circle', OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $oID . '&action=edit&tabaction=getTransactionDetails'), null, 'btn-primary');
                 $capture_button = $this->getCaptureButton($status, $Qorder->toArray());
                 $void_button = $this->getVoidButton($status, $Qorder->toArray());
                 $refund_button = $this->getRefundButton($status, $Qorder->toArray());
-                $paypal_button = HTML::button($this->app->getDef('button_view_at_paypal'), 'fa fa-paypal', 'https://www.' . ($pp_server == 'sandbox' ? 'sandbox.' : '') . 'paypal.com/cgi-bin/webscr?cmd=_view-a-trans&id=' . $status['Transaction ID'], 'info', ['newwindow' => true], 'btn-info');
+                $paypal_button = HTML::button($this->app->getDef('button_view_at_paypal'), 'fa fa-paypal', 'https://www.' . ($pp_server == 'sandbox' ? 'sandbox.' : '') . 'paypal.com/cgi-bin/webscr?cmd=_view-a-trans&id=' . $status['Transaction ID'], ['newwindow' => true], 'btn-info');
 
                 $tab_title = addslashes($this->app->getDef('tab_title'));
 
