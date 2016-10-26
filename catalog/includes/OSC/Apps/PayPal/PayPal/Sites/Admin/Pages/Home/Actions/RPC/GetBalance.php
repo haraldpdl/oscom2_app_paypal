@@ -31,7 +31,7 @@ class GetBalance extends \OSC\OM\PagesActionsAbstract
         ])) {
             $PayPalCache = new Cache('app_paypal-balance');
 
-            if ($PayPalCache->exists(15)) {
+            if (!isset($_GET['force']) && $PayPalCache->exists(15)) {
                 $response = $PayPalCache->get();
             } else {
                 $response = $OSCOM_PayPal->getApiResult('APP', 'GetBalance', null, $_GET['type']);

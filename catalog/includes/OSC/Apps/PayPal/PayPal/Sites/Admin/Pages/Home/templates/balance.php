@@ -34,7 +34,7 @@ OSCOM.APP.PAYPAL.getBalance = function(type) {
 
   var divId = 'ppAccountBalance' + type.charAt(0).toUpperCase() + type.slice(1);
 
-  $.get('<?= addslashes($OSCOM_PayPal->link('RPC&GetBalance&type=PPTYPE')); ?>'.replace('PPTYPE', type), function (data) {
+  $.get('<?= addslashes($OSCOM_PayPal->link('RPC&GetBalance&type=PPTYPE&force=true')); ?>'.replace('PPTYPE', type), function (data) {
     var balance = {};
 
     $('#' + divId + ' .panel-body').empty();
