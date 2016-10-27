@@ -118,7 +118,7 @@ EOD;
                     $dialog_body = $this->app->getDef('dialog_capture_body');
                     $field_amount_title = $this->app->getDef('dialog_capture_amount_field_title');
                     $field_last_capture_title = $this->app->getDef('dialog_capture_last_capture_field_title', [
-                        ':currency' => $order['currency']
+                        'currency' => $order['currency']
                     ]);
                     $capture_link = OSCOM::link('orders.php', 'page=' . $_GET['page'] . '&oID=' . $order['orders_id'] . '&action=edit&tabaction=doCapture');
                     $capture_currency = $order['currency'];
@@ -330,7 +330,7 @@ EOD;
 
             foreach ($tids as $key => $value) {
                 $refund_fields .= '<div class="checkbox"><label' . (isset($value['Refund']) ? ' style="text-decoration: line-through;"' : '') . '><input type="checkbox" name="ppRefund[]" value="' . $key . '" id="ppRefundPartial' . $counter . '"' . (isset($value['Refund']) ? ' disabled="disabled"' : '') . ' /> ' . $this->app->getDef('dialog_refund_payment_title', [
-                    ':amount' => $value['Amount']
+                    'amount' => $value['Amount']
                 ]) . '</label></div>';
 
                 $counter++;

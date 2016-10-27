@@ -42,10 +42,10 @@ class PayPal extends \OSC\OM\Modules\AdminDashboardAbstract
         $has_live_account = ($this->app->hasApiCredentials('live') === true) ? 'true' : 'false';
         $has_sandbox_account = ($this->app->hasApiCredentials('sandbox') === true) ? 'true' : 'false';
         $heading_live_account = $this->app->getDef('heading_live_account', [
-          ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))
+          'account' => str_replace('_api1.', '@', $this->app->getApiCredentials('live', 'username'))
         ]);
         $heading_sandbox_account = $this->app->getDef('heading_sandbox_account', [
-          ':account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))
+          'account' => str_replace('_api1.', '@', $this->app->getApiCredentials('sandbox', 'username'))
         ]);
         $cached_notice = $this->app->getDef('cached_notice');
         $receiving_balance_progress = $this->app->getDef('retrieving_balance_progress');

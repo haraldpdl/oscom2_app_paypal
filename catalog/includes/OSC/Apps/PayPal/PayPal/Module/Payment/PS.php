@@ -356,7 +356,7 @@
                           'paymentaction' => (OSCOM_APP_PAYPAL_PS_TRANSACTION_METHOD == '1') ? 'sale' : 'authorization');
 
       $return_link_title = $this->app->getDef('module_ps_button_return_to_store', [
-        ':storename' => STORE_NAME
+        'storename' => STORE_NAME
       ]);
 
       if ( strlen($return_link_title) <= 60 ) {

@@ -26,8 +26,8 @@ module_ec_field_comments = Comments:
 
 module_ec_email_account_password = An account has automatically been created for you with the following e-mail address and password:
 
-Store Account E-Mail Address: :email_address
-Store Account Password: :password
+Store Account E-Mail Address: {{email_address}}
+Store Account Password: {{password}}
 
 module_ec_error_general = Error: A general problem has occurred with the transaction. Please try again.
 module_ec_error_configuration = Error: Payment module configuration error. Please verify the PayPal App credentials.

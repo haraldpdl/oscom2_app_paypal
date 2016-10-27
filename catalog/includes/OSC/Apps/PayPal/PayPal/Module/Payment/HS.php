@@ -344,7 +344,7 @@
         }
 
         $return_link_title = $this->app->getDef('module_hs_button_return_to_store', [
-          ':storename' => STORE_NAME
+          'storename' => STORE_NAME
         ]);
 
         if ( strlen($return_link_title) <= 60 ) {

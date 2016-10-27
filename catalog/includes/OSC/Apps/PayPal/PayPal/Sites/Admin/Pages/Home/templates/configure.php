@@ -131,7 +131,7 @@ if ($OSCOM_PayPal_Config->is_installed === true) {
 </div>
 
 <p>
-  <?= HTML::button($OSCOM_PayPal->getDef('button_install_title', [':title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title')]), null, $OSCOM_PayPal->link('Configure&Install&module=' . $current_module), null, 'btn-warning'); ?>
+  <?= HTML::button($OSCOM_PayPal->getDef('button_install_title', ['title' => $OSCOM_PayPal->getConfigModuleInfo($current_module, 'title')]), null, $OSCOM_PayPal->link('Configure&Install&module=' . $current_module), null, 'btn-warning'); ?>
 </p>
 
 <?php

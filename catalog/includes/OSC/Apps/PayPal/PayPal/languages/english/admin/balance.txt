@@ -1,5 +1,5 @@
-heading_live_account = Live: :account
-heading_sandbox_account = Sandbox: :account
+heading_live_account = Live: {{account}}
+heading_sandbox_account = Sandbox: {{account}}
 
 retrieving_balance_progress = Retrieving balance &hellip;
 

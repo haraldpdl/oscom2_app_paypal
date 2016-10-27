@@ -444,8 +444,8 @@ class EC extends \OSC\OM\PagesAbstract
                             $email_text = sprintf(EMAIL_GREET_NONE, $customers_firstname) .
                                           EMAIL_WELCOME .
                                           $this->pm->app->getDef('module_ec_email_account_password', [
-                                              ':email_address' => $email_address,
-                                              ':password' => $customer_password
+                                              'email_address' => $email_address,
+                                              'password' => $customer_password
                                           ]) . "\n\n" .
                                           EMAIL_TEXT .
                                           EMAIL_CONTACT .

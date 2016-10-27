@@ -394,11 +394,11 @@ class Action implements \OSC\OM\Modules\HooksInterface
                     $this->app->db->save('orders_status_history', $sql_data_array);
 
                     $this->ms->add($this->app->getDef('ms_success_refundTransaction', [
-                        ':refund_amount' => $tids[$id]['Amount']
+                        'refund_amount' => $tids[$id]['Amount']
                     ]), 'success');
                 } else {
                     $this->ms->add($this->app->getDef('ms_error_refundTransaction', [
-                        ':refund_amount' => $tids[$id]['Amount']
+                        'refund_amount' => $tids[$id]['Amount']
                     ]), 'error');
                 }
             }

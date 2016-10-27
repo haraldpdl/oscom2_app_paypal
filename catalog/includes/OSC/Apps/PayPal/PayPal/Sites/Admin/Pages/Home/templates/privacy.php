@@ -6,7 +6,7 @@ require(__DIR__ . '/template_top.php');
 
 <?=
     $OSCOM_PayPal->getDef('privacy_body', [
-        ':api_req_countries' => implode(', ', $OSCOM_PayPal->getReqApiCountries())
+        'api_req_countries' => implode(', ', $OSCOM_PayPal->getReqApiCountries())
     ]);
 ?>
 

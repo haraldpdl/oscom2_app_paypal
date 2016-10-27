@@ -4,7 +4,7 @@ require(__DIR__ . '/template_top.php');
 
 <div id="ppAccountBalanceLive" class="panel panel-success">
   <div class="panel-heading">
-    <?= $OSCOM_PayPal->getDef('heading_live_account', [':account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('live', 'username'))]); ?>
+    <?= $OSCOM_PayPal->getDef('heading_live_account', ['account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('live', 'username'))]); ?>
   </div>
 
   <div class="panel-body">
@@ -14,7 +14,7 @@ require(__DIR__ . '/template_top.php');
 
 <div id="ppAccountBalanceSandbox" class="panel panel-warning">
   <div class="panel-heading">
-    <?= $OSCOM_PayPal->getDef('heading_sandbox_account', [':account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('sandbox', 'username'))]); ?>
+    <?= $OSCOM_PayPal->getDef('heading_sandbox_account', ['account' => str_replace('_api1.', '@', $OSCOM_PayPal->getApiCredentials('sandbox', 'username'))]); ?>
   </div>
 
   <div class="panel-body">

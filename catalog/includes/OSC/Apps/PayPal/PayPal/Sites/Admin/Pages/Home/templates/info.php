@@ -14,7 +14,7 @@ require(__DIR__ . '/template_top.php');
       <div class="panel-body">
         <?=
             $OSCOM_PayPal->getDef('online_documentation_body', [
-                ':button_online_documentation' => HTML::button($OSCOM_PayPal->getDef('button_online_documentation'), null, 'https://library.oscommerce.com/Package&paypal&oscom24', ['newwindow' => true], 'btn-info')
+                'button_online_documentation' => HTML::button($OSCOM_PayPal->getDef('button_online_documentation'), null, 'https://library.oscommerce.com/Package&paypal&oscom24', ['newwindow' => true], 'btn-info')
             ]);
         ?>
       </div>
@@ -30,7 +30,7 @@ require(__DIR__ . '/template_top.php');
       <div class="panel-body">
         <?=
             $OSCOM_PayPal->getDef('online_forum_body', [
-                ':button_online_forum' => HTML::button($OSCOM_PayPal->getDef('button_online_forum'), null, 'http://forums.oscommerce.com/forum/54-paypal/', ['newwindow' => true], 'btn-warning')
+                'button_online_forum' => HTML::button($OSCOM_PayPal->getDef('button_online_forum'), null, 'http://forums.oscommerce.com/forum/54-paypal/', ['newwindow' => true], 'btn-warning')
             ]);
         ?>
       </div>
