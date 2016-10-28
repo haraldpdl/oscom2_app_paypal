@@ -5,11 +5,6 @@ require(__DIR__ . '/template_top.php');
 ?>
 
 <div class="row">
-
-<?php
-if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
-?>
-
   <div class="col-sm-6">
     <div class="panel panel-primary">
       <div class="panel-heading"><?= $OSCOM_PayPal->getDef('onboarding_intro_title'); ?></div>
@@ -23,10 +18,6 @@ if ($OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
       </div>
     </div>
   </div>
-
-<?php
-}
-?>
 
   <div class="col-sm-6">
     <div class="panel panel-info">

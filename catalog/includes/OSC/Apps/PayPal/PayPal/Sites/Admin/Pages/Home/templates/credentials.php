@@ -18,7 +18,7 @@ require(__DIR__ . '/template_top.php');
   </div>
 
 <?php
-if (($current_module == 'PP') && $OSCOM_PayPal->isReqApiCountrySupported(STORE_COUNTRY)) {
+if ($current_module == 'PP') {
 ?>
 
   <div class="col-sm-6 text-right">

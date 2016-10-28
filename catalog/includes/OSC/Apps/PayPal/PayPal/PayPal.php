@@ -22,38 +22,6 @@ class PayPal extends \OSC\OM\AppAbstract
     {
     }
 
-    public function isReqApiCountrySupported($country_id)
-    {
-        $Qcountry = $this->db->get('countries', 'countries_iso_code_2', ['countries_id' => $country_id]);
-
-        if ($Qcountry->fetch() !== false) {
-            return in_array($Qcountry->valueInt('countries_iso_code_2'), $this->getReqApiCountries());
-        }
-
-        return false;
-    }
-
-    public function getReqApiCountries()
-    {
-        static $countries;
-
-        if (!isset($countries)) {
-            $countries = [];
-
-            if (is_file(OSCOM::BASE_DIR . 'Apps/PayPal/PayPal/req_api_countries.txt')) {
-                foreach (file(OSCOM::BASE_DIR . 'Apps/PayPal/PayPal/req_api_countries.txt') as $c) {
-                    $c = trim($c);
-
-                    if (!empty($c)) {
-                        $countries[] = $c;
-                    }
-                }
-            }
-        }
-
-        return $countries;
-    }
-
     public function log($module, $action, $result, $request, $response, $server, $is_ipn = false)
     {
         $do_log = false;
