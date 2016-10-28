@@ -18,31 +18,6 @@
     var $_identifier = 'osCommerce_PPapp_v5';
     var $_definitions = array();
 
-    function isReqApiCountrySupported($country_id) {
-      $country_query = tep_db_query("select countries_iso_code_2 from " . TABLE_COUNTRIES . " where countries_id = '" . (int)$country_id . "'");
-      $country = tep_db_fetch_array($country_query);
-
-      return in_array($country['countries_iso_code_2'], $this->getReqApiCountries());
-    }
-
-    function getReqApiCountries() {
-      static $countries;
-
-      if ( !isset($countries) ) {
-        $countries = array();
-
-        foreach ( file(DIR_FS_CATALOG . 'includes/apps/paypal/req_api_countries.txt') as $c ) {
-          $c = trim($c);
-
-          if ( !empty($c) ) {
-            $countries[]= $c;
-          }
-        }
-      }
-
-      return $countries;
-    }
-
     function log($module, $action, $result, $request, $response, $server, $is_ipn = false) {
       global $customer_id;
 
