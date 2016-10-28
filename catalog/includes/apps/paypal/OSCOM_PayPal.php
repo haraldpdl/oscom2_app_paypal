@@ -15,6 +15,7 @@
     var $_title = 'PayPal App';
     var $_version;
     var $_api_version = '204';
+    var $_identifier = 'osCommerce_PPapp_v5';
     var $_definitions = array();
 
     function isReqApiCountrySupported($country_id) {
@@ -647,6 +648,10 @@
 
     function getApiVersion() {
       return $this->_api_version;
+    }
+
+    function getIdentifier() {
+      return $this->_identifier;
     }
 
     function hasAlert() {
