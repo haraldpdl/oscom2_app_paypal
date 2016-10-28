@@ -22,7 +22,7 @@ class PayflowPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
             'TENDER' => 'C',
             'TRXTYPE' => (OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD == '1') ? 'S' : 'A',
             'CUSTIP' => tep_get_ip_address(),
-            'BUTTONSOURCE' => 'OSCOM24_DP'
+            'BUTTONSOURCE' => $this->app->getIdentifier()
         ];
 
         if (!empty($extra_params)) {

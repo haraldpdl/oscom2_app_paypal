@@ -15,7 +15,7 @@ class DoExpressCheckoutPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
         $params = [
             'METHOD' => 'DoExpressCheckoutPayment',
             'PAYMENTREQUEST_0_PAYMENTACTION' => ((OSCOM_APP_PAYPAL_EC_TRANSACTION_METHOD == '1') || !$this->app->hasCredentials('EC') ? 'Sale' : 'Authorization'),
-            'BUTTONSOURCE' => 'OSCOM24_EC'
+            'BUTTONSOURCE' => $this->app->getIdentifier()
         ];
 
         if ($this->app->hasCredentials('EC')) {

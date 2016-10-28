@@ -23,7 +23,7 @@ class BMCreateButton extends \OSC\Apps\PayPal\PayPal\APIAbstract
 
         $l_params = [
             'business' => $this->app->getCredentials('HS', 'email'),
-            'bn' => 'OSCOM24_HS'
+            'bn' => $this->app->getIdentifier()
         ];
 
         if (!empty($extra_params)) {

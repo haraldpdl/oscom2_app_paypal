@@ -352,7 +352,7 @@
                           'rm' => '2',
                           'return' => OSCOM::link('checkout_process.php'),
                           'cancel_return' => OSCOM::link('checkout_payment.php'),
-                          'bn' => 'OSCOM24_PS',
+                          'bn' => $this->app->getIdentifier(),
                           'paymentaction' => (OSCOM_APP_PAYPAL_PS_TRANSACTION_METHOD == '1') ? 'sale' : 'authorization');
 
       $return_link_title = $this->app->getDef('module_ps_button_return_to_store', [

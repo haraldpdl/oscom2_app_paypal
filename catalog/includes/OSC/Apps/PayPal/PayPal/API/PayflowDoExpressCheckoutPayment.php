@@ -22,7 +22,7 @@ class PayflowDoExpressCheckoutPayment extends \OSC\Apps\PayPal\PayPal\APIAbstrac
             'TENDER' => 'P',
             'TRXTYPE' => (OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD == '1') ? 'S' : 'A',
             'ACTION' => 'D',
-            'BUTTONSOURCE' => 'OSCOM24_ECPF'
+            'BUTTONSOURCE' => $this->app->getIdentifier()
         ];
 
         if (!empty($extra_params)) {

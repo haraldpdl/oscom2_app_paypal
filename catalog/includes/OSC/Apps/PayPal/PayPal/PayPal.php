@@ -16,6 +16,7 @@ use OSC\OM\Registry;
 class PayPal extends \OSC\OM\AppAbstract
 {
     protected $api_version = 204;
+    protected $identifier = 'osCommerce_PPapp_v5';
 
     protected function init()
     {
@@ -343,6 +344,11 @@ class PayPal extends \OSC\OM\AppAbstract
     public function getApiVersion()
     {
         return $this->api_version;
+    }
+
+    public function getIdentifier()
+    {
+        return $this->identifier;
     }
 
     function logUpdate($message, $version) {
