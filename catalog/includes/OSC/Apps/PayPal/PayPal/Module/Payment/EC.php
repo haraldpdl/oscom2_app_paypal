@@ -156,6 +156,8 @@
           $merchant_id = (OSCOM_APP_PAYPAL_EC_STATUS === '1') ? OSCOM_APP_PAYPAL_LIVE_MERCHANT_ID : OSCOM_APP_PAYPAL_SANDBOX_MERCHANT_ID;
           if (empty($merchant_id)) $merchant_id = ' ';
 
+          $server = (OSCOM_APP_PAYPAL_EC_STATUS === '1') ? 'production' : 'sandbox';
+
           $ppecset_url = OSCOM::link('index.php', 'order&callback&paypal&ec&format=json');
 
           switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_COLOR) {
@@ -204,7 +206,7 @@
 <script>
 window.paypalCheckoutReady = function () {
   paypal.checkout.setup('${merchant_id}', {
-    environment: 'sandbox',
+    environment: '{$server}',
     buttons: [
       {
         container: 'ppECButton',
