@@ -280,16 +280,8 @@ class PayPal extends \OSC\OM\AppAbstract
             'headers' => $headers
         ];
 
-        if (defined('OSCOM_APP_PAYPAL_VERIFY_SSL') && (OSCOM_APP_PAYPAL_VERIFY_SSL == '1')) {
-            $p['verify_ssl'] = true;
-        }
-
         if ((substr($server['host'], -10) == 'paypal.com')) {
             $p['cafile'] = OSCOM::BASE_DIR . 'Apps/PayPal/PayPal/paypal.com.crt';
-        }
-
-        if (defined('OSCOM_APP_PAYPAL_PROXY')) {
-            $p['proxy'] = OSCOM_APP_PAYPAL_PROXY;
         }
 
         return HTTP::getResponse($p);

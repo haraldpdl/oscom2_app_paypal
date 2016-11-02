@@ -264,32 +264,24 @@ class EC extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_EXPRESS_VERIFY_SSL')) {
-            if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_EXPRESS_VERIFY_SSL == 'True') ? '1' : '0');
-            }
-
             $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_EXPRESS_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_VERIFY_SSL')) {
-            if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_VERIFY_SSL == 'True') ? '1' : '0');
-            }
-
             $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_VERIFY_SSL');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_EXPRESS_PROXY')) {
-            if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_EXPRESS_PROXY);
+            if (!empty(MODULE_PAYMENT_PAYPAL_EXPRESS_PROXY) && empty(OSCOM_HTTP_PROXY)) {
+                $this->app->saveCfgParam('OSCOM_HTTP_PROXY', MODULE_PAYMENT_PAYPAL_EXPRESS_PROXY);
             }
 
             $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_EXPRESS_PROXY');
         }
 
         if (defined('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_PROXY')) {
-            if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_PROXY);
+            if (!empty(MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_PROXY) && empty(OSCOM_HTTP_PROXY)) {
+                $this->app->saveCfgParam('OSCOM_HTTP_PROXY', MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_PROXY);
             }
 
             $this->app->deleteCfgParam('MODULE_PAYMENT_PAYPAL_PRO_PAYFLOW_EC_PROXY');

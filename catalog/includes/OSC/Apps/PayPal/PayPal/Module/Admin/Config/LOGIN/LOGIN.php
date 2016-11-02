@@ -150,16 +150,12 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL')) {
-            if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', (MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL == 'True') ? '1' : '0');
-            }
-
             $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_VERIFY_SSL');
         }
 
         if (defined('MODULE_CONTENT_PAYPAL_LOGIN_PROXY')) {
-            if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-                $this->app->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', MODULE_CONTENT_PAYPAL_LOGIN_PROXY);
+            if (!empty(MODULE_CONTENT_PAYPAL_LOGIN_PROXY) && empty(OSCOM_HTTP_PROXY)) {
+                $this->app->saveCfgParam('OSCOM_HTTP_PROXY', MODULE_CONTENT_PAYPAL_LOGIN_PROXY);
             }
 
             $this->app->deleteCfgParam('MODULE_CONTENT_PAYPAL_LOGIN_PROXY');

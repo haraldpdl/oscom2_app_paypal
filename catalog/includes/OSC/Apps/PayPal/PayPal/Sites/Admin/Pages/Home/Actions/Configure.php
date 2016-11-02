@@ -62,14 +62,6 @@ class Configure extends \OSC\OM\PagesActionsAbstract
             $OSCOM_PayPal->saveCfgParam('OSCOM_APP_PAYPAL_TRANSACTIONS_ORDER_STATUS_ID', $status_id);
         }
 
-        if (!defined('OSCOM_APP_PAYPAL_VERIFY_SSL')) {
-            $OSCOM_PayPal->saveCfgParam('OSCOM_APP_PAYPAL_VERIFY_SSL', '1');
-        }
-
-        if (!defined('OSCOM_APP_PAYPAL_PROXY')) {
-            $OSCOM_PayPal->saveCfgParam('OSCOM_APP_PAYPAL_PROXY', '');
-        }
-
         if (!defined('OSCOM_APP_PAYPAL_GATEWAY')) {
             $OSCOM_PayPal->saveCfgParam('OSCOM_APP_PAYPAL_GATEWAY', '1');
         }
