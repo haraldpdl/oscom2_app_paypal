@@ -9,6 +9,7 @@
 namespace OSC\Apps\PayPal\PayPal\Sites\Shop\Pages\PS;
 
 use OSC\OM\HTML;
+use OSC\OM\Mail;
 use OSC\OM\OSCOM;
 use OSC\OM\Registry;
 
@@ -257,11 +258,15 @@ class PS extends \OSC\OM\PagesAbstract
                         $email_order .= $this->pm->email_footer . "\n\n";
                     }
 
-                    tep_mail($order->customer['name'], $order->customer['email_address'], EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
+                    $orderEmail = new Mail($order->customer['email_address'], $order->customer['name'], STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, EMAIL_TEXT_SUBJECT);
+                    $orderEmail->setBody($email_order);
+                    $orderEmail->send();
 
 // send emails to other people
                     if (SEND_EXTRA_ORDER_EMAILS_TO != '') {
-                        tep_mail('', SEND_EXTRA_ORDER_EMAILS_TO, EMAIL_TEXT_SUBJECT, $email_order, STORE_OWNER, STORE_OWNER_EMAIL_ADDRESS);
+                        $extraEmail = new Mail(SEND_EXTRA_ORDER_EMAILS_TO, null, STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, EMAIL_TEXT_SUBJECT);
+                        $extraEmail->setBody($email_order);
+                        $extraEmail->send();
                     }
 
                     $this->pm->app->db->delete('customers_basket', [

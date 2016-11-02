@@ -8,6 +8,8 @@
 
 namespace OSC\Apps\PayPal\PayPal\API;
 
+use OSC\OM\HTTP;
+
 class DoDirectPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
 {
     public function execute(array $extra_params = null)
@@ -18,7 +20,7 @@ class DoDirectPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
           'SIGNATURE' => $this->app->getCredentials('DP', 'signature'),
           'METHOD' => 'DoDirectPayment',
           'PAYMENTACTION' => (OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD == '1') ? 'Sale' : 'Authorization',
-          'IPADDRESS' => tep_get_ip_address(),
+          'IPADDRESS' => HTTP::getIpAddress(),
           'BUTTONSOURCE' => $this->app->getIdentifier()
         ];
 

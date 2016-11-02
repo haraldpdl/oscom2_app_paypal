@@ -8,6 +8,8 @@
 
 namespace OSC\Apps\PayPal\PayPal\API;
 
+use OSC\OM\HTTP;
+
 class PayflowPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
 {
     protected $type = 'payflow';
@@ -21,7 +23,7 @@ class PayflowPayment extends \OSC\Apps\PayPal\PayPal\APIAbstract
             'PWD' => $this->app->getCredentials('DP', 'payflow_password'),
             'TENDER' => 'C',
             'TRXTYPE' => (OSCOM_APP_PAYPAL_DP_TRANSACTION_METHOD == '1') ? 'S' : 'A',
-            'CUSTIP' => tep_get_ip_address(),
+            'CUSTIP' => HTTP::getIpAddress(),
             'BUTTONSOURCE' => $this->app->getIdentifier()
         ];
 

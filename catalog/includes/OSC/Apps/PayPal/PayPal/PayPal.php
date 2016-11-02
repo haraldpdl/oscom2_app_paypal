@@ -78,7 +78,7 @@ class PayPal extends \OSC\OM\AppAbstract
             'server' => ($server == 'live') ? 1 : -1,
             'request' => trim($request_string),
             'response' => trim($response_string),
-            'ip_address' => sprintf('%u', ip2long(tep_get_ip_address())),
+            'ip_address' => HTTP::getIpAddress(true),
             'date_added' => 'now()'
         ]);
     }
