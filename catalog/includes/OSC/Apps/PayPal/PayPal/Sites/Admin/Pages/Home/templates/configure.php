@@ -55,7 +55,7 @@ $(function() {
 <?php
 if ($OSCOM_PayPal_Config->is_installed === true) {
     foreach ($OSCOM_PayPal_Config->req_notes as $rn) {
-        echo '<div class="pp-panel pp-panel-warning"><p>' . $rn . '</p></div>';
+        echo '<div class="alert alert-warning"><p>' . $rn . '</p></div>';
     }
 ?>
 
