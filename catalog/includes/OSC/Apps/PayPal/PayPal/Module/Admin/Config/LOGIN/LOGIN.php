@@ -34,6 +34,10 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             if (((OSCOM_APP_PAYPAL_LOGIN_STATUS == '1') && (!tep_not_null(OSCOM_APP_PAYPAL_LOGIN_LIVE_CLIENT_ID) || !tep_not_null(OSCOM_APP_PAYPAL_LOGIN_LIVE_SECRET))) || ((OSCOM_APP_PAYPAL_LOGIN_STATUS == '0') && (!tep_not_null(OSCOM_APP_PAYPAL_LOGIN_SANDBOX_CLIENT_ID) || !tep_not_null(OSCOM_APP_PAYPAL_LOGIN_SANDBOX_SECRET)))) {
                 $this->req_notes[] = $this->app->getDef('module_login_error_credentials');
             }
+
+            $this->req_notes[] = $this->app->getDef('module_login_notice_paypal_app_return_url', [
+                'return_url' => OSCOM::link('Shop/index.php', 'Account&LogIn&action=paypal_login', false)
+            ]);
         }
     }
 
