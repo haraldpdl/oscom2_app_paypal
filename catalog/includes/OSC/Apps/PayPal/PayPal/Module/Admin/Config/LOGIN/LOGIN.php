@@ -36,7 +36,7 @@ class LOGIN extends \OSC\Apps\PayPal\PayPal\Module\Admin\Config\ConfigAbstract
             }
 
             $this->req_notes[] = $this->app->getDef('module_login_notice_paypal_app_return_url', [
-                'return_url' => OSCOM::link('Shop/index.php', 'Account&LogIn&action=paypal_login', false)
+                'return_url' => OSCOM::link('Shop/login.php', 'action=paypal_login', false)
             ]);
         }
     }
