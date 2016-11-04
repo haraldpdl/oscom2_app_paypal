@@ -2,6 +2,20 @@
 
 ## Changelog
 
+**v5.000 03-Nov-2016**
+
+* Use PayPal API 204.
+
+* Add Merchant Account ID field to Manage Credentials page.
+
+* PayPal Express Checkout: Enable In-Context checkout flow by default.
+
+* PayPal Express Checkout: Add configuration parameters to control Checkout with PayPal button color, shape, and size.
+
+* Remove country restrictions for API Retrieval service.
+
+* General improvements and bugfixes.
+
 **v4.039 09-Dec-2014**
 
 * Initial public release.
