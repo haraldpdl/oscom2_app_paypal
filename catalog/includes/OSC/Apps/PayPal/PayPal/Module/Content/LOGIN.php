@@ -98,13 +98,13 @@
     }
 
     function preLogin() {
-      $return_url = OSCOM::link('index.php', 'Account&LogIn');
+      $return_url = OSCOM::link('login.php');
 
       if ( isset($_GET['code']) ) {
         $_SESSION['paypal_login_customer_id'] = false;
 
         $params = array('code' => $_GET['code'],
-                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('index.php', 'Account&LogIn&action=paypal_login')));
+                        'redirect_uri' => str_replace('&amp;', '&', OSCOM::link('login.php', 'action=paypal_login')));
 
         $response_token = $this->app->getApiResult('LOGIN', 'GrantToken', $params);
 
@@ -237,7 +237,7 @@
 
             $_SESSION['billto'] = $_SESSION['sendto'];
 
-            $return_url = OSCOM::link('index.php', 'Account&LogIn&action=paypal_login_process');
+            $return_url = OSCOM::link('login.php', 'action=paypal_login_process');
           }
         }
       }

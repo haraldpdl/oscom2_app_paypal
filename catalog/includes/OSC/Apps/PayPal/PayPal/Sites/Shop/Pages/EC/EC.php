@@ -469,7 +469,7 @@ class EC extends \OSC\OM\PagesAbstract
                     $this->file = 'login_redirect.php';
 
                     $this->data = [
-                        'login_url' => OSCOM::link('index.php', 'Account&LogIn'),
+                        'login_url' => OSCOM::link('login.php'),
                         'email_address' => $email_address
                     ];
 
