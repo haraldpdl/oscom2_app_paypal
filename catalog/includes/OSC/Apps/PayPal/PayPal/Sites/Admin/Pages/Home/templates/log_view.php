@@ -1,11 +1,4 @@
 <?php
-/**
-  * osCommerce Online Merchant
-  *
-  * @copyright Copyright (c) 2015 osCommerce; http://www.oscommerce.com
-  * @license GPL; http://www.oscommerce.com/gpllicense.txt
-  */
-
 use OSC\OM\HTML;
 use OSC\OM\Registry;
 
