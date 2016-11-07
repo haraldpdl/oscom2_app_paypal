@@ -1,5 +1,6 @@
 <?php
 use OSC\OM\HTML;
+use OSC\OM\OSCOM;
 
 require(__DIR__ . '/template_top.php');
 
@@ -43,7 +44,7 @@ if ($Qlog->getPageSetTotalRows() > 0) {
       <td><?= $Qlog->value('action'); ?></td>
       <td><?= long2ip($Qlog->value('ip_address')); ?></td>
       <td><?= (!empty($customers_name)) ? HTML::outputProtected($customers_name) : '<i>' . $OSCOM_PayPal->getDef('guest') . '</i>'; ?></td>
-      <td class="text-right"><?= date(PHP_DATE_TIME_FORMAT, $Qlog->value('date_added')); ?></td>
+      <td class="text-right"><?= date(OSCOM::getDef('php_date_time_format'), $Qlog->value('date_added')); ?></td>
       <td class="action"><a href="<?= $OSCOM_PayPal->link('Log&View&page=' . (isset($_GET['page']) ? $_GET['page'] : 1) . '&lID=' . $Qlog->valueInt('id')); ?>"><i class="fa fa-file-text-o" title="<?= $OSCOM_PayPal->getDef('button_view'); ?>"></i></a></td>
     </tr>
 
