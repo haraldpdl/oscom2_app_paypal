@@ -66,7 +66,7 @@ if ($Qlog->getPageSetTotalRows() > 0) {
 
 <div>
   <span class="pull-right"><?= $Qlog->getPageSetLinks(tep_get_all_get_params(array('page'))); ?></span>
-  <span><?= $Qlog->getPageSetLabel($OSCOM_PayPal->getDef('listing_number_of_log_entries')); ?></span>
+  <?= $Qlog->getPageSetLabel($OSCOM_PayPal->getDef('listing_number_of_log_entries')); ?>
 </div>
 
 <div id="delLogs-dialog-confirm" class="modal" tabindex="-1" role="dialog">
