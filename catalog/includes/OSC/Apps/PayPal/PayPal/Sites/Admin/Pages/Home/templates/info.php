@@ -42,8 +42,6 @@ require(__DIR__ . '/template_top.php');
 
 <script>
 $(function() {
-  OSCOM.APP.PAYPAL.versionCheck();
-
   $.getJSON('<?php echo addslashes($OSCOM_PayPal->link('RPC&GetNews')); ?>', function (data) {
     if ( (typeof data == 'object') && ('rpcStatus' in data) && (data['rpcStatus'] == 1) ) {
       var ppNewsContent = '<div style="display: block; margin-top: 5px; min-height: 65px;"><a href="' + data.url + '" target="_blank"><img src="' + data.image + '" width="468" height="60" alt="' + data.title + '" border="0" /></a>';
