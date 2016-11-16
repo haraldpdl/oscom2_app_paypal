@@ -543,42 +543,42 @@ EOD;
 
 // lets start with the email confirmation
       $email_order = STORE_NAME . "\n" .
-                     EMAIL_SEPARATOR . "\n" .
-                     EMAIL_TEXT_ORDER_NUMBER . ' ' . $order_id . "\n" .
-                     EMAIL_TEXT_INVOICE_URL . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, false) . "\n" .
-                     EMAIL_TEXT_DATE_ORDERED . ' ' . strftime(DATE_FORMAT_LONG) . "\n\n";
+                     OSCOM::getDef('email_separator') . "\n" .
+                     OSCOM::getDef('email_text_order_number') . ' ' . $order_id . "\n" .
+                     OSCOM::getDef('email_text_invoice_url') . ' ' . OSCOM::link('account_history_info.php', 'order_id=' . $order_id, false) . "\n" .
+                     OSCOM::getDef('email_text_date_ordered') . ' ' . strftime(OSCOM::getDef('date_format_long')) . "\n\n";
       if ($order->info['comments']) {
         $email_order .= HTML::outputProtected($order->info['comments']) . "\n\n";
       }
-      $email_order .= EMAIL_TEXT_PRODUCTS . "\n" .
-                      EMAIL_SEPARATOR . "\n" .
+      $email_order .= OSCOM::getDef('email_text_products') . "\n" .
+                      OSCOM::getDef('email_separator') . "\n" .
                       $products_ordered .
-                      EMAIL_SEPARATOR . "\n";
+                      OSCOM::getDef('email_separator') . "\n";
 
       for ($i=0, $n=sizeof($order_totals); $i<$n; $i++) {
         $email_order .= strip_tags($order_totals[$i]['title']) . ' ' . strip_tags($order_totals[$i]['text']) . "\n";
       }
 
       if ($order->content_type != 'virtual') {
-        $email_order .= "\n" . EMAIL_TEXT_DELIVERY_ADDRESS . "\n" .
-                        EMAIL_SEPARATOR . "\n" .
+        $email_order .= "\n" . OSCOM::getDef('email_text_delivery_address') . "\n" .
+                        OSCOM::getDef('email_separator') . "\n" .
                         tep_address_label($_SESSION['customer_id'], $_SESSION['sendto'], 0, '', "\n") . "\n";
       }
 
-      $email_order .= "\n" . EMAIL_TEXT_BILLING_ADDRESS . "\n" .
-                      EMAIL_SEPARATOR . "\n" .
+      $email_order .= "\n" . OSCOM::getDef('email_text_billing_address') . "\n" .
+                      OSCOM::getDef('email_separator') . "\n" .
                       tep_address_label($_SESSION['customer_id'], $_SESSION['billto'], 0, '', "\n") . "\n\n" .
-                      EMAIL_TEXT_PAYMENT_METHOD . "\n" .
-                      EMAIL_SEPARATOR . "\n" .
+                      OSCOM::getDef('email_text_payment_method') . "\n" .
+                      OSCOM::getDef('email_separator') . "\n" .
                       $this->public_title . "\n\n";
 
-      $orderEmail = new Mail($order->customer['email_address'], $order->customer['firstname'] . ' ' . $order->customer['lastname'], STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, EMAIL_TEXT_SUBJECT);
+      $orderEmail = new Mail($order->customer['email_address'], $order->customer['firstname'] . ' ' . $order->customer['lastname'], STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, OSCOM::getDef('email_text_subject'));
       $orderEmail->setBody($email_order);
       $orderEmail->send();
 
 // send emails to other people
       if (SEND_EXTRA_ORDER_EMAILS_TO != '') {
-        $extraEmail = new Mail(SEND_EXTRA_ORDER_EMAILS_TO, null, STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, EMAIL_TEXT_SUBJECT);
+        $extraEmail = new Mail(SEND_EXTRA_ORDER_EMAILS_TO, null, STORE_OWNER_EMAIL_ADDRESS, STORE_OWNER, OSCOM::getDef('email_text_subject'));
         $extraEmail->setBody($email_order);
         $extraEmail->send();
       }
