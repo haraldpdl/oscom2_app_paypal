@@ -37,7 +37,7 @@ foreach ($OSCOM_PayPal->getConfigModules() as $m) {
 </ul>
 
 <script>
-if ($('#appPayPalToolbar li.dropdown ul.dropdown-menu li').size() === 0) {
+if ($('#appPayPalToolbar li.dropdown ul.dropdown-menu li').length === 0) {
   $('#appPayPalToolbar li.dropdown').hide();
 }
 
