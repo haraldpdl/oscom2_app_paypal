@@ -2,6 +2,10 @@
 
 ## Changelog
 
+**v5.001 19-Feb-2017**
+
+* Fix getIdentifier() usage in the PayPal Payments Standard module.
+
 **v5.000 03-Nov-2016**
 
 * Use PayPal API 204.
