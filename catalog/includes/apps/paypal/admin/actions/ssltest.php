@@ -18,7 +18,7 @@
     'curl_ssl_version' => isset($curl_info['ssl_version']) ? $curl_info['ssl_version'] : ''
   );
 
-  $test = $OSCOM_PayPal->makeApiCall('https://tlstest.paypal.com', null, null, array('returnFull' => true));
+  $test = $OSCOM_PayPal->makeApiCall('https://tlstest.paypal.com', null, null, array('returnFull' => true, 'sslVersion' => 0));
 
   $result['default'] = (isset($test['info']['http_code']) && ((int)$test['info']['http_code'] === 200));
 
