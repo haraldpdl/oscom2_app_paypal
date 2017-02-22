@@ -355,7 +355,6 @@
                           'currency_code' => $currency,
                           'invoice' => substr($cart_PayPal_Standard_ID, strpos($cart_PayPal_Standard_ID, '-')+1),
                           'custom' => $customer_id,
-                          'no_note' => '1',
                           'notify_url' => tep_href_link('ext/modules/payment/paypal/standard_ipn.php', (isset($ipn_language) ? 'language=' . $ipn_language : ''), 'SSL', false, false),
                           'rm' => '2',
                           'return' => tep_href_link(FILENAME_CHECKOUT_PROCESS, '', 'SSL'),
@@ -387,10 +386,6 @@
         $parameters['state'] = tep_get_zone_code($order->billing['country']['id'], $order->billing['zone_id'], $order->billing['state']);
         $parameters['zip'] = $order->billing['postcode'];
         $parameters['country'] = $order->billing['country']['iso_code_2'];
-      }
-
-      if (tep_not_null(OSCOM_APP_PAYPAL_PS_PAGE_STYLE)) {
-        $parameters['page_style'] = OSCOM_APP_PAYPAL_PS_PAGE_STYLE;
       }
 
       $item_params = array();
