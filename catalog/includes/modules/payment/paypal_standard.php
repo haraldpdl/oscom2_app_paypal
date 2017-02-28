@@ -381,6 +381,7 @@
         $parameters['first_name'] = $order->delivery['firstname'];
         $parameters['last_name'] = $order->delivery['lastname'];
         $parameters['address1'] = $order->delivery['street_address'];
+        $parameters['address2'] = $order->delivery['suburb'];
         $parameters['city'] = $order->delivery['city'];
         $parameters['state'] = tep_get_zone_code($order->delivery['country']['id'], $order->delivery['zone_id'], $order->delivery['state']);
         $parameters['zip'] = $order->delivery['postcode'];
@@ -390,6 +391,7 @@
         $parameters['first_name'] = $order->billing['firstname'];
         $parameters['last_name'] = $order->billing['lastname'];
         $parameters['address1'] = $order->billing['street_address'];
+        $parameters['address2'] = $order->billing['suburb'];
         $parameters['city'] = $order->billing['city'];
         $parameters['state'] = tep_get_zone_code($order->billing['country']['id'], $order->billing['zone_id'], $order->billing['state']);
         $parameters['zip'] = $order->billing['postcode'];
