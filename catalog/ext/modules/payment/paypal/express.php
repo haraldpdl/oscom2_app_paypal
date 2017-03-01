@@ -689,11 +689,9 @@ EOD;
 
       if ( OSCOM_APP_PAYPAL_GATEWAY == '1' ) { // PayPal
         $params['PAYMENTREQUEST_0_CURRENCYCODE'] = $order->info['currency'];
-        $params['ALLOWNOTE'] = '0';
       } else { // Payflow
         $params['CURRENCY'] = $order->info['currency'];
         $params['EMAIL'] = $order->customer['email_address'];
-        $params['ALLOWNOTE'] = '0';
 
         $params['BILLTOFIRSTNAME'] = $order->billing['firstname'];
         $params['BILLTOLASTNAME'] = $order->billing['lastname'];
@@ -965,10 +963,6 @@ EOD;
         if ( $paypal_express->_app->formatCurrencyRaw($paypal_item_total) == $params['AMT'] ) {
           $params = array_merge($params, $item_params);
         }
-      }
-
-      if ( tep_not_null(OSCOM_APP_PAYPAL_EC_PAGE_STYLE) && (OSCOM_APP_PAYPAL_EC_CHECKOUT_FLOW == '0') ) {
-        $params['PAGESTYLE'] = OSCOM_APP_PAYPAL_EC_PAGE_STYLE;
       }
 
       $appPayPalEcSecret = tep_create_random_value(16, 'digits');
