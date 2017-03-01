@@ -1,6 +1,24 @@
-# PayPal App for osCommerce Online Merchant v2.x
+# PayPal App for osCommerce Online Merchant v2.3.x
 
 ## Changelog
+
+**v5.010 01-Mar-2017**
+
+* Add new general App parameter to test and use the default server configured SSL version when performing API requests to PayPals servers or force TLS v1.2 connections. (TLS v1.2 connections are required from June 30, 2017)
+
+* Use the customer address suburb value as the street2 parameter value for Payments Standard, Express Checkout, Direct Payment, and Hosted Solution.
+
+* Payments Standard: If "receiver_email" is not returned back to the store, fallback to "business" to verify the transaction with.
+
+* Payments Standard: Disable the module if the App API Credentials or module PDT configuration parameters have not been entered. Either is now required to be able to verify the transaction when the customer returns back to the store after payment is made.
+
+* Payments Standard: Strip extra slashes that were being logged.
+
+* Payments Standard: Remove deprecated NO_NOTE and PAGE_STYLE parameters. (deprecated Sept. 2016)
+
+* Express Checkout: Remove deprecated ALLOWNOTE and PAGESTYLE parameters. (deprecated Sept. 2016)
+
+* Update osCommerce links from http to https.
 
 **v5.001 19-Feb-2017**
 

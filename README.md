@@ -1,6 +1,6 @@
-# PayPal App for osCommerce Online Merchant v2.x
+# PayPal App for osCommerce Online Merchant v2.3.x
 
-This is the base file-set of the PayPal App to be copied to an existing osCommerce Online Merchant v2.x installation.
+This is the base file-set of the PayPal App to be copied to an existing osCommerce Online Merchant v2.3.x installation.
 
 The PayPal App is bundled in and optimized for osCommerce Online Merchant v2.3.5 onwards.
 
