@@ -17,7 +17,7 @@
     exit;
   }
 
-  require(DIR_WS_LANGUAGES . $language . '/modules/payment/paypal_pro_hs.php');
+  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/modules/payment/paypal_pro_hs.php');
   require('includes/modules/payment/paypal_pro_hs.php');
 
   $result = false;
