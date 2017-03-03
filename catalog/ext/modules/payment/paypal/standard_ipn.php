@@ -17,12 +17,11 @@
     exit;
   }
 
-  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/' . FILENAME_CHECKOUT_PROCESS);
-
-  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/modules/payment/paypal_standard.php');
   require('includes/modules/payment/paypal_standard.php');
 
   $paypal_standard = new paypal_standard();
+
+  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/' . FILENAME_CHECKOUT_PROCESS);
 
   $result = false;
 

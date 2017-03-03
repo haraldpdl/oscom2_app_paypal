@@ -13,8 +13,6 @@
   chdir('../../../../');
   require('includes/application_top.php');
 
-  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/' . FILENAME_CREATE_ACCOUNT);
-
 // initialize variables if the customer is not logged in
   if ( !tep_session_is_registered('customer_id') ) {
     $customer_id = 0;
@@ -27,6 +25,8 @@
   if ( !$paypal_express->check() || !$paypal_express->enabled ) {
     tep_redirect(tep_href_link(FILENAME_SHOPPING_CART, '', 'SSL'));
   }
+
+  require(DIR_FS_CATALOG . 'includes/languages/' . $language . '/' . FILENAME_CREATE_ACCOUNT);
 
   if ( !tep_session_is_registered('sendto') ) {
     if ( tep_session_is_registered('customer_id') ) {

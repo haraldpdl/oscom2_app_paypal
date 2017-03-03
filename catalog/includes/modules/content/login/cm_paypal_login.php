@@ -5,7 +5,7 @@
   osCommerce, Open Source E-Commerce Solutions
   http://www.oscommerce.com
 
-  Copyright (c) 2014 osCommerce
+  Copyright (c) 2017 osCommerce
 
   Released under the GNU General Public License
 */
@@ -277,7 +277,6 @@
         if (defined('MODULE_PAYMENT_INSTALLED') && tep_not_null(MODULE_PAYMENT_INSTALLED)) {
           if ( in_array('paypal_express.php', explode(';', MODULE_PAYMENT_INSTALLED)) ) {
             if ( !class_exists('paypal_express') ) {
-              include(DIR_FS_CATALOG . 'includes/languages/' . $language . '/modules/payment/paypal_express.php');
               include(DIR_FS_CATALOG . 'includes/modules/payment/paypal_express.php');
             }
 
