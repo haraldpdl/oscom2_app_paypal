@@ -10,18 +10,6 @@
   Released under the GNU General Public License
 */
 
-if (!isset($HTTP_GET_VARS)) {
-  $HTTP_GET_VARS =& $_GET;
-}
-
-if (!isset($HTTP_POST_VARS)) {
-  $HTTP_POST_VARS =& $_POST;
-}
-
-if (!isset($HTTP_SERVER_VARS)) {
-  $HTTP_SERVER_VARS =& $_SERVER;
-}
-
 if (!defined('FILENAME_ACCOUNT_HISTORY_INFO')) {
   define('FILENAME_ACCOUNT_HISTORY_INFO', 'account_history_info.php');
 }
