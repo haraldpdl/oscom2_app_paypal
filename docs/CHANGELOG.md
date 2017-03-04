@@ -2,6 +2,10 @@
 
 ## Changelog
 
+**v5.011 04-Mar-2017**
+
+* Added compatibility layer for v2.3.4 BS Community Edition.
+
 **v5.010 01-Mar-2017**
 
 * Add new general App parameter to test and use the default server configured SSL version when performing API requests to PayPals servers or force TLS v1.2 connections. (TLS v1.2 connections are required from June 30, 2017)
