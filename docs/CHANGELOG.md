@@ -2,6 +2,14 @@
 
 ## Changelog
 
+**v5.014 05-Mar-2017**
+
+* Express Checkout: Update checkout.js javascript to v4.
+
+* Display EC requirement notice on the DP configuration page if EC is not enabled.
+
+* Always show the View button on the PayPal App Log page.
+
 **v5.011 04-Mar-2017**
 
 * Added compatibility layer for v2.3.4 BS Community Edition.
