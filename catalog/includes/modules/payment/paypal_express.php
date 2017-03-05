@@ -160,6 +160,8 @@
 
           $ppecset_url = tep_href_link('ext/modules/payment/paypal/express.php', 'format=json', 'SSL');
 
+          $ppecerror_url = tep_href_link('ext/modules/payment/paypal/express.php', 'osC_Action=setECError', 'SSL');
+
           switch (OSCOM_APP_PAYPAL_EC_INCONTEXT_BUTTON_COLOR) {
             case '3':
               $button_color = 'silver';
@@ -213,8 +215,18 @@ paypal.Button.render({
   },
   payment: function(resolve, reject) {
     paypal.request.post('${ppecset_url}')
-      .then(function(data) { resolve(data.token); })
-      .catch(function(err) { reject(err); });
+      .then(function(data) {
+        if ((data.token !== undefined) && (data.token.length > 0)) {
+          resolve(data.token);
+        } else {
+          window.location = '${ppecerror_url}';
+        }
+      })
+      .catch(function(err) {
+        reject(err);
+
+        window.location = '${ppecerror_url}';
+      });
   },
   onAuthorize: function(data, actions) {
     return actions.redirect();
