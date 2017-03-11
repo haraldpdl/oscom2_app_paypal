@@ -2,6 +2,14 @@
 
 ## Changelog
 
+**v5.016 11-Mar-2017**
+
+* Express Checkout: Pass the in-store selected shipping rate to the Instant Update Callback request and keep the shipping rate selected when the available shipping rates are displayed.
+
+* Express Checkout: If a shipping rate has been selected in-store (eg, the customer did not use the "PayPal Check out" button on the shopping cart page but went through the in-store checkout procedure and selected Express Checkout as the payment method), keep the selected shipping rate when returning back to the store checkout confirmation page.
+
+* The online update packages for v5.011 and v5.014 contained a hardcoded "admin/" path to update the "admin/paypal.php" file - if a custom administration directory name is used, please delete the "admin/" directory, this should only contain one "paypal.php" file which the v5.011 and v5.014 online update packages created.
+
 **v5.014 05-Mar-2017**
 
 * Express Checkout: Update checkout.js javascript to v4.
