@@ -2,6 +2,12 @@
 
 ## Changelog
 
+**v5.018 12-Mar-2017**
+
+* Express Checkout: Allow a custom stylesheet to be loaded to help with the styling and positioning of the checkout buttons shown on the shopping cart page.
+
+* Express Checkout: Add "id" to the checkout button html tags used on the shopping cart page.
+
 **v5.016 11-Mar-2017**
 
 * Express Checkout: Pass the in-store selected shipping rate to the Instant Update Callback request and keep the shipping rate selected when the available shipping rates are displayed.
